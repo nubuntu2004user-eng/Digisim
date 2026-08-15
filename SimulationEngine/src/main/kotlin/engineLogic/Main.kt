@@ -36,16 +36,28 @@ suspend fun parseSimulation(
     }
 }
 
-suspend fun computeSimulation(input : List<List<BasicComponent>>)= withContext(Dispatchers.Default){
-    val tickOutput = mutableListOf<Pin>()
+suspend fun computeSimulation(input : List<List<BasicComponent>> , state: SimulationState)= withContext(Dispatchers.Default){
+    val lastTickOutput = mutableListOf<Pin>()  //should be empty at on start
     for (tick in input){
+        if (lastTickOutput.isNotEmpty()){
         for (element in tick){
+            var currentInput = 0
+                element.inputs = lastTickOutput.subList(currentInput , currentInput + element.inputCount )
+
+
             element.output = element.evaluate()
-            tickOutput += element.output
+            lastTickOutput.clear()
+            lastTickOutput += element.output
         }
-        println(tickOutput)
-        tickOutput.clear()
+        }
+        else{
+            for (element in tick){
+            element.output = element.evaluate()
+            lastTickOutput += element.output
+        }
+        }
     }
+    state.outputs = lastTickOutput
 
 }
 

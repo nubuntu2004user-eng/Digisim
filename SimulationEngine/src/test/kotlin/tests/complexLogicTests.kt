@@ -15,6 +15,8 @@ import org.junit.Test
 
 
 class ComplexLogicTests {
+    val state = SimulationState()
+
 
     @Test
     fun testCircuitParsing() = runTest {
@@ -35,7 +37,6 @@ class ComplexLogicTests {
             )
         )
 
-        val state = SimulationState()
 
         // act
         parseSimulation(listOf(tick1, tick2), state)
@@ -57,7 +58,8 @@ class ComplexLogicTests {
                 Or("Test25", listOf(Pin.UNDEFINED, Pin.UNDEFINED), listOf(Pin.UNDEFINED) , 2)
             )
         )
-        computeSimulation(testInput)
+        computeSimulation(testInput , state)
+        assertEquals(listOf(Pin.HIGH) , state.outputs)
     }
 
 
