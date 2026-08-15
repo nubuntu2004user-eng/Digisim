@@ -1,6 +1,5 @@
 package tests
 
-import junit.framework.TestCase.assertEquals
 import logicGates.And
 import logicGates.Invertor
 import logicGates.Nand
@@ -8,7 +7,10 @@ import logicGates.Or
 import logicGates.Pin
 import logicGates.XNor
 import logicGates.Xor
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import engineLogic.simulationTick
+import junit.framework.TestCase.assertEquals
 
 
 class BasicComponentTests{
