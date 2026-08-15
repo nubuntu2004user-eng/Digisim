@@ -36,28 +36,35 @@ suspend fun parseSimulation(
     }
 }
 
-suspend fun computeSimulation(input : List<List<BasicComponent>> , state: SimulationState)= withContext(Dispatchers.Default){
-    val lastTickOutput = mutableListOf<Pin>()  //should be empty at on start
-    for (tick in input){
-        if (lastTickOutput.isNotEmpty()){
-        for (element in tick){
-            var currentInput = 0
-                element.inputs = lastTickOutput.subList(currentInput , currentInput + element.inputCount )
+suspend fun computeSimulation(
+    components : List<List<BasicComponent>>,
+    state: SimulationState,
+    input : MutableList<Pin>
+    )= withContext(Dispatchers.Default){
 
+    val lastTickOutput : MutableList<MutableList<Pin>> = mutableListOf()
+    lastTickOutput.add(input)
 
+    var currentInputIndex = 0
+    for (stage in components){
+        val tmp = mutableListOf<Pin>()
+        for (element in stage){
+
+            element.inputs = lastTickOutput.get(lastTickOutput.lastIndex).subList(currentInputIndex , currentInputIndex + element.inputCount)
+            currentInputIndex += element.inputCount
             element.output = element.evaluate()
-            lastTickOutput.clear()
-            lastTickOutput += element.output
+            tmp.addAll(element.output)
         }
-        }
-        else{
-            for (element in tick){
-            element.output = element.evaluate()
-            lastTickOutput += element.output
-        }
-        }
+        currentInputIndex = 0
+        lastTickOutput.add(tmp)
+
     }
-    state.outputs = lastTickOutput
+    state.outputs = lastTickOutput.get(lastTickOutput.lastIndex)
 
-}
+
+
+
+    }
+
+
 

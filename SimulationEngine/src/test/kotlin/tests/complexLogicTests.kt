@@ -58,10 +58,27 @@ class ComplexLogicTests {
                 Or("Test25", listOf(Pin.UNDEFINED, Pin.UNDEFINED), listOf(Pin.UNDEFINED) , 2)
             )
         )
-        computeSimulation(testInput , state)
+        computeSimulation(testInput , state , mutableListOf(Pin.HIGH , Pin.LOW , Pin.HIGH , Pin.HIGH))
         assertEquals(listOf(Pin.HIGH) , state.outputs)
     }
 
+//    @Test
+//    fun testComplexCircuit() = runTest {
+//        val testInput = listOf(
+//            listOf(
+//                And("Test23", listOf(Pin.HIGH, Pin.LOW), listOf(Pin.UNDEFINED) , 2),
+//                And("Test24", listOf(Pin.HIGH, Pin.HIGH), listOf(Pin.UNDEFINED) , 2)
+//            ),
+//            listOf(
+//                Or("Test25", listOf(Pin.UNDEFINED, Pin.UNDEFINED), listOf(Pin.UNDEFINED) , 2)
+//            )
+//        )
+//        computeSimulation(testInput , state)
+//        assertEquals(listOf(Pin.HIGH) , state.outputs)
+//    }
 
-}
+    }
+
+
+
 
