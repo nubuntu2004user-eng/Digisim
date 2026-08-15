@@ -1,6 +1,7 @@
 package tests
 
 import engineLogic.SimulationState
+import engineLogic.computeSimulation
 import engineLogic.parseSimulation
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
@@ -26,11 +27,11 @@ class ComplexLogicTests {
 
         val expected: List<List<BasicComponent>> = listOf(
             listOf(
-                And("Test23", listOf(Pin.HIGH, Pin.LOW), listOf(Pin.UNDEFINED)),
-                And("Test24", listOf(Pin.HIGH, Pin.HIGH), listOf(Pin.UNDEFINED))
+                And("Test23", listOf(Pin.HIGH, Pin.LOW), listOf(Pin.UNDEFINED) , 2),
+                And("Test24", listOf(Pin.HIGH, Pin.HIGH), listOf(Pin.UNDEFINED) , 2)
             ),
             listOf(
-                Or("Test25", listOf(Pin.UNDEFINED, Pin.UNDEFINED), listOf(Pin.UNDEFINED))
+                Or("Test25", listOf(Pin.UNDEFINED, Pin.UNDEFINED), listOf(Pin.UNDEFINED) , 2)
             )
         )
 
@@ -43,4 +44,22 @@ class ComplexLogicTests {
         assertEquals(2, state.CircuitData.size)
         assertEquals(expected, state.CircuitData)
     }
+
+
+    @Test
+    fun testComputing() = runTest {
+        val testInput = listOf(
+            listOf(
+                And("Test23", listOf(Pin.HIGH, Pin.LOW), listOf(Pin.UNDEFINED) , 2),
+                And("Test24", listOf(Pin.HIGH, Pin.HIGH), listOf(Pin.UNDEFINED) , 2)
+            ),
+            listOf(
+                Or("Test25", listOf(Pin.UNDEFINED, Pin.UNDEFINED), listOf(Pin.UNDEFINED) , 2)
+            )
+        )
+        computeSimulation(testInput)
+    }
+
+
 }
+

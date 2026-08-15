@@ -10,30 +10,42 @@ import logicGates.Invertor
 import logicGates.Nand
 import logicGates.Nor
 import logicGates.Or
+import logicGates.Pin
 import logicGates.XNor
 import logicGates.Xor
 
 suspend fun parseSimulation(
     elements : List<List<BasicComponentData>> ,
     state: SimulationState
-                            ) = withContext(Dispatchers.Default) {  // order is very important
+) = withContext(Dispatchers.Default) {  // order is very important
     for (tick in elements){
         val tmp = mutableListOf<BasicComponent>()
         for (element in tick){
             tmp +=  when(element.type){
-                ComponentType.AND ->  And(element.id , element.inputs , element.output)
-                ComponentType.NAND -> Nand(element.id , element.inputs , element.output)
-                ComponentType.NOR -> Nor(element.id, element.inputs, element.output)
-                ComponentType.NOT -> Invertor(element.id , element.inputs , element.output)
-                ComponentType.OR -> Or(element.id , element.inputs , element.output)
-                ComponentType.XNOR -> XNor(element.id , element.inputs , element.output)
-                ComponentType.XOR -> Xor(element.id , element.inputs , element.output)
+                ComponentType.AND ->  And(element.id , element.inputs , element.output , element.inputCount)
+                ComponentType.NAND -> Nand(element.id , element.inputs , element.output, element.inputCount)
+                ComponentType.NOR -> Nor(element.id, element.inputs, element.output, element.inputCount)
+                ComponentType.NOT -> Invertor(element.id , element.inputs , element.output, element.inputCount)
+                ComponentType.OR -> Or(element.id , element.inputs , element.output, element.inputCount)
+                ComponentType.XNOR -> XNor(element.id , element.inputs , element.output, element.inputCount)
+                ComponentType.XOR -> Xor(element.id , element.inputs , element.output, element.inputCount)
             }
         }
         state.CircuitData.add(tmp)
 
     }
+}
 
+suspend fun computeSimulation(input : List<List<BasicComponent>>)= withContext(Dispatchers.Default){
+    val tickOutput = mutableListOf<Pin>()
+    for (tick in input){
+        for (element in tick){
+            element.output = element.evaluate()
+            tickOutput += element.output
+        }
+        println(tickOutput)
+        tickOutput.clear()
+    }
 
 }
 

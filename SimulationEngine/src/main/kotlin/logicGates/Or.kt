@@ -2,7 +2,8 @@ package logicGates
 
 class Or(id : String,
          override var inputs: List<Pin>,
-         override var output: List<Pin>
+         override var output: List<Pin>,
+         override var inputCount: Int
 ):BasicComponent(id) {
     override fun evaluate(): MutableList<Pin> {
         val result = when{
