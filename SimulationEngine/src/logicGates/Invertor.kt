@@ -1,12 +1,20 @@
 package logicGates
 
-class Invertor {
+class Invertor(id : String,
+               override var inputs: List<Pin>,
+               override var output: List<Pin>
+): BasicComponent(id) {
 
-    fun invert(input : Pin):Pin{
-        val result = when (input) {
-            Pin.HIGH -> Pin.LOW
-            Pin.LOW -> Pin.HIGH
-            else -> Pin.ERROR
+    override fun evaluate(): MutableList<Pin> {
+        val result = mutableListOf<Pin>()
+        for (i in inputs){
+            when(i){
+                Pin.LOW -> result.add(Pin.HIGH)
+                Pin.HIGH -> result.add(Pin.LOW)
+                else -> result.add(Pin.ERROR)
+
+            }
+
         }
         return result
     }
