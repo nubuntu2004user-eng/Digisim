@@ -36,11 +36,11 @@ suspend fun parseSimulation(
     }
 }
 
-suspend fun computeSimulation(
+suspend fun computeSimulation(  //optimize it
     components : List<List<BasicComponent>>,
     state: SimulationState,
     input : MutableList<Pin>
-    )= withContext(Dispatchers.Default){
+    ): MutableList<Pin> {
 
     val lastTickOutput : MutableList<MutableList<Pin>> = mutableListOf()
     lastTickOutput.add(input)
@@ -50,7 +50,7 @@ suspend fun computeSimulation(
         val tmp = mutableListOf<Pin>()
         for (element in stage){
 
-            element.inputs = lastTickOutput.get(lastTickOutput.lastIndex).subList(currentInputIndex , currentInputIndex + element.inputCount)
+            element.inputs = lastTickOutput.get(lastTickOutput.lastIndex).subList(currentInputIndex , currentInputIndex + element.inputCount).toMutableList()
             currentInputIndex += element.inputCount
             element.output = element.evaluate()
             tmp.addAll(element.output)
@@ -59,12 +59,17 @@ suspend fun computeSimulation(
         lastTickOutput.add(tmp)
 
     }
-    state.outputs = lastTickOutput.get(lastTickOutput.lastIndex)
-
+    state.outputs = lastTickOutput.get(lastTickOutput.lastIndex) // move to new function
+    return lastTickOutput.get(lastTickOutput.lastIndex)
 
 
 
     }
+
+
+suspend fun manageSimulation(){
+    //should create the instance of simulation state class and then compute a "simulationTree"
+}
 
 
 

@@ -7,6 +7,6 @@ import logicGates.Pin
 
     var CircuitData = mutableListOf<MutableList<BasicComponent>>()
 
-    var outputs = mutableListOf<Pin>()
+    var outputs = mutableListOf<Pin>()  // refactor this, namely add a function that will be managing the flow of simulation and will sava only the last output
 
 }
