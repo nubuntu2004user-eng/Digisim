@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,7 +22,7 @@ fun App() {
             TopRow()
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
-                    Text("Add things later")
+                    componentSettings(viewModel)
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     ToolSelectorRow(viewModel)
