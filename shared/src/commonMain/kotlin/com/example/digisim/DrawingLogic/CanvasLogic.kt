@@ -18,9 +18,9 @@ internal fun wirePins(viewModel : CanvasViewModel , position : Offset){
                 viewModel.wires.add(
                     Wire(
                         id = viewModel.nextId++,
-                        sourceGateId = source.gateId,
+                        sourceGateId = source.elementId,
                         sourcePortIndex = source.portIndex,
-                        targetGateId = hitPort.gateId,
+                        targetGateId = hitPort.elementId,
                         targetPortIndex = hitPort.portIndex
                     )
                 )
@@ -33,13 +33,13 @@ internal fun wirePins(viewModel : CanvasViewModel , position : Offset){
 }
 
 internal fun handleDrag(viewModel: CanvasViewModel , position: Offset){
-    val hitGate = viewModel.gates.findLast { gate ->
-        position.x in gate.x..(gate.x + gate.width) &&
-                position.y in gate.y..(gate.y + gate.height)
+    val hitGate = viewModel.components.findLast { component ->
+        position.x in component.x..(component.x + component.width) &&
+                position.y in component.y..(component.y + component.height)
     }
     if (hitGate != null) {
         viewModel.dragState = DragState(
-            gateId = hitGate.id,
+            componentId = hitGate.ID,
             pointerOffset = Offset(position.x - hitGate.x, position.y - hitGate.y),
             originalX = hitGate.x,
             originalY = hitGate.y
@@ -52,13 +52,14 @@ internal fun handleDrag(viewModel: CanvasViewModel , position: Offset){
 internal fun dragComponent(viewModel: CanvasViewModel, event : PointerEvent){
     viewModel.dragState?.let { state ->
         val position = event.changes.first().position
-        val gate = viewModel.findGate(state.gateId)
-        if (gate != null) {
+        val component = viewModel.findGate(state.componentId)
+        if (component != null) {
             val newX = position.x - state.pointerOffset.x
             val newY = position.y - state.pointerOffset.y
-            val index = viewModel.gates.indexOf(gate)
+            val index = viewModel.components.indexOf(component)
             if (index != -1) {
-                viewModel.gates[index] = gate.copy(x = newX, y = newY)
+                viewModel.components[index].x = newX
+                viewModel.components[index].y = newY
             }
         }
     }
@@ -67,14 +68,14 @@ internal fun dragComponent(viewModel: CanvasViewModel, event : PointerEvent){
 
 internal fun editComponent(viewModel: CanvasViewModel , position: Offset){
 
-    val hitGate = viewModel.gates.findLast { gate ->
+    val hitGate = viewModel.components.findLast { gate ->
         position.x in gate.x..(gate.x + gate.width) &&
                 position.y in gate.y..(gate.y + gate.height)
     }
 
     if (hitGate != null){
 
-        viewModel.selectedGateId = hitGate.id
+        viewModel.selectedGateId = hitGate.ID
     }
 
 }

@@ -6,11 +6,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
+import com.example.digisim.LogicGates.And
+import com.example.digisim.LogicGates.Nand
+import com.example.digisim.LogicGates.Nor
+import com.example.digisim.LogicGates.Not
+import com.example.digisim.LogicGates.Or
+import com.example.digisim.LogicGates.XNor
+import com.example.digisim.LogicGates.Xor
+import com.example.digisim.ParsingLogic.Component
+import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.DragState
-import com.example.digisim.ParsingLogic.Gate
-import com.example.digisim.ParsingLogic.GateType
 import com.example.digisim.ParsingLogic.Input
-import com.example.digisim.ParsingLogic.InputOrOutput
 import com.example.digisim.ParsingLogic.Output
 import com.example.digisim.ParsingLogic.PortHit
 import com.example.digisim.ParsingLogic.Wire
@@ -23,30 +29,43 @@ class CanvasViewModel: ViewModel() {
 
     var selectedGateId by mutableStateOf<Int?>(null)
 
-    val inputsAndOutputs = mutableStateListOf<InputOrOutput>()
+    val components = mutableListOf<Component>()
 
-    val gates =  mutableStateListOf<Gate>()
+//    val inputsAndOutputs = mutableStateListOf<InputOrOutput>()
+
+//    val gates =  mutableStateListOf<Gate>()
     val wires = mutableStateListOf<Wire>()
     var nextId by  mutableStateOf(0)
 
     var dragState by  mutableStateOf<DragState?>(null)
     var wireSource by mutableStateOf<PortHit?>(null)
 
-    fun addGate(type: GateType) {
-        val x = 50f + gates.size * 20f
-        val y = 50f + gates.size * 20f
-        gates.add(Gate(nextId++, type, x, y))
-    }
-    fun addInputOrOutput(isInput : Boolean) {
-        val x = 50f + inputsAndOutputs.size * 20f
-        val y = 50f + inputsAndOutputs.size * 20f
-        if (isInput){
-        inputsAndOutputs.add(Input(nextId++, x, y))
-    }
-        else {
-            inputsAndOutputs.add(Output(nextId , x ,y))
+    fun addComponent(type: ComponentType) {
+        val x = 50f + components.size * 20f
+        val y = 50f + components.size * 20f
+        when (type){
+            ComponentType.AND -> { components.add(And(nextId++, x, y, 2, 1))}
+            ComponentType.OR -> { components.add(Or(nextId++, x, y, 2, 1))}
+            ComponentType.NAND -> { components.add(Nand(nextId++, x, y, 2, 1))}
+            ComponentType.NOR -> { components.add(Nor(nextId++, x, y, 2, 1))}
+            ComponentType.XOR -> { components.add(Xor(nextId++, x, y, 2, 1))}
+            ComponentType.XNOR -> { components.add(XNor(nextId++, x, y, 2, 1))}
+            ComponentType.NOT -> { components.add(Not(nextId++, x, y, 1, 1))}
+            ComponentType.OUTPUT -> { components.add(Output(nextId++, x, y))}
+            ComponentType.INPUT -> { components.add(Input(nextId++, x, y))}
+
         }
     }
+//    fun addInputOrOutput(isInput : Boolean) {
+//        val x = 50f + components.size * 20f
+//        val y = 50f + components.size * 20f
+//        if (isInput){
+//        components.add(Input(nextId++, x, y))
+//    }
+//        else {
+//            components.add(Output(nextId++ , x ,y))
+//        }
+//    }
 
 
     // Manual distance calculation
@@ -54,20 +73,27 @@ class CanvasViewModel: ViewModel() {
         sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))
 
     fun findPortAt(position: Offset): PortHit? {
-        for (gate in gates) {
+        for (gate in components) {
             gate.inputPortPositions().forEachIndexed { idx, portPos ->
                 if (distance(position, portPos) < 12f) {
-                    return PortHit(gate.id, idx, true, portPos)
+                    return PortHit(gate.ID, idx, true, portPos)
                 }
             }
             gate.outputPortPositions().forEachIndexed { idx, portPos ->
                 if (distance(position, portPos) < 12f) {
-                    return PortHit(gate.id, idx, false, portPos)
+                    return PortHit(gate.ID, idx, false, portPos)
                 }
             }
         }
+        for (element in components) {
+                if (distance(position, element.findPortOffset()) < 12f) {
+                    return PortHit(element.ID, 0 , element.componentType == ComponentType.INPUT, element.findPortOffset())
+                }
+            }
+
+
         return null
     }
 
-    fun findGate(id: Int): Gate? = gates.find { it.id == id }
+    fun findGate(id: Int): Component? = components.find { it.ID == id }
 }

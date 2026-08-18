@@ -10,6 +10,7 @@ abstract class InputOrOutput(val id : Int) {
 
     abstract val height : Float
 
+    abstract val isInput : Boolean
 
     abstract fun findPortOffset(): Offset
 }

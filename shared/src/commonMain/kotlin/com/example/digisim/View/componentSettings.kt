@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,11 +16,11 @@ import com.example.digisim.DrawingLogic.CanvasViewModel
 fun componentSettings(viewModel: CanvasViewModel){
     Column(modifier = Modifier.background(Color.LightGray).fillMaxSize()) {
         if (viewModel.selectedGateId != null ){
-            val gate = viewModel.gates.find{ it.id == viewModel.selectedGateId}
-        Text( " " + gate?.id.toString() + "\n " + gate?.type)
+            val component = viewModel.components.find{ it.ID == viewModel.selectedGateId}
+        Text( " " + component?.ID.toString() + "\n " + component?.componentType)
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
             Button(onClick = {
-                viewModel.gates.remove(gate)
+                viewModel.components.remove(component)
                 viewModel.selectedGateId = null
             }){
                 Text("Delete")

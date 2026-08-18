@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.rememberTextMeasurer
+import com.example.digisim.ParsingLogic.ComponentType
 
 
 @Composable
@@ -62,21 +63,30 @@ fun DigitalLogicSimulator(modifier: Modifier = Modifier , viewModel : CanvasView
             // Draw wires
             viewModel.wires.forEach { wire ->
                 drawWire(
-                    sourceGate = viewModel.gates.find { it.id == wire.sourceGateId }!!,
+                    sourceComponent = viewModel.components.find { it.ID == wire.sourceGateId }!!,
                     sourcePortIndex = wire.sourcePortIndex,
-                    targetGate = viewModel.gates.find { it.id == wire.targetGateId }!!,
+                    targetComponent = viewModel.components.find { it.ID == wire.targetGateId }!!,
                     targetPortIndex = wire.targetPortIndex
                 )
             }
 
-            // Draw gates
-            viewModel.gates.forEach { gate ->
-                drawGate(gate, textMeasurer)
+            //Draw All
+            viewModel.components.forEach { component ->
+                drawComponent(component , textMeasurer)
             }
 
-            // Draw InputsAndOutputs
-            viewModel.inputsAndOutputs.forEach { drawInput ->
-                drawInputOrOutput(drawInput, textMeasurer)
+            // Draw gates
+//            viewModel.components.forEach { component ->
+//                if (component.componentType == ComponentType.GATE){
+//                drawGate(component, textMeasurer)
+//                }
+//            }
+//
+//            // Draw InputsAndOutputs
+//            viewModel.components.forEach { component ->
+//                if (component.componentType == ComponentType.INPUT || component.componentType == ComponentType.OUTPUT){
+//                    drawInputOrOutput(component, textMeasurer)
+//                }
 
             }
 
@@ -86,7 +96,7 @@ fun DigitalLogicSimulator(modifier: Modifier = Modifier , viewModel : CanvasView
         }
     }
 
-}
+
 
 
 
