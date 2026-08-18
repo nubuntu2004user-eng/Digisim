@@ -47,7 +47,7 @@ fun DigitalLogicSimulator(modifier: Modifier = Modifier , viewModel : CanvasView
                                 PointerEventType.Move -> {
                                     if (viewModel.currentMode == CanvasViewModel.editingMode.DRAG){  //do the draging
 
-                                        dragGate(viewModel, event)
+                                        dragComponent(viewModel, event)
                                 }
                                 }
                                 PointerEventType.Release -> {
@@ -73,6 +73,14 @@ fun DigitalLogicSimulator(modifier: Modifier = Modifier , viewModel : CanvasView
             viewModel.gates.forEach { gate ->
                 drawGate(gate, textMeasurer)
             }
+
+            // Draw InputsAndOutputs
+            viewModel.inputsAndOutputs.forEach { drawInput ->
+                drawInputOrOutput(drawInput, textMeasurer)
+
+            }
+
+
 
 
         }

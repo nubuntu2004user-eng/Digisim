@@ -2,6 +2,8 @@ package com.example.digisim.DrawingLogic
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
+import com.example.digisim.ParsingLogic.DragState
+import com.example.digisim.ParsingLogic.Wire
 
 internal fun wirePins(viewModel : CanvasViewModel , position : Offset){
     val hitPort = viewModel.findPortAt(position)
@@ -47,7 +49,7 @@ internal fun handleDrag(viewModel: CanvasViewModel , position: Offset){
     }
 }
 
-internal fun dragGate(viewModel: CanvasViewModel , event : PointerEvent){
+internal fun dragComponent(viewModel: CanvasViewModel, event : PointerEvent){
     viewModel.dragState?.let { state ->
         val position = event.changes.first().position
         val gate = viewModel.findGate(state.gateId)

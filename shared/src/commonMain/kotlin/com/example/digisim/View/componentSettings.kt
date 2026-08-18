@@ -18,7 +18,7 @@ fun componentSettings(viewModel: CanvasViewModel){
     Column(modifier = Modifier.background(Color.LightGray).fillMaxSize()) {
         if (viewModel.selectedGateId != null ){
             val gate = viewModel.gates.find{ it.id == viewModel.selectedGateId}
-        Text( gate?.id.toString() + "\n" + gate?.type)
+        Text( " " + gate?.id.toString() + "\n " + gate?.type)
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
             Button(onClick = {
                 viewModel.gates.remove(gate)

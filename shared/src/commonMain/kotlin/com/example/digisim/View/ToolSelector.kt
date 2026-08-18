@@ -14,7 +14,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.digisim.DrawingLogic.CanvasViewModel
-import com.example.digisim.DrawingLogic.GateType
+import com.example.digisim.ParsingLogic.GateType
 
 @Composable
 fun ToolSelectorRow(viewModel : CanvasViewModel){
@@ -35,6 +35,12 @@ fun ToolSelectorRow(viewModel : CanvasViewModel){
             )
         }
     }
+        TextButton(onClick = {viewModel.addInputOrOutput(true)}){
+            Text("Add Input")
+        }
+        TextButton(onClick = {viewModel.addInputOrOutput(false)}){
+            Text("Add Output")
+        }
 
         GateType.values().forEach { gateType ->
             TextButton(onClick = {viewModel.addGate(gateType)}){

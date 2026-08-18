@@ -1,4 +1,4 @@
-package com.example.digisim.DrawingLogic
+package com.example.digisim.ParsingLogic
 
 import androidx.compose.ui.geometry.Offset
 

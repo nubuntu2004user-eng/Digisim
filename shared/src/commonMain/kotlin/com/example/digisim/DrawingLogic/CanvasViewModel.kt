@@ -6,6 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
+import com.example.digisim.ParsingLogic.DragState
+import com.example.digisim.ParsingLogic.Gate
+import com.example.digisim.ParsingLogic.GateType
+import com.example.digisim.ParsingLogic.Input
+import com.example.digisim.ParsingLogic.InputOrOutput
+import com.example.digisim.ParsingLogic.Output
+import com.example.digisim.ParsingLogic.PortHit
+import com.example.digisim.ParsingLogic.Wire
 import kotlin.math.sqrt
 
 class CanvasViewModel: ViewModel() {
@@ -14,6 +22,9 @@ class CanvasViewModel: ViewModel() {
     var currentMode by mutableStateOf(editingMode.POKE)
 
     var selectedGateId by mutableStateOf<Int?>(null)
+
+    val inputsAndOutputs = mutableStateListOf<InputOrOutput>()
+
     val gates =  mutableStateListOf<Gate>()
     val wires = mutableStateListOf<Wire>()
     var nextId by  mutableStateOf(0)
@@ -26,6 +37,17 @@ class CanvasViewModel: ViewModel() {
         val y = 50f + gates.size * 20f
         gates.add(Gate(nextId++, type, x, y))
     }
+    fun addInputOrOutput(isInput : Boolean) {
+        val x = 50f + inputsAndOutputs.size * 20f
+        val y = 50f + inputsAndOutputs.size * 20f
+        if (isInput){
+        inputsAndOutputs.add(Input(nextId++, x, y))
+    }
+        else {
+            inputsAndOutputs.add(Output(nextId , x ,y))
+        }
+    }
+
 
     // Manual distance calculation
     fun distance(a: Offset, b: Offset): Float =
