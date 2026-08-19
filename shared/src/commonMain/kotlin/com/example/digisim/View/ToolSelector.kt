@@ -19,12 +19,31 @@ import com.example.digisim.ParsingLogic.ComponentType
 
 @Composable
 fun ToolSelectorRow(viewModel : CanvasViewModel){
-     val buttonList = mutableListOf(
+     val buttonList = listOf(
         ToolButtonParams(Icons.Filled.TouchApp , {viewModel.currentMode = CanvasViewModel.editingMode.POKE}),
          ToolButtonParams(Icons.Filled.Edit , {viewModel.currentMode = CanvasViewModel.editingMode.EDIT}),
         ToolButtonParams(Icons.Filled.AdsClick , {viewModel.currentMode = CanvasViewModel.editingMode.DRAG}),
         ToolButtonParams(Icons.Filled.Cable , {viewModel.currentMode = CanvasViewModel.editingMode.WIRE}),
         ToolButtonParams(Icons.Filled.TextFields , {}),
+
+        )
+    val componentButtonList = listOf(
+        ComponentButtonParams("Add Input" , {viewModel.addComponent(ComponentType.INPUT)}),
+        ComponentButtonParams("Add Output" , {viewModel.addComponent(ComponentType.OUTPUT)}),
+        ComponentButtonParams("Add Not" , {viewModel.addComponent(ComponentType.NOT)}),
+        ComponentButtonParams("Add And" , {viewModel.addComponent(ComponentType.AND)}),
+        ComponentButtonParams("Add Or" , {viewModel.addComponent(ComponentType.OR)}),
+        ComponentButtonParams("Add Xor" , {viewModel.addComponent(ComponentType.XOR)}),
+        ComponentButtonParams("Add Nand" , {viewModel.addComponent(ComponentType.NAND)}),
+        ComponentButtonParams("Add Nor" , {viewModel.addComponent(ComponentType.NOR)}),
+        ComponentButtonParams("Add XNor" , {viewModel.addComponent(ComponentType.XNOR)}),
+
+
+
+
+
+
+
 
         )
     Row{
@@ -36,18 +55,14 @@ fun ToolSelectorRow(viewModel : CanvasViewModel){
             )
         }
     }
-        TextButton(onClick = {viewModel.addComponent(ComponentType.INPUT)}){
-            Text("Add Input")
+        for (i in componentButtonList){
+        TextButton(onClick = i.onClick){
+            Text(i.text)
         }
-        TextButton(onClick = {viewModel.addComponent(ComponentType.OUTPUT)}){
-            Text("Add Output")
         }
 
-//        GateType.values().forEach { gateType ->
-//            TextButton(onClick = {viewModel.addComponent(gateType)}){
-//                Text(gateType.label)
-//            }
-//        }
+
+
     }
 }
 
@@ -57,4 +72,9 @@ private data class ToolButtonParams(
     val icon : ImageVector ,
     val onClick :() -> Unit
 
+)
+
+private data class ComponentButtonParams(
+    val text : String,
+    val onClick :() -> Unit
 )

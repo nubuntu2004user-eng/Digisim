@@ -1,20 +1,29 @@
 package com.example.digisim.LogicGates
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 
 
-data class Xor(
-    val id: Int,
-    override var x: Float,       // top‑left x
-    override var y: Float,        // top‑left y
-    override var inputCount : Int,
-    override var outputCount : Int
-): Component(id) {
-    override val componentType = ComponentType.XOR
-    override var width = 80f
-    override var height = 60f
+ class Xor(
+     id: Int,
+     initialX: Float = 0f,
+     initialY: Float = 0f,
+     initialInputCount: Int,
+     initialOutputCount: Int
+ ) : Component(id) {
+
+     override var x: Float by mutableStateOf(initialX)
+     override var y: Float by mutableStateOf(initialY)
+     override var width: Float by mutableStateOf(80f)
+     override var height: Float by mutableStateOf(60f)
+     override var inputCount: Int by mutableStateOf(initialInputCount)
+     override var outputCount: Int by mutableStateOf(initialOutputCount)
+
+     override val componentType = ComponentType.XOR
 
     override fun findPortOffset() = Offset(0f, 0f)
 
@@ -24,8 +33,8 @@ data class Xor(
     }
 
     fun outputPortOffsets(): List<Offset> {
-        val spacing = height / (inputCount + 1)
-        return (1..inputCount).map { i -> Offset(width, spacing * i) }
+        val spacing = height / (outputCount + 1)
+        return (1..outputCount).map { i -> Offset(width, spacing * i) }
     }
 
     override  fun inputPortPositions(): List<Offset> =

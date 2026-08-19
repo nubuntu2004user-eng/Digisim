@@ -5,6 +5,11 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import com.example.digisim.ParsingLogic.DragState
 import com.example.digisim.ParsingLogic.Wire
 
+private const val GRID_SIZE = 20f
+
+private fun snap(value: Float): Float =
+    kotlin.math.round(value / GRID_SIZE) * GRID_SIZE
+
 internal fun wirePins(viewModel : CanvasViewModel , position : Offset){
     val hitPort = viewModel.findPortAt(position)
     if (hitPort != null) {
@@ -54,8 +59,8 @@ internal fun dragComponent(viewModel: CanvasViewModel, event : PointerEvent){
         val position = event.changes.first().position
         val component = viewModel.findGate(state.componentId)
         if (component != null) {
-            val newX = position.x - state.pointerOffset.x
-            val newY = position.y - state.pointerOffset.y
+            val newX = snap(position.x - state.pointerOffset.x)
+            val newY = snap(position.y - state.pointerOffset.y)
             val index = viewModel.components.indexOf(component)
             if (index != -1) {
                 viewModel.components[index].x = newX
