@@ -12,7 +12,8 @@ class SimulationViewModel : ViewModel() {
 
 
     fun convertData(viewModel : CanvasViewModel) {
-        splitToStages(viewModel)
+        val tmp = splitToStages(viewModel)
+        val result = convertAll(tmp)
     }
 
     private fun splitToStages(viewModel: CanvasViewModel): MutableList<MutableList<Component>>{
@@ -33,7 +34,6 @@ class SimulationViewModel : ViewModel() {
             if(checkIfLast(result))    done = true
 
         }
-        println(result)
         return result
     }
     private fun parseStage(input : MutableList<Component> , wires : MutableList<Wire> , viewModel: CanvasViewModel): MutableList<Component>{

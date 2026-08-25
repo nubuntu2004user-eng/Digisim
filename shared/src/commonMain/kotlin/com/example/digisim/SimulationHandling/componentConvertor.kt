@@ -32,3 +32,15 @@ fun convertForSimulation(input : Component): List<BasicComponent>?{
 
 
 }
+fun convertAll (input: MutableList<MutableList<Component>>): MutableList<MutableList<BasicComponent>>{
+    val result = mutableListOf<MutableList<BasicComponent>>()
+    val tmp = mutableListOf<BasicComponent>()
+    for (stage in input){
+        for (i in stage){
+            if (i !== null) tmp.add(convertForSimulation(i)!!.first())
+        }
+        result.add(tmp.toMutableList())
+        tmp.clear()
+    }
+    return  result
+}

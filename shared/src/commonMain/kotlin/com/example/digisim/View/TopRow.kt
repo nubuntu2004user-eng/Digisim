@@ -20,7 +20,6 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel){
         TopRowButtonParams("Simulate" , {}),
         TopRowButtonParams("FPGA" , {} ),
         TopRowButtonParams("Window" , {}),
-        TopRowButtonParams("Debug" , { print(convertForSimulation(And( 1 , 0f , 0f  , 2 , 1))) }),
         TopRowButtonParams("Run" , onClick = {simulation.convertData(viewModel)})
 
     )
