@@ -12,14 +12,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.DrawingLogic.DigitalLogicSimulator
+import com.example.digisim.SimulationHandling.SimulationViewModel
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
         val viewModel = CanvasViewModel()
+        val simulation = SimulationViewModel()
         Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-            TopRow()
+            TopRow(simulation , viewModel)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
                     componentSettings(viewModel)

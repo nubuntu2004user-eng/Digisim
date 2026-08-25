@@ -1,9 +1,11 @@
 package logicGates
 
-class And(id : String,
+class And(id : Int,
     override var inputs: List<Pin>,
     override var output: List<Pin>,
-          override var inputCount: Int
+          override var inputCount: Int ,
+          override val inputFrom: MutableList<inputWire>,
+          override val outputTo: MutableList<outputWire>
 
 ):BasicComponent(id) {
     override fun evaluate(): MutableList<Pin> {

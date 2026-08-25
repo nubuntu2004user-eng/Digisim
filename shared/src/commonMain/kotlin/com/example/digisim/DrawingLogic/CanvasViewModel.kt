@@ -31,9 +31,6 @@ class CanvasViewModel: ViewModel() {
 
     val components = mutableStateListOf<Component>()
 
-//    val inputsAndOutputs = mutableStateListOf<InputOrOutput>()
-
-//    val gates =  mutableStateListOf<Gate>()
     val wires = mutableStateListOf<Wire>()
     var nextId by  mutableStateOf(0)
 

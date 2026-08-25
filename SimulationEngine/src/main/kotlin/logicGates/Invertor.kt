@@ -1,9 +1,12 @@
 package logicGates
 
-class Invertor(id : String,
+class Invertor(id : Int,
                override var inputs: List<Pin>,
                override var output: List<Pin>,
-               override var inputCount: Int
+               override var inputCount: Int,
+               override val inputFrom: MutableList<inputWire>,
+               override val outputTo: MutableList<outputWire>
+
 ): BasicComponent(id) {
 
     override fun evaluate(): MutableList<Pin> {
