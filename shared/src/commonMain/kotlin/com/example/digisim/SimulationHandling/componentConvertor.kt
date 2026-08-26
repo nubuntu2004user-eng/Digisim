@@ -16,15 +16,15 @@ import logicGates.Pin
 
 fun convertForSimulation(input : Component): List<BasicComponent>?{
     when (input){
-        is And -> return listOf( logicGates.And(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Nand ->return listOf( logicGates.Nand(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Input -> return listOf( logicGates.Input(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Output ->return listOf( logicGates.Output(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Not ->return listOf( logicGates.Invertor(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Nor ->return listOf( logicGates.Nor(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Or ->return listOf( logicGates.Or(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
-        is XNor -> return listOf( logicGates.XNor(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Xor ->return listOf( logicGates.Xor(input.ID , emptyList() ,emptyList() , input.inputCount , mutableListOf() , mutableListOf() ))
+        is And -> return listOf( logicGates.And(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Nand ->return listOf( logicGates.Nand(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Input -> return listOf( logicGates.Input(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Output ->return listOf( logicGates.Output(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Not ->return listOf( logicGates.Invertor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Nor ->return listOf( logicGates.Nor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Or ->return listOf( logicGates.Or(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is XNor -> return listOf( logicGates.XNor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Xor ->return listOf( logicGates.Xor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         else -> return null
 
 
@@ -34,13 +34,15 @@ fun convertForSimulation(input : Component): List<BasicComponent>?{
 }
 fun convertAll (input: MutableList<MutableList<Component>>): MutableList<MutableList<BasicComponent>>{
     val result = mutableListOf<MutableList<BasicComponent>>()
-    val tmp = mutableListOf<BasicComponent>()
     for (stage in input){
+        val tmp = mutableListOf<BasicComponent>()
         for (i in stage){
-            if (i !== null) tmp.add(convertForSimulation(i)!!.first())
+            val converted = convertForSimulation(i)
+            if (converted != null && converted.isNotEmpty()) {
+                tmp.add(converted.first())
+            }
         }
-        result.add(tmp.toMutableList())
-        tmp.clear()
+        result.add(tmp)
     }
     return  result
 }

@@ -1,6 +1,10 @@
 package com.example.digisim.ParsingLogic
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import logicGates.Pin
 
 abstract class Component(val ID : Int) {
     abstract var x : Float
@@ -13,6 +17,8 @@ abstract class Component(val ID : Int) {
     abstract var outputCount : Int
 
     abstract val componentType: ComponentType
+
+    open var outputPin: Pin by mutableStateOf(Pin.LOW)
 
     abstract fun inputPortPositions():List<Offset>
 

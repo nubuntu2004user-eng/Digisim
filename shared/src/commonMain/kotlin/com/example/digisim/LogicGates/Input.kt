@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
+import logicGates.Pin
 
 class Input(
     id: Int,
@@ -23,9 +24,11 @@ class Input(
     override var outputCount: Int by mutableStateOf(initialOutputCount)
 
     override val componentType = ComponentType.INPUT
-     val isInput = true
+    val isInput = true
 
-
+    fun switch() {
+        outputPin = if (outputPin == Pin.HIGH) Pin.LOW else Pin.HIGH
+    }
 
     val portOffset = Offset(width , height / 2)
 

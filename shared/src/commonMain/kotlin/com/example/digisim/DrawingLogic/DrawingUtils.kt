@@ -17,6 +17,21 @@ import com.example.digisim.ComponentsDrawing.drawOutput
 import com.example.digisim.ComponentsDrawing.drawXnor
 import com.example.digisim.ComponentsDrawing.drawXor
 
+import logicGates.Pin
+
+fun getComponentInnerRectColor(pin: Pin): Color {
+    return when (pin) {
+        Pin.HIGH -> Color(0xFF81C784) // Brighter green for High
+        Pin.LOW -> Color(0xFF2E7D32)  // Darker green for Low
+        Pin.ERROR -> Color(0xFFE57373)
+        Pin.UNDEFINED -> Color(0xFFC8E6C9)
+    }
+}
+
+fun getComponentTextColor(pin: Pin): Color {
+    return if (pin == Pin.LOW) Color.White else Color.Black
+}
+
 internal fun DrawScope.drawWire(
     sourceComponent: Component,
     sourcePortIndex: Int,

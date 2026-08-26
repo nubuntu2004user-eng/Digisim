@@ -2,31 +2,52 @@ package com.example.digisim.DrawingLogic
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
+import com.example.digisim.LogicGates.Input
 import com.example.digisim.ParsingLogic.DragState
 import com.example.digisim.ParsingLogic.Wire
+import com.example.digisim.SimulationHandling.SimulationViewModel
+import kotlinx.coroutines.CoroutineScope
 
 private const val GRID_SIZE = 20f
 
 private fun snap(value: Float): Float =
     kotlin.math.round(value / GRID_SIZE) * GRID_SIZE
 
-internal fun wirePins(viewModel : CanvasViewModel , position : Offset){
+internal fun pokeComponent(
+    viewModel: CanvasViewModel,
+    simulation: SimulationViewModel?,
+    scope: CoroutineScope?,
+    position: Offset
+) {
+    val hitGate = viewModel.components.findLast { component ->
+        position.x in component.x..(component.x + component.width) &&
+                position.y in component.y..(component.y + component.height)
+    }
+
+    if (hitGate is Input) {
+        hitGate.switch()
+        if (simulation != null && simulation.isRunning) {
+            simulation.runSimulation(viewModel, scope)
+        }
+    }
+}
+
+internal fun wirePins(viewModel: CanvasViewModel, position: Offset) {
     val hitPort = viewModel.findPortAt(position)
     if (hitPort != null) {
         if (viewModel.wireSource == null) {
-            if (!hitPort.isInput) {
-                viewModel.wireSource = hitPort
-            }
+            viewModel.wireSource = hitPort
         } else {
-            if (hitPort.isInput) {
-                val source = viewModel.wireSource!!
+            val source = viewModel.wireSource!!
+            if (source.elementId != hitPort.elementId && source.isInput != hitPort.isInput) {
+                val (outPort, inPort) = if (!source.isInput) Pair(source, hitPort) else Pair(hitPort, source)
                 viewModel.wires.add(
                     Wire(
                         id = viewModel.nextId++,
-                        sourceGateId = source.elementId,
-                        sourcePortIndex = source.portIndex,
-                        targetGateId = hitPort.elementId,
-                        targetPortIndex = hitPort.portIndex
+                        sourceGateId = outPort.elementId,
+                        sourcePortIndex = outPort.portIndex,
+                        targetGateId = inPort.elementId,
+                        targetPortIndex = inPort.portIndex
                     )
                 )
                 viewModel.wireSource = null

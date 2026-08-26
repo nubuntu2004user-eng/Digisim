@@ -19,7 +19,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
         TopRowButtonParams("Simulate" , {}),
         TopRowButtonParams("FPGA" , {} ),
         TopRowButtonParams("Window" , {}),
-        TopRowButtonParams("Run" , onClick = {simulation.runSimulation(viewModel , scope)})
+        TopRowButtonParams("Run" , onClick = {simulation.startSimulation(viewModel , scope)})
 
     )
     Row {

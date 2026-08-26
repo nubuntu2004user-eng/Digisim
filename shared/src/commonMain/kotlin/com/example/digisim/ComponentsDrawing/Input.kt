@@ -10,6 +10,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.digisim.DrawingLogic.getComponentInnerRectColor
+import com.example.digisim.DrawingLogic.getComponentTextColor
 import com.example.digisim.ParsingLogic.Component
 
 internal fun DrawScope.drawInput(component : Component , textMeasurer: TextMeasurer){
@@ -19,7 +21,7 @@ internal fun DrawScope.drawInput(component : Component , textMeasurer: TextMeasu
     val h = component.height
 
     val textStyle = TextStyle(
-        color = Color.Black,
+        color = getComponentTextColor(component.outputPin),
         fontSize = 20.sp,
         fontWeight = FontWeight.Medium
     )
@@ -33,7 +35,7 @@ internal fun DrawScope.drawInput(component : Component , textMeasurer: TextMeasu
     )
     // Fill
     drawRect(
-        color = Color(0xFFC8E6C9),
+        color = getComponentInnerRectColor(component.outputPin),
         topLeft = Offset(x + 2f, y + 2f),
         size = Size(w - 4f, h - 4f)
     )

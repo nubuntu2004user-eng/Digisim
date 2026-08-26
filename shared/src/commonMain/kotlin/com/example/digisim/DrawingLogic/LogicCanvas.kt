@@ -10,10 +10,17 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.rememberTextMeasurer
 import com.example.digisim.ParsingLogic.ComponentType
+import com.example.digisim.SimulationHandling.SimulationViewModel
+import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun DigitalLogicSimulator(modifier: Modifier = Modifier , viewModel : CanvasViewModel) {
+fun DigitalLogicSimulator(
+    modifier: Modifier = Modifier,
+    viewModel: CanvasViewModel,
+    simulation: SimulationViewModel? = null,
+    scope: CoroutineScope? = null
+) {
 
     val textMeasurer = rememberTextMeasurer()
 
@@ -42,14 +49,18 @@ fun DigitalLogicSimulator(modifier: Modifier = Modifier , viewModel : CanvasView
 
                                     }
 
-                                handleDrag(viewModel, position)
+                                    else if (viewModel.currentMode == CanvasViewModel.editingMode.POKE){
+                                        pokeComponent(viewModel, simulation, scope, position)
+                                    }
+
+                                    handleDrag(viewModel, position)
 
                                 }
                                 PointerEventType.Move -> {
                                     if (viewModel.currentMode == CanvasViewModel.editingMode.DRAG){  //do the draging
 
                                         dragComponent(viewModel, event)
-                                }
+                                    }
                                 }
                                 PointerEventType.Release -> {
                                     viewModel.dragState = null
@@ -62,12 +73,16 @@ fun DigitalLogicSimulator(modifier: Modifier = Modifier , viewModel : CanvasView
         ) {
             // Draw wires
             viewModel.wires.forEach { wire ->
-                drawWire(
-                    sourceComponent = viewModel.components.find { it.ID == wire.sourceGateId }!!,
-                    sourcePortIndex = wire.sourcePortIndex,
-                    targetComponent = viewModel.components.find { it.ID == wire.targetGateId }!!,
-                    targetPortIndex = wire.targetPortIndex
-                )
+                val source = viewModel.components.find { it.ID == wire.sourceGateId }
+                val target = viewModel.components.find { it.ID == wire.targetGateId }
+                if (source != null && target != null) {
+                    drawWire(
+                        sourceComponent = source,
+                        sourcePortIndex = wire.sourcePortIndex,
+                        targetComponent = target,
+                        targetPortIndex = wire.targetPortIndex
+                    )
+                }
             }
 
             //Draw All
@@ -75,26 +90,18 @@ fun DigitalLogicSimulator(modifier: Modifier = Modifier , viewModel : CanvasView
                 drawComponent(component , textMeasurer)
             }
 
-            // Draw gates
-//            viewModel.components.forEach { component ->
-//                if (component.componentType == ComponentType.GATE){
-//                drawGate(component, textMeasurer)
-//                }
-//            }
-//
-//            // Draw InputsAndOutputs
-//            viewModel.components.forEach { component ->
-//                if (component.componentType == ComponentType.INPUT || component.componentType == ComponentType.OUTPUT){
-//                    drawInputOrOutput(component, textMeasurer)
-//                }
-
+            // Highlight wire source if selected
+            viewModel.wireSource?.let { source ->
+                drawCircle(
+                    color = Color.Red,
+                    radius = 8f,
+                    center = source.position
+                )
             }
-
-
-
 
         }
     }
+}
 
 
 

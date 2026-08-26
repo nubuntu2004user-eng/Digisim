@@ -21,19 +21,19 @@ import kotlin.coroutines.coroutineContext
 @Preview
 fun App() {
     MaterialTheme {
-        val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
-        val viewModel = CanvasViewModel()
-        val simulation = SimulationViewModel()
+        val scope: CoroutineScope = rememberCoroutineScope()
+        val viewModel = remember { CanvasViewModel() }
+        val simulation = remember { SimulationViewModel() }
         Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
             TopRow(simulation , viewModel , scope)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
-                    componentSettings(viewModel)
+                    componentSettings(viewModel ,simulation)
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     ToolSelectorRow(viewModel)
                     Box(modifier = Modifier.weight(1f)) {
-                        DigitalLogicSimulator(viewModel = viewModel)
+                        DigitalLogicSimulator(viewModel = viewModel, simulation = simulation, scope = scope)
                     }
                 }
 
