@@ -3,20 +3,27 @@ package com.example.digisim
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.example.digisim.DrawingLogic.CanvasViewModel
+import com.example.digisim.DrawingLogic.dragComponent
 import com.example.digisim.DrawingLogic.getComponentInnerRectColor
 import com.example.digisim.DrawingLogic.getComponentTextColor
+import com.example.digisim.DrawingLogic.handleDrag
+import com.example.digisim.DrawingLogic.placePendingComponent
 import com.example.digisim.DrawingLogic.pokeComponent
+import com.example.digisim.DrawingLogic.updatePendingComponentPosition
 import com.example.digisim.DrawingLogic.wirePins
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Input
 import com.example.digisim.LogicGates.Not
 import com.example.digisim.LogicGates.Output
+import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.Wire
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import logicGates.Pin
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class SharedCommonTest {
@@ -157,6 +164,26 @@ class SharedCommonTest {
     }
 
     @Test
+    fun testSettingsViewModelColorCustomization() {
+        val customSettings = SettingsViewModel()
+        customSettings.highPinColor = Color.Cyan
+        customSettings.lowPinColor = Color.Magenta
+        customSettings.gateOutlineColor = Color.Yellow
+        customSettings.portColor = Color.DarkGray
+        customSettings.wireColor = Color.Green
+        customSettings.textHighColor = Color.Red
+        customSettings.textLowColor = Color.Blue
+
+        assertEquals(Color.Cyan, customSettings.getComponentInnerRectColor(Pin.HIGH))
+        assertEquals(Color.Magenta, customSettings.getComponentInnerRectColor(Pin.LOW))
+        assertEquals(Color.Red, customSettings.getComponentTextColor(Pin.HIGH))
+        assertEquals(Color.Blue, customSettings.getComponentTextColor(Pin.LOW))
+        assertEquals(Color.Yellow, customSettings.gateOutlineColor)
+        assertEquals(Color.DarkGray, customSettings.portColor)
+        assertEquals(Color.Green, customSettings.wireColor)
+    }
+
+    @Test
     fun testWiringNotElementInUi() {
         val viewModel = CanvasViewModel()
         val in0 = Input(0, 10f, 10f, 0, 1)
@@ -192,5 +219,79 @@ class SharedCommonTest {
         assertEquals(Pin.LOW, in0.outputPin)
         assertEquals(Pin.HIGH, not1.outputPin)
         assertEquals(Pin.HIGH, out2.outputPin)
+    }
+
+    @Test
+    fun testDragBoundaryConstraints() {
+        val viewModel = CanvasViewModel()
+        val andGate = And(0, 100f, 100f, 2, 1) // width = 80f, height = 60f
+        viewModel.components.add(andGate)
+
+        val canvasWidth = 500f
+        val canvasHeight = 400f
+
+        // Initiate drag on andGate at offset (10f, 10f) relative to gate top-left
+        handleDrag(viewModel, Offset(110f, 110f))
+        assertNotNull(viewModel.dragState)
+
+        // Drag beyond top-left boundary (negative position)
+        dragComponent(viewModel, Offset(-200f, -100f), canvasWidth, canvasHeight)
+        assertEquals(0f, andGate.x)
+        assertEquals(0f, andGate.y)
+
+        // Drag beyond bottom-right boundary
+        // maxX = 500f - 80f = 420f, maxY = 400f - 60f = 340f
+        dragComponent(viewModel, Offset(1000f, 1000f), canvasWidth, canvasHeight)
+        assertEquals(420f, andGate.x)
+        assertEquals(340f, andGate.y)
+
+        // Drag to a valid inside position, snapping to grid (20f)
+        // cursor at (213f, 154f) -> rawX = 213 - 10 = 203 -> snap = 200f; rawY = 154 - 10 = 144 -> snap = 140f
+        dragComponent(viewModel, Offset(213f, 154f), canvasWidth, canvasHeight)
+        assertEquals(200f, andGate.x)
+        assertEquals(140f, andGate.y)
+    }
+
+    @Test
+    fun testHoverAndPlaceComponent() {
+        val viewModel = CanvasViewModel()
+        val canvasWidth = 600f
+        val canvasHeight = 500f
+
+        // Initial state: no pending component
+        assertNull(viewModel.pendingComponent)
+        assertEquals(0, viewModel.components.size)
+
+        // Trigger adding an AND gate (width = 80f, height = 60f)
+        viewModel.addComponent(ComponentType.AND)
+        val pending = viewModel.pendingComponent
+        assertNotNull(pending)
+        assertEquals(ComponentType.AND, pending.componentType)
+
+        // Hover cursor over canvas at (200f, 150f)
+        // Center alignment: rawX = 200 - 40 = 160f (snap 160f), rawY = 150 - 30 = 120f (snap 120f)
+        updatePendingComponentPosition(viewModel, Offset(200f, 150f), canvasWidth, canvasHeight)
+        assertEquals(160f, pending.x)
+        assertEquals(120f, pending.y)
+
+        // Hover near boundaries: should be constrained
+        updatePendingComponentPosition(viewModel, Offset(-50f, -50f), canvasWidth, canvasHeight)
+        assertEquals(0f, pending.x)
+        assertEquals(0f, pending.y)
+
+        updatePendingComponentPosition(viewModel, Offset(1000f, 1000f), canvasWidth, canvasHeight)
+        assertEquals(520f, pending.x) // 600 - 80 = 520
+        assertEquals(440f, pending.y) // 500 - 60 = 440
+
+        // Click to place component at (200f, 150f)
+        placePendingComponent(viewModel, Offset(200f, 150f), canvasWidth, canvasHeight)
+
+        // After placement: pendingComponent is cleared, component added to components list
+        assertNull(viewModel.pendingComponent)
+        assertEquals(1, viewModel.components.size)
+        val placed = viewModel.components.first()
+        assertEquals(ComponentType.AND, placed.componentType)
+        assertEquals(160f, placed.x)
+        assertEquals(120f, placed.y)
     }
 }

@@ -75,13 +75,21 @@ internal fun handleDrag(viewModel: CanvasViewModel , position: Offset){
     }
 }
 
-internal fun dragComponent(viewModel: CanvasViewModel, event : PointerEvent){
+internal fun dragComponent(
+    viewModel: CanvasViewModel,
+    position: Offset,
+    canvasWidth: Float = Float.MAX_VALUE,
+    canvasHeight: Float = Float.MAX_VALUE
+) {
     viewModel.dragState?.let { state ->
-        val position = event.changes.first().position
         val component = viewModel.findGate(state.componentId)
         if (component != null) {
-            val newX = snap(position.x - state.pointerOffset.x)
-            val newY = snap(position.y - state.pointerOffset.y)
+            val rawX = position.x - state.pointerOffset.x
+            val rawY = position.y - state.pointerOffset.y
+            val maxX = (canvasWidth - component.width).coerceAtLeast(0f)
+            val maxY = (canvasHeight - component.height).coerceAtLeast(0f)
+            val newX = snap(rawX).coerceIn(0f, maxX)
+            val newY = snap(rawY).coerceIn(0f, maxY)
             val index = viewModel.components.indexOf(component)
             if (index != -1) {
                 viewModel.components[index].x = newX
@@ -89,6 +97,55 @@ internal fun dragComponent(viewModel: CanvasViewModel, event : PointerEvent){
             }
         }
     }
+}
+
+internal fun dragComponent(
+    viewModel: CanvasViewModel,
+    event: PointerEvent,
+    canvasWidth: Float = Float.MAX_VALUE,
+    canvasHeight: Float = Float.MAX_VALUE
+) {
+    val position = event.changes.first().position
+    dragComponent(viewModel, position, canvasWidth, canvasHeight)
+}
+
+internal fun updatePendingComponentPosition(
+    viewModel: CanvasViewModel,
+    position: Offset,
+    canvasWidth: Float = Float.MAX_VALUE,
+    canvasHeight: Float = Float.MAX_VALUE
+) {
+    val pending = viewModel.pendingComponent ?: return
+    val rawX = position.x - pending.width / 2f
+    val rawY = position.y - pending.height / 2f
+    val maxX = (canvasWidth - pending.width).coerceAtLeast(0f)
+    val maxY = (canvasHeight - pending.height).coerceAtLeast(0f)
+    pending.x = snap(rawX).coerceIn(0f, maxX)
+    pending.y = snap(rawY).coerceIn(0f, maxY)
+}
+
+internal fun placePendingComponent(
+    viewModel: CanvasViewModel,
+    position: Offset,
+    canvasWidth: Float = Float.MAX_VALUE,
+    canvasHeight: Float = Float.MAX_VALUE
+) {
+    val pending = viewModel.pendingComponent ?: return
+    val rawX = position.x - pending.width / 2f
+    val rawY = position.y - pending.height / 2f
+    val maxX = (canvasWidth - pending.width).coerceAtLeast(0f)
+    val maxY = (canvasHeight - pending.height).coerceAtLeast(0f)
+    val finalX = snap(rawX).coerceIn(0f, maxX)
+    val finalY = snap(rawY).coerceIn(0f, maxY)
+
+    val placedComponent = createComponent(
+        type = pending.componentType,
+        id = viewModel.nextId++,
+        x = finalX,
+        y = finalY
+    )
+    viewModel.components.add(placedComponent)
+    viewModel.pendingComponent = null
 }
 
 

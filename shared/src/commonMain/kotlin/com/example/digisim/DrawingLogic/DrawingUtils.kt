@@ -6,8 +6,6 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import com.example.digisim.ComponentsDrawing.drawAnd
-import com.example.digisim.ParsingLogic.Component
-import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ComponentsDrawing.drawInput
 import com.example.digisim.ComponentsDrawing.drawNand
 import com.example.digisim.ComponentsDrawing.drawNor
@@ -16,27 +14,41 @@ import com.example.digisim.ComponentsDrawing.drawOr
 import com.example.digisim.ComponentsDrawing.drawOutput
 import com.example.digisim.ComponentsDrawing.drawXnor
 import com.example.digisim.ComponentsDrawing.drawXor
-
+import com.example.digisim.ParsingLogic.Component
+import com.example.digisim.ParsingLogic.ComponentType
+import com.example.digisim.SettingsViewModel
 import logicGates.Pin
 
-fun getComponentInnerRectColor(pin: Pin): Color {
-    return when (pin) {
-        Pin.HIGH -> Color(0xFF81C784) // Brighter green for High
-        Pin.LOW -> Color(0xFF2E7D32)  // Darker green for Low
-        Pin.ERROR -> Color(0xFFE57373)
-        Pin.UNDEFINED -> Color(0xFFC8E6C9)
-    }
+fun getComponentInnerRectColor(pin: Pin, settings: SettingsViewModel = SettingsViewModel.default): Color {
+    return settings.getComponentInnerRectColor(pin)
 }
 
-fun getComponentTextColor(pin: Pin): Color {
-    return if (pin == Pin.LOW) Color.White else Color.Black
+fun getComponentTextColor(pin: Pin, settings: SettingsViewModel = SettingsViewModel.default): Color {
+    return settings.getComponentTextColor(pin)
+}
+
+fun getGateOutlineColor(settings: SettingsViewModel = SettingsViewModel.default): Color {
+    return settings.gateOutlineColor
+}
+
+fun getPortColor(settings: SettingsViewModel = SettingsViewModel.default): Color {
+    return settings.portColor
+}
+
+fun getWireColor(settings: SettingsViewModel = SettingsViewModel.default): Color {
+    return settings.wireColor
+}
+
+fun getWireHighlightColor(settings: SettingsViewModel = SettingsViewModel.default): Color {
+    return settings.wireHighlightColor
 }
 
 internal fun DrawScope.drawWire(
     sourceComponent: Component,
     sourcePortIndex: Int,
     targetComponent: Component,
-    targetPortIndex: Int
+    targetPortIndex: Int,
+    settings: SettingsViewModel = SettingsViewModel.default
 ) {
 
     val sourcePos = if (sourceComponent.componentType == ComponentType.INPUT) {
@@ -61,25 +73,27 @@ internal fun DrawScope.drawWire(
 
     drawPath(
         path = path,
-        color = Color.Blue,
+        color = getWireColor(settings),
         style = Stroke(width = 3f)
     )
 }
 
- fun DrawScope.drawComponent(component: Component, textMeasurer: TextMeasurer){
-        when (component.componentType){
-            ComponentType.AND -> { drawAnd(component , textMeasurer)}
-            ComponentType.OR -> { drawOr(component , textMeasurer)}
-            ComponentType.NAND -> { drawNand(component , textMeasurer)}
-            ComponentType.NOR -> { drawNor(component , textMeasurer)}
-            ComponentType.XOR -> { drawXor(component , textMeasurer)}
-            ComponentType.XNOR -> { drawXnor(component , textMeasurer)}
-            ComponentType.NOT -> { drawNot(component , textMeasurer)}
-            ComponentType.OUTPUT -> { drawOutput(component , textMeasurer)}
-            ComponentType.INPUT -> { drawInput(component , textMeasurer)}
-
-
-        }
+fun DrawScope.drawComponent(
+    component: Component,
+    textMeasurer: TextMeasurer,
+    settings: SettingsViewModel = SettingsViewModel.default
+) {
+    when (component.componentType) {
+        ComponentType.AND -> { drawAnd(component, textMeasurer, settings) }
+        ComponentType.OR -> { drawOr(component, textMeasurer, settings) }
+        ComponentType.NAND -> { drawNand(component, textMeasurer, settings) }
+        ComponentType.NOR -> { drawNor(component, textMeasurer, settings) }
+        ComponentType.XOR -> { drawXor(component, textMeasurer, settings) }
+        ComponentType.XNOR -> { drawXnor(component, textMeasurer, settings) }
+        ComponentType.NOT -> { drawNot(component, textMeasurer, settings) }
+        ComponentType.OUTPUT -> { drawOutput(component, textMeasurer, settings) }
+        ComponentType.INPUT -> { drawInput(component, textMeasurer, settings) }
+    }
 }
 
 

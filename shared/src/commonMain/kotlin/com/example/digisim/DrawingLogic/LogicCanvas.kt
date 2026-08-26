@@ -34,10 +34,17 @@ fun DigitalLogicSimulator(
                     awaitPointerEventScope {
                         while (true) {
                             val event = awaitPointerEvent()
+                            val canvasWidth = size.width.toFloat()
+                            val canvasHeight = size.height.toFloat()
                             when (event.type) {
                                 PointerEventType.Press -> {
 
                                     val position = event.changes.first().position
+
+                                    if (viewModel.pendingComponent != null) {
+                                        placePendingComponent(viewModel, position, canvasWidth, canvasHeight)
+                                        continue
+                                    }
 
                                     if (viewModel.currentMode == CanvasViewModel.editingMode.WIRE){   // do the wiring
                                         wirePins(viewModel, position)
@@ -57,9 +64,23 @@ fun DigitalLogicSimulator(
 
                                 }
                                 PointerEventType.Move -> {
-                                    if (viewModel.currentMode == CanvasViewModel.editingMode.DRAG){  //do the draging
-
-                                        dragComponent(viewModel, event)
+                                    val position = event.changes.first().position
+                                    if (viewModel.pendingComponent != null) {
+                                        updatePendingComponentPosition(viewModel, position, canvasWidth, canvasHeight)
+                                    } else if (viewModel.currentMode == CanvasViewModel.editingMode.DRAG){  //do the draging
+                                        dragComponent(viewModel, event, canvasWidth, canvasHeight)
+                                    }
+                                }
+                                PointerEventType.Enter -> {
+                                    val position = event.changes.firstOrNull()?.position
+                                    if (position != null && viewModel.pendingComponent != null) {
+                                        updatePendingComponentPosition(viewModel, position, canvasWidth, canvasHeight)
+                                    }
+                                }
+                                PointerEventType.Exit -> {
+                                    if (viewModel.pendingComponent != null) {
+                                        viewModel.pendingComponent?.x = -1000f
+                                        viewModel.pendingComponent?.y = -1000f
                                     }
                                 }
                                 PointerEventType.Release -> {
@@ -90,10 +111,17 @@ fun DigitalLogicSimulator(
                 drawComponent(component , textMeasurer)
             }
 
+            // Draw pending component (hovering)
+            viewModel.pendingComponent?.let { pending ->
+                if (pending.x >= 0 && pending.y >= 0) {
+                    drawComponent(pending, textMeasurer)
+                }
+            }
+
             // Highlight wire source if selected
             viewModel.wireSource?.let { source ->
                 drawCircle(
-                    color = Color.Red,
+                    color = getWireHighlightColor(),
                     radius = 8f,
                     center = source.position
                 )

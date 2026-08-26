@@ -36,22 +36,10 @@ class CanvasViewModel: ViewModel() {
 
     var dragState by  mutableStateOf<DragState?>(null)
     var wireSource by mutableStateOf<PortHit?>(null)
+    var pendingComponent by mutableStateOf<Component?>(null)
 
     fun addComponent(type: ComponentType) {
-        val x = 50f + components.size * 20f
-        val y = 50f + components.size * 20f
-        when (type){
-            ComponentType.AND -> { components.add(And(nextId++, x, y, 2, 1))}
-            ComponentType.OR -> { components.add(Or(nextId++, x, y, 2, 1))}
-            ComponentType.NAND -> { components.add(Nand(nextId++, x, y, 2, 1))}
-            ComponentType.NOR -> { components.add(Nor(nextId++, x, y, 2, 1))}
-            ComponentType.XOR -> { components.add(Xor(nextId++, x, y, 2, 1))}
-            ComponentType.XNOR -> { components.add(XNor(nextId++, x, y, 2, 1))}
-            ComponentType.NOT -> { components.add(Not(nextId++, x, y, 1, 1))}
-            ComponentType.OUTPUT -> { components.add(Output(nextId++, x, y , 1 , 0))}
-            ComponentType.INPUT -> { components.add(Input(nextId++, x, y , 0 , 1))}
-
-        }
+        pendingComponent = createComponent(type, id = -1, x = -1000f, y = -1000f)
     }
 
 
@@ -90,4 +78,23 @@ class CanvasViewModel: ViewModel() {
     }
 
     fun findGate(id: Int): Component? = components.find { it.ID == id }
+}
+
+fun createComponent(
+    type: ComponentType,
+    id: Int = -1,
+    x: Float = 0f,
+    y: Float = 0f
+): Component {
+    return when (type) {
+        ComponentType.AND -> And(id, x, y, 2, 1)
+        ComponentType.OR -> Or(id, x, y, 2, 1)
+        ComponentType.NAND -> Nand(id, x, y, 2, 1)
+        ComponentType.NOR -> Nor(id, x, y, 2, 1)
+        ComponentType.XOR -> Xor(id, x, y, 2, 1)
+        ComponentType.XNOR -> XNor(id, x, y, 2, 1)
+        ComponentType.NOT -> Not(id, x, y, 1, 1)
+        ComponentType.OUTPUT -> Output(id, x, y, 1, 0)
+        ComponentType.INPUT -> Input(id, x, y, 0, 1)
+    }
 }
