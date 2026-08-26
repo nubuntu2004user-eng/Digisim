@@ -13,15 +13,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.DrawingLogic.DigitalLogicSimulator
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.coroutineContext
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
+        val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
         val viewModel = CanvasViewModel()
         val simulation = SimulationViewModel()
         Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-            TopRow(simulation , viewModel)
+            TopRow(simulation , viewModel , scope)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
                     componentSettings(viewModel)

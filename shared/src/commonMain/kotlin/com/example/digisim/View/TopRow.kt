@@ -6,13 +6,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.example.digisim.DrawingLogic.CanvasViewModel
-import com.example.digisim.LogicGates.And
 import com.example.digisim.SimulationHandling.SimulationViewModel
-import com.example.digisim.SimulationHandling.convertForSimulation
+import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel){
+fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope){
     val buttonList = mutableListOf(
         TopRowButtonParams("File" , {}),
         TopRowButtonParams("Edit" , {}),
@@ -20,7 +19,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel){
         TopRowButtonParams("Simulate" , {}),
         TopRowButtonParams("FPGA" , {} ),
         TopRowButtonParams("Window" , {}),
-        TopRowButtonParams("Run" , onClick = {simulation.convertData(viewModel)})
+        TopRowButtonParams("Run" , onClick = {simulation.runSimulation(viewModel , scope)})
 
     )
     Row {

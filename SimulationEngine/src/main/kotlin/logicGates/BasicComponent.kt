@@ -1,14 +1,16 @@
 package logicGates
 
 abstract class BasicComponent(val id : Int) {
-    abstract var inputs : List<Pin>
-    abstract var output: List<Pin>
+    abstract var inputs: MutableList<Pin>
+    abstract var output: MutableList<Pin>
 
     abstract var inputCount : Int
 
     abstract val inputFrom : MutableList<inputWire>
 
     abstract val outputTo : MutableList<outputWire>
+
+    abstract val componentType : ComponentType
     abstract fun evaluate(): MutableList<Pin>
 
     override fun equals(other: Any?): Boolean {
@@ -28,21 +30,16 @@ abstract class BasicComponent(val id : Int) {
 
 enum class Pin { HIGH, LOW , UNDEFINED , ERROR}
 
-enum class ComponentType { NAND , AND , OR , NOR , XOR , XNOR , NOT}
-
-//data class BasicComponentData(val id : String, //generated on front end (Ui)
-//                              val type : ComponentType,
-//                              val inputs : List<Pin>,
-//                              var output : List<Pin>,
-//                              var inputCount: Int = 2
-//)
+enum class ComponentType { NAND , AND , OR , NOR , XOR , XNOR , NOT , INPUT , OUTPUT}
 
 data class inputWire(
-    val gateId : Int ,
-    val portId : Int
+    val sourceGateId : Int,
+    val portId : Int,
+    var value : Pin = Pin.UNDEFINED
 )
 
 data class outputWire(
-    val gateId : Int ,
-    val portId : Int
+    val targetGateId : Int,
+    val portId : Int,
+    var value: Pin = Pin.UNDEFINED
 )
