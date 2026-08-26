@@ -165,6 +165,12 @@ class SharedCommonTest {
 
     @Test
     fun testSettingsViewModelColorCustomization() {
+        val defaultSettings = SettingsViewModel()
+        assertEquals(true, defaultSettings.drawText)
+
+        val noTextSettings = SettingsViewModel(drawText = false)
+        assertEquals(false, noTextSettings.drawText)
+
         val customSettings = SettingsViewModel()
         customSettings.highPinColor = Color.Cyan
         customSettings.lowPinColor = Color.Magenta
@@ -173,7 +179,9 @@ class SharedCommonTest {
         customSettings.wireColor = Color.Green
         customSettings.textHighColor = Color.Red
         customSettings.textLowColor = Color.Blue
+        customSettings.drawText = false
 
+        assertEquals(false, customSettings.drawText)
         assertEquals(Color.Cyan, customSettings.getComponentInnerRectColor(Pin.HIGH))
         assertEquals(Color.Magenta, customSettings.getComponentInnerRectColor(Pin.LOW))
         assertEquals(Color.Red, customSettings.getComponentTextColor(Pin.HIGH))

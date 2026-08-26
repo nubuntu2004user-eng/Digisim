@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
@@ -25,7 +26,9 @@ import kotlin.math.sqrt
 class CanvasViewModel: ViewModel() {
     enum class editingMode { POKE , DRAG , WIRE , EDIT}
 
-    var currentMode by mutableStateOf(editingMode.POKE)
+    var currentMode by mutableStateOf(editingMode.DRAG)
+
+    var currentWiringColor = Color.Blue
 
     var selectedGateId by mutableStateOf<Int?>(null)
 

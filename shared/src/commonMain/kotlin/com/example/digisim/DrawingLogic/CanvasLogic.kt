@@ -3,7 +3,9 @@ package com.example.digisim.DrawingLogic
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import com.example.digisim.LogicGates.Input
+import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.DragState
+import com.example.digisim.ParsingLogic.PortHit
 import com.example.digisim.ParsingLogic.Wire
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -41,15 +43,19 @@ internal fun wirePins(viewModel: CanvasViewModel, position: Offset) {
             val source = viewModel.wireSource!!
             if (source.elementId != hitPort.elementId && source.isInput != hitPort.isInput) {
                 val (outPort, inPort) = if (!source.isInput) Pair(source, hitPort) else Pair(hitPort, source)
+                val allowed = checkIfWireIsAllowed(outPort , inPort , viewModel)
+                if (allowed){
                 viewModel.wires.add(
                     Wire(
                         id = viewModel.nextId++,
                         sourceGateId = outPort.elementId,
                         sourcePortIndex = outPort.portIndex,
                         targetGateId = inPort.elementId,
-                        targetPortIndex = inPort.portIndex
+                        targetPortIndex = inPort.portIndex,
+                        color = viewModel.currentWiringColor
                     )
                 )
+                }
                 viewModel.wireSource = null
             } else {
                 viewModel.wireSource = hitPort
@@ -161,4 +167,26 @@ internal fun editComponent(viewModel: CanvasViewModel , position: Offset){
         viewModel.selectedGateId = hitGate.ID
     }
 
+}
+
+internal fun checkIfWireIsAllowed(source : PortHit, target : PortHit, viewModel: CanvasViewModel): Boolean{
+    val targetComponent = viewModel.components.find { it.ID == target.elementId }
+    if (viewModel.wires.any {
+        it.sourceGateId == source.elementId
+        }&&
+        viewModel.wires.any{
+            it.sourcePortIndex == source.portIndex
+        }&&
+        viewModel.wires.any {
+            it.targetGateId == target.elementId
+        }&&
+        viewModel.wires.any {
+            it.targetPortIndex == target.portIndex
+        }
+        ) return false
+    if (targetComponent?.componentType == ComponentType.OUTPUT){
+        val wiresTo =viewModel.wires.filter { it.targetGateId == targetComponent.ID }
+        if (wiresTo.size > 1) return false
+    }
+     return true
 }

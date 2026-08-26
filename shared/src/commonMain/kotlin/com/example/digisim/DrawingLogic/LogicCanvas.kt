@@ -10,6 +10,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.rememberTextMeasurer
 import com.example.digisim.ParsingLogic.ComponentType
+import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import kotlinx.coroutines.CoroutineScope
 
@@ -101,20 +102,21 @@ fun DigitalLogicSimulator(
                         sourceComponent = source,
                         sourcePortIndex = wire.sourcePortIndex,
                         targetComponent = target,
-                        targetPortIndex = wire.targetPortIndex
+                        targetPortIndex = wire.targetPortIndex,
+                        color = wire.color
                     )
                 }
             }
 
             //Draw All
             viewModel.components.forEach { component ->
-                drawComponent(component , textMeasurer)
+                drawComponent(component , textMeasurer , SettingsViewModel.default)
             }
 
             // Draw pending component (hovering)
             viewModel.pendingComponent?.let { pending ->
                 if (pending.x >= 0 && pending.y >= 0) {
-                    drawComponent(pending, textMeasurer)
+                    drawComponent(pending, textMeasurer , SettingsViewModel.default)
                 }
             }
 

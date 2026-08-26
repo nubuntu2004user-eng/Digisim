@@ -31,7 +31,7 @@ fun App() {
                     componentSettings(viewModel ,simulation)
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    ToolSelectorRow(viewModel)
+                    ToolSelectorRow(viewModel , simulation)
                     Box(modifier = Modifier.weight(1f)) {
                         DigitalLogicSimulator(viewModel = viewModel, simulation = simulation, scope = scope)
                     }

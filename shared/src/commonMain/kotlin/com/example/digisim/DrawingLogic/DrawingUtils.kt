@@ -35,9 +35,6 @@ fun getPortColor(settings: SettingsViewModel = SettingsViewModel.default): Color
     return settings.portColor
 }
 
-fun getWireColor(settings: SettingsViewModel = SettingsViewModel.default): Color {
-    return settings.wireColor
-}
 
 fun getWireHighlightColor(settings: SettingsViewModel = SettingsViewModel.default): Color {
     return settings.wireHighlightColor
@@ -48,7 +45,7 @@ internal fun DrawScope.drawWire(
     sourcePortIndex: Int,
     targetComponent: Component,
     targetPortIndex: Int,
-    settings: SettingsViewModel = SettingsViewModel.default
+    color: Color,
 ) {
 
     val sourcePos = if (sourceComponent.componentType == ComponentType.INPUT) {
@@ -73,7 +70,7 @@ internal fun DrawScope.drawWire(
 
     drawPath(
         path = path,
-        color = getWireColor(settings),
+        color = color,
         style = Stroke(width = 3f)
     )
 }

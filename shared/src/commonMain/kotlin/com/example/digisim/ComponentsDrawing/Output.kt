@@ -62,15 +62,17 @@ fun DrawScope.drawOutput(
     // Input port
     drawCircle(color = getPortColor(settings), radius = 6f, center = component.findPortOffset())
 
-    val label = component.ID.toString()
+    val label = "ID ${component.ID}"
     val textLayout = textMeasurer.measure(label, style = textStyle)
-    drawText(
-        textMeasurer = textMeasurer,
-        text = label,
-        style = textStyle,
-        topLeft = Offset(
-            center.x - textLayout.size.width / 2,
-            center.y - textLayout.size.height / 2
+    if (settings.drawText) {
+        drawText(
+            textMeasurer = textMeasurer,
+            text = label,
+            style = textStyle,
+            topLeft = Offset(
+                center.x - textLayout.size.width / 2,
+                center.y - textLayout.size.height / 2
+            )
         )
-    )
+    }
 }

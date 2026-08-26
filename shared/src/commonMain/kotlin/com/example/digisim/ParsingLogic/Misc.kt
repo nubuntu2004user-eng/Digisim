@@ -1,7 +1,7 @@
 package com.example.digisim.ParsingLogic
 
 import androidx.compose.ui.geometry.Offset
-
+import androidx.compose.ui.graphics.Color
 
 
 data class Wire(
@@ -9,7 +9,8 @@ data class Wire(
     val sourceGateId: Int,
     val sourcePortIndex: Int,
     val targetGateId: Int,
-    val targetPortIndex: Int
+    val targetPortIndex: Int ,
+    var color: Color = Color.Blue
 )
 
 data class PortHit(

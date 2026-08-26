@@ -66,22 +66,24 @@ fun DrawScope.drawNot(
     )
 
     // Label – using Compose's drawText (multiplatform)
-    val label = "Not №${component.ID}"
+    val label = "ID ${component.ID}"
     val textStyle = TextStyle(
         color = getComponentTextColor(component.outputPin, settings),
         fontSize = 20.sp,
         fontWeight = FontWeight.Medium
     )
     val textLayout = textMeasurer.measure(label, style = textStyle)
-    drawText(
-        textMeasurer = textMeasurer,
-        text = label,
-        style = textStyle,
-        topLeft = Offset(
-            x + bodyW * 0.35f - textLayout.size.width / 2,
-            y + h / 2 - textLayout.size.height / 2
+    if (settings.drawText) {
+        drawText(
+            textMeasurer = textMeasurer,
+            text = label,
+            style = textStyle,
+            topLeft = Offset(
+                x + bodyW * 0.35f - textLayout.size.width / 2,
+                y + h / 2 - textLayout.size.height / 2
+            )
         )
-    )
+    }
 
     // Input ports
     component.inputPortPositions().forEach { pos ->
