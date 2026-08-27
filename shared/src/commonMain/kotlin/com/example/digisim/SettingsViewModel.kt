@@ -14,8 +14,8 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
 
     var drawText: Boolean by mutableStateOf(drawText)
 
-    var highPinColor: Color by mutableStateOf(Color(0xFF81C784))
-    var lowPinColor: Color by mutableStateOf(Color(0xFF2E7D32))
+    var highPinColor: Color by mutableStateOf(Color(0xFF2E7D32))
+    var lowPinColor: Color by mutableStateOf(Color(0xFF81C784))
     var errorPinColor: Color by mutableStateOf(Color(0xFFE57373))
     var undefinedPinColor: Color by mutableStateOf(Color(0xFFC8E6C9))
     var gateOutlineColor: Color by mutableStateOf(Color(0xFF4CAF50))
