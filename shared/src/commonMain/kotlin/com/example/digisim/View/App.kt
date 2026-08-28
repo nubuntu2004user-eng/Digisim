@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.DrawingLogic.DigitalLogicSimulator
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import com.example.digisim.UiUtils.ComponentLibrariesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.coroutineContext
@@ -24,11 +25,12 @@ fun App() {
         val scope: CoroutineScope = rememberCoroutineScope()
         val viewModel = remember { CanvasViewModel() }
         val simulation = remember { SimulationViewModel() }
+        val librariesViewModel  = remember { ComponentLibrariesViewModel() }
         Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
             TopRow(simulation , viewModel , scope)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
-                    componentSettings(viewModel ,simulation)
+                    leftPanel(viewModel, simulation , librariesViewModel)
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     ToolSelectorRow(viewModel , simulation)
