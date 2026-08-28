@@ -41,6 +41,10 @@ class CanvasViewModel: ViewModel() {
     var wireSource by mutableStateOf<PortHit?>(null)
     var pendingComponent by mutableStateOf<Component?>(null)
 
+    var viewportX by mutableStateOf(0f)
+    var viewportY by mutableStateOf(0f)
+    var isPanning by mutableStateOf(false)
+
     fun addComponent(type: ComponentType) {
         pendingComponent = createComponent(type, id = -1, x = -1000f, y = -1000f)
     }

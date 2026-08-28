@@ -23,6 +23,9 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
     var wireHighlightColor: Color by mutableStateOf(Color.Red)
     var textHighColor: Color by mutableStateOf(Color.Black)
     var textLowColor: Color by mutableStateOf(Color.White)
+    
+    var gridColor: Color by mutableStateOf(Color.LightGray)
+    var gridSize: Float by mutableStateOf(20f)
 
     fun getComponentInnerRectColor(pin: Pin): Color {
         return when (pin) {

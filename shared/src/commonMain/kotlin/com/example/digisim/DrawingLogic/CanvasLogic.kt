@@ -15,15 +15,20 @@ private const val GRID_SIZE = 20f
 private fun snap(value: Float): Float =
     kotlin.math.round(value / GRID_SIZE) * GRID_SIZE
 
+fun screenToWorld(screenPos: Offset, viewportX: Float, viewportY: Float): Offset {
+    return Offset(screenPos.x + viewportX, screenPos.y + viewportY)
+}
+
 internal fun pokeComponent(
     viewModel: CanvasViewModel,
     simulation: SimulationViewModel?,
     scope: CoroutineScope?,
     position: Offset
 ) {
+    val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
     val hitGate = viewModel.components.findLast { component ->
-        position.x in component.x..(component.x + component.width) &&
-                position.y in component.y..(component.y + component.height)
+        worldPosition.x in component.x..(component.x + component.width) &&
+                worldPosition.y in component.y..(component.y + component.height)
     }
 
     if (hitGate is Input) {
@@ -35,44 +40,45 @@ internal fun pokeComponent(
 }
 
 internal fun wirePins(viewModel: CanvasViewModel, position: Offset) {
-    val hitPort = viewModel.findPortAt(position)
-    if (hitPort != null) {
-        if (viewModel.wireSource == null) {
-            viewModel.wireSource = hitPort
-        } else {
-            val source = viewModel.wireSource!!
-            if (source.elementId != hitPort.elementId && source.isInput != hitPort.isInput) {
-                val (outPort, inPort) = if (!source.isInput) Pair(source, hitPort) else Pair(hitPort, source)
-                val allowed = checkIfWireIsAllowed(outPort , inPort , viewModel)
-                if (allowed){
-                viewModel.wires.add(
-                    Wire(
-                        id = viewModel.nextId++,
-                        sourceGateId = outPort.elementId,
-                        sourcePortIndex = outPort.portIndex,
-                        targetGateId = inPort.elementId,
-                        targetPortIndex = inPort.portIndex,
-                        color = viewModel.currentWiringColor
-                    )
+    val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
+    val hitPort = viewModel.findPortAt(worldPosition) ?: return
+    
+    if (viewModel.wireSource == null) {
+        viewModel.wireSource = hitPort
+    } else {
+        val source = viewModel.wireSource!!
+        if (source.elementId != hitPort.elementId && source.isInput != hitPort.isInput) {
+            val (outPort, inPort) = if (!source.isInput) Pair(source, hitPort) else Pair(hitPort, source)
+            val allowed = checkIfWireIsAllowed(outPort , inPort , viewModel)
+            if (allowed){
+            viewModel.wires.add(
+                Wire(
+                    id = viewModel.nextId++,
+                    sourceGateId = outPort.elementId,
+                    sourcePortIndex = outPort.portIndex,
+                    targetGateId = inPort.elementId,
+                    targetPortIndex = inPort.portIndex,
+                    color = viewModel.currentWiringColor
                 )
-                }
-                viewModel.wireSource = null
-            } else {
-                viewModel.wireSource = hitPort
+            )
             }
+            viewModel.wireSource = null
+        } else {
+            viewModel.wireSource = hitPort
         }
     }
 }
 
 internal fun handleDrag(viewModel: CanvasViewModel , position: Offset){
+    val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
     val hitGate = viewModel.components.findLast { component ->
-        position.x in component.x..(component.x + component.width) &&
-                position.y in component.y..(component.y + component.height)
+        worldPosition.x in component.x..(component.x + component.width) &&
+                worldPosition.y in component.y..(component.y + component.height)
     }
     if (hitGate != null) {
         viewModel.dragState = DragState(
             componentId = hitGate.ID,
-            pointerOffset = Offset(position.x - hitGate.x, position.y - hitGate.y),
+            pointerOffset = Offset(worldPosition.x - hitGate.x, worldPosition.y - hitGate.y),
             originalX = hitGate.x,
             originalY = hitGate.y
         )
@@ -90,8 +96,9 @@ internal fun dragComponent(
     viewModel.dragState?.let { state ->
         val component = viewModel.findGate(state.componentId)
         if (component != null) {
-            val rawX = position.x - state.pointerOffset.x
-            val rawY = position.y - state.pointerOffset.y
+            val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
+            val rawX = worldPosition.x - state.pointerOffset.x
+            val rawY = worldPosition.y - state.pointerOffset.y
             val maxX = (canvasWidth - component.width).coerceAtLeast(0f)
             val maxY = (canvasHeight - component.height).coerceAtLeast(0f)
             val newX = snap(rawX).coerceIn(0f, maxX)
@@ -122,8 +129,9 @@ internal fun updatePendingComponentPosition(
     canvasHeight: Float = Float.MAX_VALUE
 ) {
     val pending = viewModel.pendingComponent ?: return
-    val rawX = position.x - pending.width / 2f
-    val rawY = position.y - pending.height / 2f
+    val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
+    val rawX = worldPosition.x - pending.width / 2f
+    val rawY = worldPosition.y - pending.height / 2f
     val maxX = (canvasWidth - pending.width).coerceAtLeast(0f)
     val maxY = (canvasHeight - pending.height).coerceAtLeast(0f)
     pending.x = snap(rawX).coerceIn(0f, maxX)
@@ -137,8 +145,9 @@ internal fun placePendingComponent(
     canvasHeight: Float = Float.MAX_VALUE
 ) {
     val pending = viewModel.pendingComponent ?: return
-    val rawX = position.x - pending.width / 2f
-    val rawY = position.y - pending.height / 2f
+    val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
+    val rawX = worldPosition.x - pending.width / 2f
+    val rawY = worldPosition.y - pending.height / 2f
     val maxX = (canvasWidth - pending.width).coerceAtLeast(0f)
     val maxY = (canvasHeight - pending.height).coerceAtLeast(0f)
     val finalX = snap(rawX).coerceIn(0f, maxX)
@@ -156,10 +165,10 @@ internal fun placePendingComponent(
 
 
 internal fun editComponent(viewModel: CanvasViewModel , position: Offset){
-
+    val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
     val hitGate = viewModel.components.findLast { gate ->
-        position.x in gate.x..(gate.x + gate.width) &&
-                position.y in gate.y..(gate.y + gate.height)
+        worldPosition.x in gate.x..(gate.x + gate.width) &&
+                worldPosition.y in gate.y..(gate.y + gate.height)
     }
 
     if (hitGate != null){
