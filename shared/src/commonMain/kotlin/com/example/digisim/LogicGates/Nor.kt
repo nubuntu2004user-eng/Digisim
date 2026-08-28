@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
-
+import com.example.digisim.DrawingLogic.calculateInputPinPositions
 
  class Nor(
      id: Int,
@@ -27,18 +27,12 @@ import com.example.digisim.ParsingLogic.ComponentType
 
     override fun findPortOffset() = Offset(0f, 0f)
 
-    fun inputPortOffsets(): List<Offset> {
-        val spacing = height / (inputCount + 1)
-        return (1..inputCount).map { i -> Offset(0f, spacing * i) }
-    }
+    override fun inputPortPositions(): List<Offset> = calculateInputPinPositions(this)
 
     fun outputPortOffsets(): List<Offset> {
         val spacing = height / (outputCount + 1)
         return (1..outputCount).map { i -> Offset(width, spacing * i) }
     }
-
-    override  fun inputPortPositions(): List<Offset> =
-        inputPortOffsets().map { it + Offset(x, y) }
 
     override fun outputPortPositions(): List<Offset> =
         outputPortOffsets().map { it + Offset(x, y) }

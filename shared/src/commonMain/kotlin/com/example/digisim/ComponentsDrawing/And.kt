@@ -55,7 +55,7 @@ fun DrawScope.drawAnd(
         style = Stroke(width = 2f)
     )
 
-    // Label – using Compose's drawText (multiplatform)
+    // Label
     val label = "ID ${component.ID}"
     val textStyle = TextStyle(
         color = getComponentTextColor(component.outputPin, settings),
@@ -74,10 +74,25 @@ fun DrawScope.drawAnd(
             )
         )
     }
+
     // Input ports
-    component.inputPortPositions().forEach { pos ->
+    val inputPositions = component.inputPortPositions()
+    if (component.inputCount > 2 && inputPositions.isNotEmpty()) {
+        // Draw the vertical line
+        val minY = inputPositions.minOf { it.y }
+        val maxY = inputPositions.maxOf { it.y }
+        drawLine(
+            color = getGateOutlineColor(settings),
+            start = Offset(x, minY),
+            end = Offset(x, maxY),
+            strokeWidth = 2f
+        )
+    }
+    
+    inputPositions.forEach { pos ->
         drawCircle(color = getPortColor(settings), radius = 6f, center = pos)
     }
+
     // Output ports
     component.outputPortPositions().forEach { pos ->
         drawCircle(color = getPortColor(settings), radius = 6f, center = pos)

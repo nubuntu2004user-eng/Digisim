@@ -1,5 +1,6 @@
 package com.example.digisim.DrawingLogic
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -19,9 +20,37 @@ import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
 import logicGates.Pin
 
+/**
+ * Calculates the positions for input ports.
+ * Modular structure to support future orientation and size changes.
+ */
+fun calculateInputPinPositions(component: Component): List<Offset> {
+    val inputCount = component.inputCount
+    if (inputCount <= 0) return emptyList()
+
+    // Base logic for standard layout (<= 2 inputs)
+    if (inputCount <= 2) {
+        val spacing = component.height / (inputCount + 1)
+        return (1..inputCount).map { i -> Offset(component.x, component.y + spacing * i) }
+    }
+
+    // Line-based layout for > 2 inputs
+    // Constant spacing
+    val pinSpacing = 20f
+
+    // For now, assume vertical orientation (standard)
+    val totalHeight = (inputCount - 1) * pinSpacing
+    val startY = component.y + (component.height / 2f) - (totalHeight / 2f)
+
+    return (0 until inputCount).map { i ->
+        Offset(component.x, startY + (i * pinSpacing))
+    }
+}
+
 fun getComponentInnerRectColor(pin: Pin, settings: SettingsViewModel = SettingsViewModel.default): Color {
     return settings.getComponentInnerRectColor(pin)
 }
+// ... existing code ...
 
 fun getComponentTextColor(pin: Pin, settings: SettingsViewModel = SettingsViewModel.default): Color {
     return settings.getComponentTextColor(pin)
