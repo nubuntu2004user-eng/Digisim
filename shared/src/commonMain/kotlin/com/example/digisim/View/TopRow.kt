@@ -23,11 +23,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope){
+fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager){
     val buttonList = listOf(
         TopRowButtonParams("File" , {}),
         TopRowButtonParams("Edit" , {}),
@@ -45,7 +46,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
         }
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
         if(!simulation.isRunning){
-            IconButton(onClick = {simulation.startSimulation(viewModel , scope) ; viewModel.currentMode = CanvasViewModel.editingMode.POKE}){
+            IconButton(onClick = {simulation.startSimulation(viewModel , scope , clockManager = clockManager) ; viewModel.currentMode = CanvasViewModel.editingMode.POKE}){
                 Icon(
                     imageVector = Icons.Filled.PlayArrow,
                     contentDescription = null

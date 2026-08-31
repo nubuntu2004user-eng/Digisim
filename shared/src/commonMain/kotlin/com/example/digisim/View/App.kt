@@ -14,6 +14,7 @@ import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.DrawingLogic.DigitalLogicSimulator
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.ComponentLibrariesViewModel
+import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.coroutineContext
@@ -26,8 +27,9 @@ fun App() {
         val viewModel = remember { CanvasViewModel() }
         val simulation = remember { SimulationViewModel() }
         val librariesViewModel  = remember { ComponentLibrariesViewModel() }
+        val clockManager = remember { ClockManager() }
         Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-            TopRow(simulation , viewModel , scope)
+            TopRow(simulation , viewModel , scope , clockManager)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
                     leftPanel(viewModel, simulation , librariesViewModel)
@@ -35,7 +37,7 @@ fun App() {
                 Column(modifier = Modifier.weight(1f)) {
                     ToolSelectorRow(viewModel , simulation)
                     Box(modifier = Modifier.weight(1f)) {
-                        DigitalLogicSimulator(viewModel = viewModel, simulation = simulation, scope = scope)
+                        DigitalLogicSimulator(viewModel = viewModel, simulation = simulation, scope = scope , clockManager = clockManager)
                     }
                 }
 

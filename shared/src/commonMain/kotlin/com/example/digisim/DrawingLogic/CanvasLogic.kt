@@ -8,6 +8,7 @@ import com.example.digisim.ParsingLogic.DragState
 import com.example.digisim.ParsingLogic.PortHit
 import com.example.digisim.ParsingLogic.Wire
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -24,7 +25,8 @@ internal fun pokeComponent(
     viewModel: CanvasViewModel,
     simulation: SimulationViewModel?,
     scope: CoroutineScope?,
-    position: Offset
+    position: Offset ,
+    clockManager: ClockManager
 ) {
     val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
     val hitGate = viewModel.components.findLast { component ->
@@ -36,7 +38,7 @@ internal fun pokeComponent(
         hitGate.switch()
         if (simulation != null && simulation.isRunning) {
             scope?.launch {
-            simulation.runSimulation(viewModel, scope)
+            simulation.runSimulation(viewModel, scope , clockManager)
             }
         }
     }

@@ -9,7 +9,7 @@ class Or(id : Int,
          override val componentType: ComponentType = ComponentType.OR,
          override var highDuration: Int? = null,
          override var lowDuration: Int? = null,
-         override var delay: Int? = null
+         override var delayTicks: Int? = null
 
 ):BasicComponent(id) {
     override suspend fun evaluate(): MutableList<Pin> {

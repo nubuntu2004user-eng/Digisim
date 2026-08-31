@@ -11,9 +11,10 @@ import com.example.digisim.LogicGates.XNor
 import com.example.digisim.LogicGates.Xor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.Wiring.Clock
+import engineLogic.ClockManager
 import logicGates.BasicComponent
 
-fun convertForSimulation(input : Component): List<BasicComponent>?{
+fun convertForSimulation(input : Component , clockManager : ClockManager): List<BasicComponent>?{
     when (input){
         is And -> return listOf( logicGates.And(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Nand ->return listOf( logicGates.Nand(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
@@ -42,7 +43,7 @@ fun convertForSimulation(input : Component): List<BasicComponent>?{
         is Or ->return listOf( logicGates.Or(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is XNor -> return listOf( logicGates.XNor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Xor ->return listOf( logicGates.Xor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Clock -> return listOf(wiring.CLOCK(input.ID ,mutableListOf() , mutableListOf(input.outputPin), input.inputCount , mutableListOf(), mutableListOf(), delay = input.delay ))
+        is Clock -> return listOf(wiring.CLOCK(input.ID ,mutableListOf() , mutableListOf(input.outputPin), input.inputCount , mutableListOf(), mutableListOf(), delayTicks = input.delay , clockManager = clockManager))
         else -> return null
 
 
@@ -50,12 +51,12 @@ fun convertForSimulation(input : Component): List<BasicComponent>?{
 
 
 }
-fun convertAll (input: MutableList<MutableList<Component>>): MutableList<MutableList<BasicComponent>>{
+fun convertAll (input: MutableList<MutableList<Component>> , clockManager: ClockManager): MutableList<MutableList<BasicComponent>>{
     val result = mutableListOf<MutableList<BasicComponent>>()
     for (stage in input){
         val tmp = mutableListOf<BasicComponent>()
         for (i in stage){
-            val converted = convertForSimulation(i)
+            val converted = convertForSimulation(i , clockManager = clockManager)
             if (converted != null && converted.isNotEmpty()) {
                 tmp.add(converted.first())
             }

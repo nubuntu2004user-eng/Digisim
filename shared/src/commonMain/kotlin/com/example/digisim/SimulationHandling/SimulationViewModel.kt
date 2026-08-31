@@ -9,6 +9,7 @@ import com.example.digisim.Wiring.Input
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.Wire
+import engineLogic.ClockManager
 import engineLogic.computeSimulation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -27,7 +28,7 @@ class SimulationViewModel : ViewModel() {
     var isAuto by mutableStateOf(true)
     val componentsState by mutableStateOf(mutableListOf<MutableList<BasicComponent>>())
 
-    fun startSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null) {
+    fun startSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null , clockManager: ClockManager) {
         isRunning = true
         isAuto = true
         viewModel.components.forEach {
@@ -36,17 +37,18 @@ class SimulationViewModel : ViewModel() {
             }
         }
         scope?.launch{
-            runSimulation(viewModel, scope)
+            runSimulation(viewModel, scope , clockManager)
         }
     }
 
-    suspend fun runSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null) {
+    suspend fun runSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null , clockManager: ClockManager) {
         val action: suspend () -> Unit = {
             val tmp = splitToStages(viewModel)
             if (tmp.isNotEmpty() && tmp.any { it.isNotEmpty() }) {
-                val splitToStages = convertAll(tmp)
+                val splitToStages = convertAll(tmp , clockManager)
                 val mappedToWires = mapWires(splitToStages, viewModel)
                 val result = computeSimulation(mappedToWires)
+                clockManager.tick ++
                 componentsState.clear()
                 componentsState.addAll(result)
                 for (stage in result) {

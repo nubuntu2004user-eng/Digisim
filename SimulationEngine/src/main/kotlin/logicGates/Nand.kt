@@ -9,7 +9,7 @@ package logicGates
             override val componentType: ComponentType = ComponentType.NAND,
             override var highDuration: Int? = null,
             override var lowDuration: Int? = null,
-            override var delay: Int? = null
+            override var delayTicks: Int? = null
 
  ):BasicComponent(id) {
 

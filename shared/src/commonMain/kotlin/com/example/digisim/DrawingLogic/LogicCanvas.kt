@@ -16,6 +16,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -24,7 +25,8 @@ fun DigitalLogicSimulator(
     modifier: Modifier = Modifier,
     viewModel: CanvasViewModel,
     simulation: SimulationViewModel? = null,
-    scope: CoroutineScope? = null
+    scope: CoroutineScope? = null,
+    clockManager: ClockManager
 ) {
 
     val textMeasurer = rememberTextMeasurer()
@@ -66,7 +68,7 @@ fun DigitalLogicSimulator(
                                     }
 
                                     else if (viewModel.currentMode == CanvasViewModel.editingMode.POKE){
-                                        pokeComponent(viewModel, simulation, scope, position)
+                                        pokeComponent(viewModel, simulation, scope, position , clockManager )
                                     }
 
                                     // Check if we hit a component
