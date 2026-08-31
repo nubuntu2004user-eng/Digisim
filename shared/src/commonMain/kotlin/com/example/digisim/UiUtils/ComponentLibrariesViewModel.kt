@@ -19,7 +19,8 @@ class ComponentLibrariesViewModel: ViewModel() {
     )
     val wiring = listOf(
         LibraryComponent("Input pin", "add Input pin", null, ComponentType.INPUT),
-        LibraryComponent("Output pin", "add Output pin", null, ComponentType.OUTPUT)
+        LibraryComponent("Output pin", "add Output pin", null, ComponentType.OUTPUT),
+        LibraryComponent("Clock" , "add Clock" , null , ComponentType.CLOCK)
     )
     val libraries = listOf(
         Libraries("Gates", gates),

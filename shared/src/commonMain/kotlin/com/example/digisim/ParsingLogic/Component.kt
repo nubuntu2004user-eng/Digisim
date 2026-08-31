@@ -20,6 +20,8 @@ abstract class Component(val ID : Int) {
 
     open var outputPin: Pin by mutableStateOf(Pin.LOW)
 
+    abstract var delay : Int?
+
     abstract fun inputPortPositions():List<Offset>
 
     abstract fun outputPortPositions():List<Offset>
@@ -27,4 +29,4 @@ abstract class Component(val ID : Int) {
     abstract fun findPortOffset() : Offset //for elements with one pin
 }
 
-enum class ComponentType {AND , NAND , NOR , OR , XNOR , XOR , NOT , INPUT , OUTPUT}
+enum class ComponentType {AND , NAND , NOR , OR , XNOR , XOR , NOT , INPUT , OUTPUT ,CLOCK}

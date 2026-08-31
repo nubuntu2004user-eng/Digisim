@@ -6,11 +6,14 @@ class Invertor(id : Int,
                override var inputCount: Int,
                override val inputFrom: MutableList<inputWire>,
                override val outputTo: MutableList<outputWire>,
-               override val componentType: ComponentType = ComponentType.NOT
+               override val componentType: ComponentType = ComponentType.NOT,
+               override var highDuration: Int? = null,
+               override var lowDuration: Int? = null,
+               override var delay: Int? = null
 
 ): BasicComponent(id) {
 
-    override fun evaluate(): MutableList<Pin> {
+    override suspend fun evaluate(): MutableList<Pin> {
         val result = mutableListOf<Pin>()
         for (i in inputs){
             when(i){

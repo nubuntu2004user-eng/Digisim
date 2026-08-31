@@ -6,6 +6,8 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.runBlocking
 import logicGates.*
 import org.junit.Test
+import wiring.Input
+import wiring.Output
 
 class ComplexLogicTests {
 

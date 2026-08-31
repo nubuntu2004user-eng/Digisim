@@ -17,10 +17,11 @@ import com.example.digisim.LogicGates.Xor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.DragState
-import com.example.digisim.LogicGates.Input
-import com.example.digisim.LogicGates.Output
+import com.example.digisim.Wiring.Input
+import com.example.digisim.Wiring.Output
 import com.example.digisim.ParsingLogic.PortHit
 import com.example.digisim.ParsingLogic.Wire
+import com.example.digisim.Wiring.Clock
 import kotlin.math.sqrt
 
 class CanvasViewModel: ViewModel() {
@@ -43,7 +44,7 @@ class CanvasViewModel: ViewModel() {
 
     var viewportX by mutableStateOf(0f)
     var viewportY by mutableStateOf(0f)
-    var isPanning by mutableStateOf(false)
+//    var isPanning by mutableStateOf(false)
 
     fun addComponent(type: ComponentType) {
         pendingComponent = createComponent(type, id = -1, x = -1000f, y = -1000f)
@@ -57,7 +58,7 @@ class CanvasViewModel: ViewModel() {
 
     fun findPortAt(position: Offset): PortHit? {
         for (component in components) {
-            if (component.componentType == ComponentType.INPUT){
+            if (component.componentType == ComponentType.INPUT || component.componentType == ComponentType.CLOCK){
                 if (distance(position, component.findPortOffset()) < 12f){
                 return   PortHit(component.ID, 0, false, component.findPortOffset())
             }
@@ -103,5 +104,6 @@ fun createComponent(
         ComponentType.NOT -> Not(id, x, y, 1, 1)
         ComponentType.OUTPUT -> Output(id, x, y, 1, 0)
         ComponentType.INPUT -> Input(id, x, y, 0, 1)
+        ComponentType.CLOCK -> Clock(id , x , y ,0 , 1, 999)
     }
 }

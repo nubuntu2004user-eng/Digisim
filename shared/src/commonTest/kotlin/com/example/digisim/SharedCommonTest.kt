@@ -12,9 +12,9 @@ import com.example.digisim.DrawingLogic.pokeComponent
 import com.example.digisim.DrawingLogic.updatePendingComponentPosition
 import com.example.digisim.DrawingLogic.wirePins
 import com.example.digisim.LogicGates.And
-import com.example.digisim.LogicGates.Input
+import com.example.digisim.Wiring.Input
 import com.example.digisim.LogicGates.Not
-import com.example.digisim.LogicGates.Output
+import com.example.digisim.Wiring.Output
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.Wire
 import com.example.digisim.SimulationHandling.SimulationViewModel

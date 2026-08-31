@@ -1,6 +1,5 @@
 package com.example.digisim.View
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -22,13 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SimulationHandling.SimulationViewModel
-import com.example.digisim.UiUtils.findComponent
 
 @Composable
 fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel){
@@ -76,6 +73,29 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                 )
             }
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+            if(component?.componentType == ComponentType.CLOCK){
+                if (convertHzToMills(component?.delay) !== null) {
+                    Text("Frequency: " + convertHzToMills(component.delay ?: 1000).toString() + "Hz")
+                }
+                else {
+                    Text("Frequency: 1KHz" )
+                }
+                var userInputDelay by remember {mutableStateOf("")}
+                OutlinedTextField(value = userInputDelay , onValueChange = {userInputDelay = it} , placeholder = {Text("Change frequency")},
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            userInputDelay.toIntOrNull()?.let {
+                                component?.delay = convertHzToMills(userInputDelay.toInt())
+                            }
+                        }){
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
+            }
             Button(onClick = {
                 viewModel.components.remove(component)
                 viewModel.selectedGateId = null
@@ -84,4 +104,17 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
             }
         }
     }
+}
+
+private fun convertHzToMills(input : Int?):Int?{
+    if (input == null){
+        return null
+    }
+    if(input > 999){
+        return null
+    }
+    if (input >1){
+        return 1000 / input
+    }
+    else return 999
 }

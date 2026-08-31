@@ -5,35 +5,42 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.digisim.DrawingLogic.CanvasViewModel
-import com.example.digisim.LogicGates.Input
+import com.example.digisim.Wiring.Input
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.Wire
 import engineLogic.computeSimulation
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logicGates.BasicComponent
 import logicGates.Pin
 import logicGates.inputWire
 import logicGates.outputWire
+import kotlin.time.Duration.Companion.milliseconds
 
 class SimulationViewModel : ViewModel() {
 
     var isRunning by mutableStateOf(false)
+
+    var isAuto by mutableStateOf(true)
     val componentsState by mutableStateOf(mutableListOf<MutableList<BasicComponent>>())
 
     fun startSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null) {
         isRunning = true
+        isAuto = true
         viewModel.components.forEach {
             if (it is Input) {
                 it.outputPin = Pin.LOW
             }
         }
-        runSimulation(viewModel, scope)
+        scope?.launch{
+            runSimulation(viewModel, scope)
+        }
     }
 
-    fun runSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null) {
+    suspend fun runSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null) {
         val action: suspend () -> Unit = {
             val tmp = splitToStages(viewModel)
             if (tmp.isNotEmpty() && tmp.any { it.isNotEmpty() }) {
@@ -53,11 +60,18 @@ class SimulationViewModel : ViewModel() {
                 }
             }
         }
-
+        if(isAuto && scope !== null){
+            while(isAuto){
+                delay(1.milliseconds)
+                scope.launch { action() }
+            }
+        }
+        else{
         if (scope != null) {
             scope.launch { action() }
         } else {
             runBlocking { action() }
+        }
         }
     }
 

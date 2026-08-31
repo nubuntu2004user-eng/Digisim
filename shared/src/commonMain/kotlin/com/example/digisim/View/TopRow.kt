@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DoubleArrow
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
@@ -36,10 +37,6 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
         TopRowButtonParams("Window" , {}),
 
     )
-    val simulationButtons = listOf(
-        simulationButton(Icons.Filled.Stop , {simulation.isRunning = false ; simulation.componentsState.clear()}),
-        simulationButton(Icons.Filled.Pause , {})
-    )
     Row {
         for (i in buttonList){
             TextButton(onClick = i.onClick){
@@ -63,14 +60,31 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
 
         }
         else{
-            for (i in simulationButtons){
-                IconButton(onClick = i.onClick){
+                IconButton(onClick = {simulation.isRunning = false ; simulation.isAuto = false ; simulation.componentsState.clear()}){
                     Icon(
-                        imageVector = i.icon,
+                        imageVector = Icons.Filled.Stop,
                         contentDescription = null
                     )
                 }
+                if (simulation.isAuto){
+                    IconButton(onClick = {simulation.isAuto = false}){
+                        Icon(
+                            imageVector = Icons.Filled.Pause,
+                            contentDescription = null
+
+                        )
+                    }
+                }
+            else{
+                    IconButton(onClick = {simulation.isAuto = true}){
+                        Icon(
+                            imageVector = Icons.Filled.DoubleArrow,
+                            contentDescription = null
+
+                        )
+                    }
             }
+
         }
         if (viewModel.currentMode == CanvasViewModel.editingMode.WIRE){
             val colorButtonList = listOf(
@@ -92,11 +106,6 @@ private data class TopRowButtonParams (
         var label : String,
         var onClick : () -> Unit
         )
-private class simulationButton(
-    val icon : ImageVector ,
-    val onClick: () -> Unit
-
-)
 private class colorButton(
     val color: Color,
     val name : String

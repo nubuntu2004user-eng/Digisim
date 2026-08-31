@@ -2,13 +2,14 @@ package com.example.digisim.DrawingLogic
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
-import com.example.digisim.LogicGates.Input
+import com.example.digisim.Wiring.Input
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.DragState
 import com.example.digisim.ParsingLogic.PortHit
 import com.example.digisim.ParsingLogic.Wire
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 private const val GRID_SIZE = 20f
 
@@ -34,7 +35,9 @@ internal fun pokeComponent(
     if (hitGate is Input) {
         hitGate.switch()
         if (simulation != null && simulation.isRunning) {
+            scope?.launch {
             simulation.runSimulation(viewModel, scope)
+            }
         }
     }
 }

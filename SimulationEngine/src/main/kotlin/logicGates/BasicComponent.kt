@@ -11,7 +11,12 @@ abstract class BasicComponent(val id : Int) {
     abstract val outputTo : MutableList<outputWire>
 
     abstract val componentType : ComponentType
-    abstract fun evaluate(): MutableList<Pin>
+
+    //componentSpecial things
+    abstract var delay: Int?
+    abstract var highDuration : Int?
+    abstract var lowDuration : Int?
+    abstract suspend fun evaluate(): MutableList<Pin>
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -30,7 +35,7 @@ abstract class BasicComponent(val id : Int) {
 
 enum class Pin { HIGH, LOW , UNDEFINED , ERROR}
 
-enum class ComponentType { NAND , AND , OR , NOR , XOR , XNOR , NOT , INPUT , OUTPUT}
+enum class ComponentType { NAND , AND , OR , NOR , XOR , XNOR , NOT , INPUT , OUTPUT , CLOCK}
 
 data class inputWire(
     val sourceGateId : Int,

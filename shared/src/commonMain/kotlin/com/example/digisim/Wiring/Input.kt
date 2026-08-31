@@ -1,4 +1,4 @@
-package com.example.digisim.LogicGates
+package com.example.digisim.Wiring
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +22,7 @@ class Input(
     override var height: Float by mutableStateOf(60f)
     override var inputCount: Int by mutableStateOf(initialInputCount)
     override var outputCount: Int by mutableStateOf(initialOutputCount)
+    override var delay: Int? = null
 
     override val componentType = ComponentType.INPUT
     val isInput = true

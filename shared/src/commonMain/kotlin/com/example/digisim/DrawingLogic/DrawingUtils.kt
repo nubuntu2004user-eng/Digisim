@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import com.example.digisim.ComponentsDrawing.drawAnd
+import com.example.digisim.ComponentsDrawing.drawClock
 import com.example.digisim.ComponentsDrawing.drawInput
 import com.example.digisim.ComponentsDrawing.drawNand
 import com.example.digisim.ComponentsDrawing.drawNor
@@ -77,7 +78,7 @@ internal fun DrawScope.drawWire(
     color: Color,
 ) {
 
-    val sourcePos = if (sourceComponent.componentType == ComponentType.INPUT) {
+    val sourcePos = if (sourceComponent.componentType == ComponentType.INPUT || sourceComponent.componentType == ComponentType.CLOCK) {
         sourceComponent.findPortOffset()
     } else {
         sourceComponent.outputPortPositions()[sourcePortIndex]
@@ -119,6 +120,7 @@ fun DrawScope.drawComponent(
         ComponentType.NOT -> { drawNot(component, textMeasurer, settings) }
         ComponentType.OUTPUT -> { drawOutput(component, textMeasurer, settings) }
         ComponentType.INPUT -> { drawInput(component, textMeasurer, settings) }
+        ComponentType.CLOCK -> {drawClock(component ,textMeasurer , settings)}
     }
 }
 

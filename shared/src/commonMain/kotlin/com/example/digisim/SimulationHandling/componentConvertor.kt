@@ -1,30 +1,48 @@
 package com.example.digisim.SimulationHandling
 
-import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.LogicGates.And
-import com.example.digisim.LogicGates.Input
+import com.example.digisim.Wiring.Input
 import com.example.digisim.LogicGates.Nand
 import com.example.digisim.LogicGates.Nor
 import com.example.digisim.LogicGates.Not
 import com.example.digisim.LogicGates.Or
-import com.example.digisim.LogicGates.Output
+import com.example.digisim.Wiring.Output
 import com.example.digisim.LogicGates.XNor
 import com.example.digisim.LogicGates.Xor
 import com.example.digisim.ParsingLogic.Component
+import com.example.digisim.Wiring.Clock
 import logicGates.BasicComponent
-import logicGates.Pin
 
 fun convertForSimulation(input : Component): List<BasicComponent>?{
     when (input){
         is And -> return listOf( logicGates.And(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Nand ->return listOf( logicGates.Nand(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Input -> return listOf( logicGates.Input(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
-        is Output ->return listOf( logicGates.Output(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Input -> return listOf(
+            wiring.Input(
+                input.ID,
+                mutableListOf(),
+                mutableListOf(input.outputPin),
+                input.inputCount,
+                mutableListOf(),
+                mutableListOf()
+            )
+        )
+        is Output ->return listOf(
+            wiring.Output(
+                input.ID,
+                mutableListOf(),
+                mutableListOf(input.outputPin),
+                input.inputCount,
+                mutableListOf(),
+                mutableListOf()
+            )
+        )
         is Not ->return listOf( logicGates.Invertor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Nor ->return listOf( logicGates.Nor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Or ->return listOf( logicGates.Or(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is XNor -> return listOf( logicGates.XNor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Xor ->return listOf( logicGates.Xor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
+        is Clock -> return listOf(wiring.CLOCK(input.ID ,mutableListOf() , mutableListOf(input.outputPin), input.inputCount , mutableListOf(), mutableListOf(), delay = input.delay ))
         else -> return null
 
 
