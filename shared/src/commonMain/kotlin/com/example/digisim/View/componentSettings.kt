@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -108,8 +109,11 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
 
             wiresIn.forEach { wireIn ->
              Row{
-                 Text(translationViewModel.getString("From component: ") + wireIn.sourceGateId + translationViewModel.getString("Port: ") + wireIn.sourcePortIndex)
-                 Button(onClick = {viewModel.wires.remove(wireIn)}){
+                 Text(translationViewModel.getString("From component: ") + wireIn.sourceGateId + translationViewModel.getString("Port: ") + wireIn.sourcePortIndex ,
+                     modifier = Modifier.padding(10.dp))
+                 Button(onClick = {viewModel.wires.remove(wireIn)} ,
+                     colors = ButtonColors(Color.Red , Color.White , Color.Red , Color.White)
+                     ){
                      Text(translationViewModel.getString("Delete"))
                  }
              }
@@ -122,8 +126,11 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
 
             wiresOut.forEach { wireOut ->
                 Row{
-                    Text(translationViewModel.getString("To component: ") + wireOut.targetGateId + translationViewModel.getString("Port: ") + wireOut.targetPortIndex)
-                    Button(onClick = {viewModel.wires.remove(wireOut)}){
+                    Text(translationViewModel.getString("To component: ") + wireOut.targetGateId + translationViewModel.getString("Port: ") + wireOut.targetPortIndex,
+                        modifier = Modifier.padding(10.dp))
+                    Button(onClick = {viewModel.wires.remove(wireOut)},
+                        colors = ButtonColors(Color.Red , Color.White , Color.Red , Color.White)
+                    ){
                         Text(translationViewModel.getString("Delete"))
                     }
                 }
@@ -181,8 +188,11 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
             Button(onClick = {
                 viewModel.components.remove(component)
                 viewModel.selectedGateId = null
-            }){
-                Text(translationViewModel.getString("Delete"))
+            },
+                colors = ButtonColors(Color.Red , Color.White , Color.Red , Color.White)
+
+            ){
+                Text(translationViewModel.getString("Delete Component"))
             }
         }
     }
