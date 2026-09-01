@@ -46,59 +46,63 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
         })
         Text( "ID: " + component?.ID.toString())
         Text("Component type:" + component?.componentType)
-            if (component?.componentType !== ComponentType.OUTPUT && component?.componentType !== ComponentType.INPUT && component?.componentType !== ComponentType.NOT){
-        Text("Input count:" + component?.inputCount)
-            var userInputCount by remember {mutableStateOf("")}
-            OutlinedTextField(value = userInputCount , onValueChange = {userInputCount = it} , placeholder = {Text("Change input count")},
-                trailingIcon = {
-                    IconButton(onClick = {
-                        userInputCount.toIntOrNull()?.let {
-                            if (it < 0){
-                                component?.inputCount = 2
+            val isMultiInputGate = component?.componentType in listOf(
+                ComponentType.AND,
+                ComponentType.OR,
+                ComponentType.NAND,
+                ComponentType.NOR,
+                ComponentType.XOR,
+                ComponentType.XNOR
+            )
+            if (isMultiInputGate) {
+                Text("Input count: " + component?.inputCount)
+                var userInputCount by remember { mutableStateOf("") }
+                OutlinedTextField(
+                    value = userInputCount,
+                    onValueChange = { userInputCount = it },
+                    placeholder = { Text("Change input count") },
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            userInputCount.toIntOrNull()?.let {
+                                if (it < 2) {
+                                    component?.inputCount = 2
+                                } else if (it > 64) {
+                                    component?.inputCount = 64
+                                } else {
+                                    component?.inputCount = it
+                                }
                             }
-                            else if (it > 64){
-                                component?.inputCount = 2
-                            }
-                            else {
-                                component?.inputCount = userInputCount.toInt()
-                            }
-
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null
+                            )
                         }
-                    }){
-                        Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = null
-                        )
                     }
-                }
                 )
             }
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
-            if(component?.componentType == ComponentType.CLOCK){
-                if (convertHzToDelay(component.delay?.toFloat()) !== null) {
-                    Text("Frequency: " + convertHzToDelay(component.delay?.toFloat() ?: 1000.0f)?.toString() + "Hz")
+            if (component?.componentType == ComponentType.CLOCK) {
+                if (convertHzToDelay(component.delay) != null) {
+                    Text("Frequency: " + convertHzToDelay(component.delay ?: 1000.0f)?.toString() + "Hz")
+                } else {
+                    Text("Frequency: 1KHz")
                 }
-                else {
-                    Text("Frequency: 1KHz" )
-                }
-                var userInputDelay by remember {mutableStateOf("")}
-                OutlinedTextField(value = userInputDelay , onValueChange = {userInputDelay = it} , placeholder = {Text("Change frequency")},
+                var userInputDelay by remember { mutableStateOf("") }
+                OutlinedTextField(
+                    value = userInputDelay,
+                    onValueChange = { userInputDelay = it },
+                    placeholder = { Text("Change frequency") },
                     trailingIcon = {
                         IconButton(onClick = {
-                            userInputDelay.toIntOrNull()?.let {
-                                val output = convertHzToDelay(userInputDelay.toFloat())
-                                if (output !== null){
-                                if (((output?.roundToInt())?.rem(2))!! == 0){
-                                    component?.delay = output
-                                }
-                                    else{
-                                    component?.delay = output -1.0f
-
-                                }
-
+                            userInputDelay.toFloatOrNull()?.let { freq ->
+                                val output = convertHzToDelay(freq)
+                                if (output != null) {
+                                    val rounded = output.roundToInt()
+                                    component.delay = if (rounded % 2 == 0) output else output - 1.0f
                                 }
                             }
-                        }){
+                        }) {
                             Icon(
                                 imageVector = Icons.Filled.Check,
                                 contentDescription = null

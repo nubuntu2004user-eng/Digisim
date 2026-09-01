@@ -3,6 +3,7 @@ package com.example.digisim
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.example.digisim.DrawingLogic.CanvasViewModel
+import com.example.digisim.DrawingLogic.createComponent
 import com.example.digisim.DrawingLogic.dragComponent
 import com.example.digisim.DrawingLogic.getComponentInnerRectColor
 import com.example.digisim.DrawingLogic.getComponentTextColor
@@ -11,13 +12,20 @@ import com.example.digisim.DrawingLogic.placePendingComponent
 import com.example.digisim.DrawingLogic.pokeComponent
 import com.example.digisim.DrawingLogic.updatePendingComponentPosition
 import com.example.digisim.DrawingLogic.wirePins
+import com.example.digisim.FlipFlops.DFlipFlop
+import com.example.digisim.FlipFlops.JKFlipFlop
+import com.example.digisim.FlipFlops.RSFlipFlop
+import com.example.digisim.FlipFlops.TFlipFlop
 import com.example.digisim.LogicGates.And
-import com.example.digisim.Wiring.Input
 import com.example.digisim.LogicGates.Not
-import com.example.digisim.Wiring.Output
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.Wire
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import com.example.digisim.UiUtils.ComponentLibrariesViewModel
+import com.example.digisim.Wiring.Input
+import com.example.digisim.Wiring.Output
+import engineLogic.ClockManager
+import kotlinx.coroutines.test.runTest
 import logicGates.Pin
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -29,12 +37,13 @@ import kotlin.test.assertTrue
 class SharedCommonTest {
 
     @Test
-    fun testSimulation() {
+    fun testSimulation() = runTest {
         val viewModel = CanvasViewModel()
         val in0 = Input(0, 0f, 0f, 0, 1)
         val in1 = Input(1, 0f, 0f, 0, 1)
         val and2 = And(2, 0f, 0f, 2, 1)
         val out3 = Output(3, 0f, 0f, 1, 0)
+        val clockManager = ClockManager()
 
         viewModel.components.addAll(listOf(in0, in1, and2, out3))
         viewModel.wires.addAll(listOf(
@@ -44,7 +53,7 @@ class SharedCommonTest {
         ))
 
         val simulation = SimulationViewModel()
-        simulation.runSimulation(viewModel)
+        simulation.runSimulation(viewModel, clockManager = clockManager)
 
         assertEquals(Pin.LOW, in0.outputPin)
         assertEquals(Pin.LOW, in1.outputPin)
@@ -59,6 +68,7 @@ class SharedCommonTest {
         val in1 = Input(1, 0f, 0f, 0, 1).apply { outputPin = Pin.HIGH }
         val and2 = And(2, 0f, 0f, 2, 1)
         val out3 = Output(3, 0f, 0f, 1, 0)
+        val clockManager = ClockManager()
 
         viewModel.components.addAll(listOf(in0, in1, and2, out3))
         viewModel.wires.addAll(listOf(
@@ -68,7 +78,7 @@ class SharedCommonTest {
         ))
 
         val simulation = SimulationViewModel()
-        simulation.startSimulation(viewModel)
+        simulation.startSimulation(viewModel, clockManager = clockManager)
 
         assertTrue(simulation.isRunning)
         assertEquals(Pin.LOW, in0.outputPin)
@@ -84,6 +94,7 @@ class SharedCommonTest {
         val in1 = Input(1, 10f, 100f, 0, 1)
         val and2 = And(2, 150f, 50f, 2, 1)
         val out3 = Output(3, 280f, 50f, 1, 0)
+        val clockManager = ClockManager()
 
         viewModel.components.addAll(listOf(in0, in1, and2, out3))
         viewModel.wires.addAll(listOf(
@@ -93,7 +104,7 @@ class SharedCommonTest {
         ))
 
         val simulation = SimulationViewModel()
-        simulation.startSimulation(viewModel)
+        simulation.startSimulation(viewModel, clockManager = clockManager)
 
         assertEquals(Pin.LOW, in0.outputPin)
         assertEquals(Pin.LOW, in1.outputPin)
@@ -101,21 +112,21 @@ class SharedCommonTest {
         assertEquals(Pin.LOW, out3.outputPin)
 
         // Poke in0 (clicking within in0's bounds: x in 10..90, y in 10..70)
-        pokeComponent(viewModel, simulation, null, Offset(20f, 20f))
+        pokeComponent(viewModel, simulation, null, Offset(20f, 20f), clockManager)
         assertEquals(Pin.HIGH, in0.outputPin)
         assertEquals(Pin.LOW, in1.outputPin)
         assertEquals(Pin.LOW, and2.outputPin)
         assertEquals(Pin.LOW, out3.outputPin)
 
         // Poke in1 (clicking within in1's bounds: x in 10..90, y in 100..160)
-        pokeComponent(viewModel, simulation, null, Offset(20f, 110f))
+        pokeComponent(viewModel, simulation, null, Offset(20f, 110f), clockManager)
         assertEquals(Pin.HIGH, in0.outputPin)
         assertEquals(Pin.HIGH, in1.outputPin)
         assertEquals(Pin.HIGH, and2.outputPin)
         assertEquals(Pin.HIGH, out3.outputPin)
 
         // Poke in0 again -> turns OFF
-        pokeComponent(viewModel, simulation, null, Offset(20f, 20f))
+        pokeComponent(viewModel, simulation, null, Offset(20f, 20f), clockManager)
         assertEquals(Pin.LOW, in0.outputPin)
         assertEquals(Pin.HIGH, in1.outputPin)
         assertEquals(Pin.LOW, and2.outputPin)
@@ -128,6 +139,7 @@ class SharedCommonTest {
         val in0 = Input(0, 10f, 10f, 0, 1)
         val not1 = Not(1, 120f, 10f, 1, 1)
         val out2 = Output(2, 240f, 10f, 1, 0)
+        val clockManager = ClockManager()
 
         viewModel.components.addAll(listOf(in0, not1, out2))
         viewModel.wires.addAll(listOf(
@@ -136,7 +148,7 @@ class SharedCommonTest {
         ))
 
         val simulation = SimulationViewModel()
-        simulation.startSimulation(viewModel)
+        simulation.startSimulation(viewModel, clockManager = clockManager)
 
         // Initially input is LOW, so NOT output is HIGH, Output is HIGH
         assertEquals(Pin.LOW, in0.outputPin)
@@ -144,7 +156,7 @@ class SharedCommonTest {
         assertEquals(Pin.HIGH, out2.outputPin)
 
         // Poke input to HIGH -> NOT output becomes LOW, Output becomes LOW
-        pokeComponent(viewModel, simulation, null, Offset(20f, 20f))
+        pokeComponent(viewModel, simulation, null, Offset(20f, 20f), clockManager)
         assertEquals(Pin.HIGH, in0.outputPin)
         assertEquals(Pin.LOW, not1.outputPin)
         assertEquals(Pin.LOW, out2.outputPin)
@@ -156,8 +168,8 @@ class SharedCommonTest {
         val lowColor = getComponentInnerRectColor(Pin.LOW)
 
         assertNotEquals(highColor, lowColor)
-        assertEquals(Color(0xFF81C784), highColor)
-        assertEquals(Color(0xFF2E7D32), lowColor)
+        assertEquals(Color(0xFF2E7D32), highColor)
+        assertEquals(Color(0xFF81C784), lowColor)
 
         assertEquals(Color.Black, getComponentTextColor(Pin.HIGH))
         assertEquals(Color.White, getComponentTextColor(Pin.LOW))
@@ -176,7 +188,7 @@ class SharedCommonTest {
         customSettings.lowPinColor = Color.Magenta
         customSettings.gateOutlineColor = Color.Yellow
         customSettings.portColor = Color.DarkGray
-        customSettings.wireColor = Color.Green
+        customSettings.wireHighlightColor = Color.Green
         customSettings.textHighColor = Color.Red
         customSettings.textLowColor = Color.Blue
         customSettings.drawText = false
@@ -188,7 +200,7 @@ class SharedCommonTest {
         assertEquals(Color.Blue, customSettings.getComponentTextColor(Pin.LOW))
         assertEquals(Color.Yellow, customSettings.gateOutlineColor)
         assertEquals(Color.DarkGray, customSettings.portColor)
-        assertEquals(Color.Green, customSettings.wireColor)
+        assertEquals(Color.Green, customSettings.wireHighlightColor)
     }
 
     @Test
@@ -197,13 +209,14 @@ class SharedCommonTest {
         val in0 = Input(0, 10f, 10f, 0, 1)
         val not1 = Not(1, 150f, 10f, 1, 1)
         val out2 = Output(2, 300f, 10f, 1, 0)
+        val clockManager = ClockManager()
 
         viewModel.components.addAll(listOf(in0, not1, out2))
 
         // Wire from in0 output port to not1 input port
-        val in0OutPortPos = in0.findPortOffset() // Offset(90f, 40f)
+        val in0OutPortPos = in0.findPortOffset()
         wirePins(viewModel, in0OutPortPos)
-        val not1InPortPos = not1.inputPortPositions().first() // Offset(150f, 40f)
+        val not1InPortPos = not1.inputPortPositions().first()
         wirePins(viewModel, not1InPortPos)
 
         assertEquals(1, viewModel.wires.size)
@@ -211,9 +224,9 @@ class SharedCommonTest {
         assertEquals(1, viewModel.wires[0].targetGateId)
 
         // Wire from out2 input port to not1 output port (reverse direction)
-        val out2InPortPos = out2.findPortOffset() // Offset(300f, 40f)
+        val out2InPortPos = out2.findPortOffset()
         wirePins(viewModel, out2InPortPos)
-        val not1OutPortPos = not1.outputPortPositions().first() // Offset(230f, 40f)
+        val not1OutPortPos = not1.outputPortPositions().first()
         wirePins(viewModel, not1OutPortPos)
 
         assertEquals(2, viewModel.wires.size)
@@ -222,7 +235,7 @@ class SharedCommonTest {
 
         // Run simulation on the wired circuit
         val simulation = SimulationViewModel()
-        simulation.startSimulation(viewModel)
+        simulation.startSimulation(viewModel, clockManager = clockManager)
 
         assertEquals(Pin.LOW, in0.outputPin)
         assertEquals(Pin.HIGH, not1.outputPin)
@@ -230,31 +243,91 @@ class SharedCommonTest {
     }
 
     @Test
+    fun testFlipFlopCreationAndLibraries() {
+        val libVm = ComponentLibrariesViewModel()
+        val flipFlopsLib = libVm.libraries.find { it.name == "Flip-Flops" }
+        assertNotNull(flipFlopsLib)
+        assertEquals(4, flipFlopsLib.components.size)
+
+        val rsComp = createComponent(ComponentType.RS_FLIP_FLOP, 1, 10f, 20f)
+        assertTrue(rsComp is RSFlipFlop)
+        assertEquals(2, rsComp.inputCount)
+        assertEquals(2, rsComp.outputCount)
+
+        val jkComp = createComponent(ComponentType.JK_FLIP_FLOP, 2, 10f, 20f)
+        assertTrue(jkComp is JKFlipFlop)
+        assertEquals(3, jkComp.inputCount)
+        assertEquals(2, jkComp.outputCount)
+
+        val dComp = createComponent(ComponentType.D_FLIP_FLOP, 3, 10f, 20f)
+        assertTrue(dComp is DFlipFlop)
+        assertEquals(2, dComp.inputCount)
+        assertEquals(2, dComp.outputCount)
+
+        val tComp = createComponent(ComponentType.T_FLIP_FLOP, 4, 10f, 20f)
+        assertTrue(tComp is TFlipFlop)
+        assertEquals(2, tComp.inputCount)
+        assertEquals(2, tComp.outputCount)
+
+        val btnComp = createComponent(ComponentType.BUTTON, 5, 10f, 20f)
+        assertTrue(btnComp is com.example.digisim.Wiring.Button)
+        assertEquals(0, btnComp.inputCount)
+        assertEquals(1, btnComp.outputCount)
+
+        val wiringLib = libVm.libraries.find { it.name == "Wiring" }
+        assertNotNull(wiringLib)
+        assertTrue(wiringLib.components.any { it.type == ComponentType.BUTTON })
+    }
+
+    @Test
+    fun testButtonPokeInteractionInUi() {
+        val viewModel = CanvasViewModel()
+        val btn = com.example.digisim.Wiring.Button(0, 10f, 10f, 0, 1)
+        val out1 = Output(1, 150f, 10f, 1, 0)
+        val clockManager = ClockManager()
+
+        viewModel.components.addAll(listOf(btn, out1))
+        viewModel.wires.add(Wire(2, 0, 0, 1, 0))
+
+        val simulation = SimulationViewModel()
+        simulation.startSimulation(viewModel, clockManager = clockManager)
+
+        // Initially LOW
+        assertEquals(Pin.LOW, btn.outputPin)
+        assertEquals(Pin.LOW, out1.outputPin)
+
+        // Poke Button -> fires 1-tick pulse (HIGH)
+        pokeComponent(viewModel, simulation, null, Offset(20f, 20f), clockManager)
+        assertEquals(Pin.HIGH, out1.outputPin)
+
+        // Next tick evaluation without poke -> Button automatically resets to LOW
+        kotlinx.coroutines.runBlocking {
+            simulation.runSimulation(viewModel, null, clockManager)
+        }
+        assertEquals(Pin.LOW, btn.outputPin)
+        assertEquals(Pin.LOW, out1.outputPin)
+    }
+
+    @Test
     fun testDragBoundaryConstraints() {
         val viewModel = CanvasViewModel()
-        val andGate = And(0, 100f, 100f, 2, 1) // width = 80f, height = 60f
+        val andGate = And(0, 100f, 100f, 2, 1)
         viewModel.components.add(andGate)
 
         val canvasWidth = 500f
         val canvasHeight = 400f
 
-        // Initiate drag on andGate at offset (10f, 10f) relative to gate top-left
         handleDrag(viewModel, Offset(110f, 110f))
         assertNotNull(viewModel.dragState)
 
-        // Drag beyond top-left boundary (negative position)
         dragComponent(viewModel, Offset(-200f, -100f), canvasWidth, canvasHeight)
         assertEquals(0f, andGate.x)
         assertEquals(0f, andGate.y)
 
-        // Drag beyond bottom-right boundary
-        // maxX = 500f - 80f = 420f, maxY = 400f - 60f = 340f
         dragComponent(viewModel, Offset(1000f, 1000f), canvasWidth, canvasHeight)
         assertEquals(420f, andGate.x)
         assertEquals(340f, andGate.y)
 
-        // Drag to a valid inside position, snapping to grid (20f)
-        // cursor at (213f, 154f) -> rawX = 213 - 10 = 203 -> snap = 200f; rawY = 154 - 10 = 144 -> snap = 140f
         dragComponent(viewModel, Offset(213f, 154f), canvasWidth, canvasHeight)
         assertEquals(200f, andGate.x)
         assertEquals(140f, andGate.y)
@@ -266,35 +339,28 @@ class SharedCommonTest {
         val canvasWidth = 600f
         val canvasHeight = 500f
 
-        // Initial state: no pending component
         assertNull(viewModel.pendingComponent)
         assertEquals(0, viewModel.components.size)
 
-        // Trigger adding an AND gate (width = 80f, height = 60f)
         viewModel.addComponent(ComponentType.AND)
         val pending = viewModel.pendingComponent
         assertNotNull(pending)
         assertEquals(ComponentType.AND, pending.componentType)
 
-        // Hover cursor over canvas at (200f, 150f)
-        // Center alignment: rawX = 200 - 40 = 160f (snap 160f), rawY = 150 - 30 = 120f (snap 120f)
         updatePendingComponentPosition(viewModel, Offset(200f, 150f), canvasWidth, canvasHeight)
         assertEquals(160f, pending.x)
         assertEquals(120f, pending.y)
 
-        // Hover near boundaries: should be constrained
         updatePendingComponentPosition(viewModel, Offset(-50f, -50f), canvasWidth, canvasHeight)
         assertEquals(0f, pending.x)
         assertEquals(0f, pending.y)
 
         updatePendingComponentPosition(viewModel, Offset(1000f, 1000f), canvasWidth, canvasHeight)
-        assertEquals(520f, pending.x) // 600 - 80 = 520
-        assertEquals(440f, pending.y) // 500 - 60 = 440
+        assertEquals(520f, pending.x)
+        assertEquals(440f, pending.y)
 
-        // Click to place component at (200f, 150f)
         placePendingComponent(viewModel, Offset(200f, 150f), canvasWidth, canvasHeight)
 
-        // After placement: pendingComponent is cleared, component added to components list
         assertNull(viewModel.pendingComponent)
         assertEquals(1, viewModel.components.size)
         val placed = viewModel.components.first()

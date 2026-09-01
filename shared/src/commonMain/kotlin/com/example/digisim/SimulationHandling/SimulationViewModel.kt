@@ -25,19 +25,25 @@ class SimulationViewModel : ViewModel() {
 
     var isRunning by mutableStateOf(false)
 
-    var isAuto by mutableStateOf(true)
+    var isAuto by mutableStateOf(false)
     val componentsState by mutableStateOf(mutableListOf<MutableList<BasicComponent>>())
 
-    fun startSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null , clockManager: ClockManager) {
+    fun startSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null, clockManager: ClockManager) {
         isRunning = true
-        isAuto = true
+//        isAuto = false
         viewModel.components.forEach {
             if (it is Input) {
                 it.outputPin = Pin.LOW
             }
         }
-        scope?.launch{
-            runSimulation(viewModel, scope , clockManager)
+        if (scope != null) {
+            scope.launch {
+                runSimulation(viewModel, scope, clockManager)
+            }
+        } else {
+            runBlocking {
+                runSimulation(viewModel, null, clockManager)
+            }
         }
     }
 
@@ -86,7 +92,7 @@ class SimulationViewModel : ViewModel() {
 
         val initialOutputs = components.filter { comp ->
             comp.componentType == ComponentType.OUTPUT ||
-                    (wires.none { it.sourceGateId == comp.ID } && comp.componentType != ComponentType.INPUT)
+                    (wires.none { it.sourceGateId == comp.ID } && comp.componentType != ComponentType.INPUT && comp.componentType != ComponentType.BUTTON && comp.componentType != ComponentType.CLOCK)
         }.toMutableList()
 
         val startStage = if (initialOutputs.isNotEmpty()) initialOutputs else components.toMutableList()
@@ -108,11 +114,11 @@ class SimulationViewModel : ViewModel() {
             if (checkIfLast(result)) done = true
         }
 
-        val allInputs = components.filter { it.componentType == ComponentType.INPUT }
-        val inputsInStages = result.flatten().filter { it.componentType == ComponentType.INPUT }.map { it.ID }.toSet()
+        val allInputs = components.filter { it.componentType == ComponentType.INPUT || it.componentType == ComponentType.CLOCK || it.componentType == ComponentType.BUTTON }
+        val inputsInStages = result.flatten().filter { it.componentType == ComponentType.INPUT || it.componentType == ComponentType.CLOCK || it.componentType == ComponentType.BUTTON }.map { it.ID }.toSet()
         val missingInputs = allInputs.filter { it.ID !in inputsInStages }.toMutableList()
         if (missingInputs.isNotEmpty()) {
-            if (result.isNotEmpty() && result.last().all { it.componentType == ComponentType.INPUT }) {
+            if (result.isNotEmpty() && result.last().all { it.componentType == ComponentType.INPUT || it.componentType == ComponentType.CLOCK || it.componentType == ComponentType.BUTTON }) {
                 result.last().addAll(missingInputs)
             } else {
                 result.add(missingInputs)
@@ -138,7 +144,7 @@ class SimulationViewModel : ViewModel() {
     private fun checkIfLast(input: MutableList<MutableList<Component>>): Boolean {
         if (input.isEmpty() || input.last().isEmpty()) return true
         for (i in input.last()) {
-            if (i.componentType != ComponentType.INPUT) {
+            if (i.componentType != ComponentType.INPUT && i.componentType != ComponentType.CLOCK && i.componentType != ComponentType.BUTTON) {
                 return false
             }
         }
@@ -156,7 +162,7 @@ class SimulationViewModel : ViewModel() {
                     if (wire.targetGateId == i.id) {
                         i.inputFrom += inputWire(wire.sourceGateId, wire.targetPortIndex)
                     } else if (wire.sourceGateId == i.id) {
-                        i.outputTo += outputWire(wire.targetGateId, wire.targetPortIndex)
+                        i.outputTo += outputWire(wire.targetGateId, wire.targetPortIndex, sourcePortId = wire.sourcePortIndex)
                     }
                 }
                 i.inputFrom.sortBy { it.portId }

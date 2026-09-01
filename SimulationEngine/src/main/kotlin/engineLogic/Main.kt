@@ -8,10 +8,13 @@ suspend fun computeSimulation ( input : MutableList<MutableList<BasicComponent>>
     val result = input.reversed().toMutableList()
     for (stage in result){
         for (element in stage){
-            if (element.componentType == ComponentType.INPUT ){
-                val outVal = element.evaluate().firstOrNull() ?: Pin.LOW
-                element.output = mutableListOf(outVal)
-                for(i in element.outputTo){
+            if (element.componentType == ComponentType.INPUT || element.componentType == ComponentType.BUTTON) {
+                val evalList = element.evaluate()
+                val outVal = evalList.firstOrNull() ?: Pin.LOW
+                if (element.componentType == ComponentType.INPUT) {
+                    element.output = mutableListOf(outVal)
+                }
+                for (i in element.outputTo) {
                     i.value = outVal
                     for (downstreamStage in result) {
                         for (downstreamElem in downstreamStage) {
@@ -31,9 +34,9 @@ suspend fun computeSimulation ( input : MutableList<MutableList<BasicComponent>>
                     element.inputs.add(Pin.UNDEFINED)
                 }
                 val evalList = element.evaluate()
-                val outVal = evalList.firstOrNull() ?: Pin.LOW
-                element.output = mutableListOf(outVal)
+                element.output = evalList
                 for (i in element.outputTo){
+                    val outVal = evalList.getOrElse(i.sourcePortId) { evalList.firstOrNull() ?: Pin.LOW }
                     i.value = outVal
                     for (downstreamStage in result) {
                         for (downstreamElem in downstreamStage) {

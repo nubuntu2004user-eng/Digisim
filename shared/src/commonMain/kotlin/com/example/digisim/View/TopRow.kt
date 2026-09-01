@@ -1,5 +1,6 @@
 package com.example.digisim.View
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +13,15 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,21 +34,8 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager){
-    val buttonList = listOf(
-        TopRowButtonParams("File" , {}),
-        TopRowButtonParams("Edit" , {}),
-        TopRowButtonParams("Project" , {}),
-        TopRowButtonParams("Simulate" , {}),
-        TopRowButtonParams("FPGA" , {} ),
-        TopRowButtonParams("Window" , {}),
-
-    )
     Row {
-        for (i in buttonList){
-            TextButton(onClick = i.onClick){
-                Text(i.label , color = Color.Black)
-            }
-        }
+        controlButtons()
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
         if(!simulation.isRunning){
             IconButton(onClick = {simulation.startSimulation(viewModel , scope , clockManager = clockManager) ; viewModel.currentMode = CanvasViewModel.editingMode.POKE}){
@@ -100,13 +92,6 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
 
     }
 }
-
-
-
-private data class TopRowButtonParams (
-        var label : String,
-        var onClick : () -> Unit
-        )
 private class colorButton(
     val color: Color,
     val name : String

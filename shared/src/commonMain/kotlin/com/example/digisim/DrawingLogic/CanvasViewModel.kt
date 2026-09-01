@@ -7,6 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.example.digisim.FlipFlops.DFlipFlop
+import com.example.digisim.FlipFlops.JKFlipFlop
+import com.example.digisim.FlipFlops.RSFlipFlop
+import com.example.digisim.FlipFlops.TFlipFlop
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
 import com.example.digisim.LogicGates.Nor
@@ -17,6 +21,7 @@ import com.example.digisim.LogicGates.Xor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.DragState
+import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Input
 import com.example.digisim.Wiring.Output
 import com.example.digisim.ParsingLogic.PortHit
@@ -58,18 +63,18 @@ class CanvasViewModel: ViewModel() {
 
     fun findPortAt(position: Offset): PortHit? {
         for (component in components) {
-            if (component.componentType == ComponentType.INPUT || component.componentType == ComponentType.CLOCK){
-                if (distance(position, component.findPortOffset()) < 12f){
-                return   PortHit(component.ID, 0, false, component.findPortOffset())
-            }
-            }
-            if (component.componentType == ComponentType.OUTPUT){
+            if (component.componentType == ComponentType.INPUT || component.componentType == ComponentType.CLOCK || component.componentType == ComponentType.BUTTON) {
                 if (distance(position, component.findPortOffset()) < 12f) {
-                return   PortHit(component.ID, 0, true, component.findPortOffset())
-            }}
+                    return PortHit(component.ID, 0, false, component.findPortOffset())
+                }
+            }
+            if (component.componentType == ComponentType.OUTPUT) {
+                if (distance(position, component.findPortOffset()) < 12f) {
+                    return PortHit(component.ID, 0, true, component.findPortOffset())
+                }
+            }
             component.inputPortPositions().forEachIndexed { idx, portPos ->
                 if (distance(position, portPos) < 12f) {
-
                     return PortHit(component.ID, idx, true, portPos)
                 }
             }
@@ -79,8 +84,6 @@ class CanvasViewModel: ViewModel() {
                 }
             }
         }
-
-
 
         return null
     }
@@ -104,6 +107,11 @@ fun createComponent(
         ComponentType.NOT -> Not(id, x, y, 1, 1)
         ComponentType.OUTPUT -> Output(id, x, y, 1, 0)
         ComponentType.INPUT -> Input(id, x, y, 0, 1)
-        ComponentType.CLOCK -> Clock(id , x , y ,0 , 1, 999.0f)
+        ComponentType.BUTTON -> Button(id, x, y, 0, 1)
+        ComponentType.CLOCK -> Clock(id, x, y, 0, 1, 999.0f)
+        ComponentType.RS_FLIP_FLOP -> RSFlipFlop(id, x, y, 2, 2)
+        ComponentType.JK_FLIP_FLOP -> JKFlipFlop(id, x, y, 3, 2)
+        ComponentType.D_FLIP_FLOP -> DFlipFlop(id, x, y, 2, 2)
+        ComponentType.T_FLIP_FLOP -> TFlipFlop(id, x, y, 2, 2)
     }
 }

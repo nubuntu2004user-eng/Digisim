@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import com.example.digisim.ComponentsDrawing.drawAnd
+import com.example.digisim.ComponentsDrawing.drawButton
 import com.example.digisim.ComponentsDrawing.drawClock
 import com.example.digisim.ComponentsDrawing.drawInput
 import com.example.digisim.ComponentsDrawing.drawNand
@@ -16,6 +17,10 @@ import com.example.digisim.ComponentsDrawing.drawOr
 import com.example.digisim.ComponentsDrawing.drawOutput
 import com.example.digisim.ComponentsDrawing.drawXnor
 import com.example.digisim.ComponentsDrawing.drawXor
+import com.example.digisim.ComponentsDrawing.drawDFlipFlop
+import com.example.digisim.ComponentsDrawing.drawJKFlipFlop
+import com.example.digisim.ComponentsDrawing.drawRSFlipFlop
+import com.example.digisim.ComponentsDrawing.drawTFlipFlop
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
@@ -78,7 +83,7 @@ internal fun DrawScope.drawWire(
     color: Color,
 ) {
 
-    val sourcePos = if (sourceComponent.componentType == ComponentType.INPUT || sourceComponent.componentType == ComponentType.CLOCK) {
+    val sourcePos = if (sourceComponent.componentType == ComponentType.INPUT || sourceComponent.componentType == ComponentType.CLOCK || sourceComponent.componentType == ComponentType.BUTTON) {
         sourceComponent.findPortOffset()
     } else {
         sourceComponent.outputPortPositions()[sourcePortIndex]
@@ -120,7 +125,12 @@ fun DrawScope.drawComponent(
         ComponentType.NOT -> { drawNot(component, textMeasurer, settings) }
         ComponentType.OUTPUT -> { drawOutput(component, textMeasurer, settings) }
         ComponentType.INPUT -> { drawInput(component, textMeasurer, settings) }
-        ComponentType.CLOCK -> {drawClock(component ,textMeasurer , settings)}
+        ComponentType.BUTTON -> { drawButton(component, textMeasurer, settings) }
+        ComponentType.CLOCK -> { drawClock(component, textMeasurer, settings) }
+        ComponentType.RS_FLIP_FLOP -> { drawRSFlipFlop(component, textMeasurer, settings) }
+        ComponentType.JK_FLIP_FLOP -> { drawJKFlipFlop(component, textMeasurer, settings) }
+        ComponentType.D_FLIP_FLOP -> { drawDFlipFlop(component, textMeasurer, settings) }
+        ComponentType.T_FLIP_FLOP -> { drawTFlipFlop(component, textMeasurer, settings) }
     }
 }
 

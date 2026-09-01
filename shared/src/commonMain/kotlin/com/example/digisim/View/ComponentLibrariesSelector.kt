@@ -47,15 +47,15 @@ import com.example.digisim.UiUtils.ComponentLibrariesViewModel
 
 @Composable
 fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: ComponentLibrariesViewModel){
-    var selectedLibrary = libraryViewModel.libraries[libraryViewModel.currentLibraryIndex]
-    var componentList by mutableStateOf(selectedLibrary.components)
-    var previewComponents by mutableStateOf(
+    val selectedLibrary = libraryViewModel.libraries[libraryViewModel.currentLibraryIndex]
+    val componentList = selectedLibrary.components
+    val currentLibraryName = selectedLibrary.name
+    val previewComponents = remember(componentList) {
         componentList.associate { it.type to createComponent(it.type, id = -1, x = 0f, y = 0f) }
-    )
+    }
     val previewSettings = remember { SettingsViewModel(drawText = false) }
     val textMeasurer = rememberTextMeasurer()
-    var currentLibraryName by mutableStateOf(selectedLibrary.name)
-    Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.2f)) {
+    Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.3f)) {
         Row(modifier = Modifier.fillMaxWidth()){
             Spacer(modifier = Modifier.fillMaxWidth(0.2f))
             IconButton(onClick = {libraryViewModel.previousLib()} , modifier = Modifier){

@@ -35,7 +35,7 @@ abstract class BasicComponent(val id : Int) {
 
 enum class Pin { HIGH, LOW , UNDEFINED , ERROR}
 
-enum class ComponentType { NAND , AND , OR , NOR , XOR , XNOR , NOT , INPUT , OUTPUT , CLOCK}
+enum class ComponentType { NAND , AND , OR , NOR , XOR , XNOR , NOT , INPUT , OUTPUT , CLOCK, RS_FLIP_FLOP, JK_FLIP_FLOP, D_FLIP_FLOP, T_FLIP_FLOP, BUTTON }
 
 data class inputWire(
     val sourceGateId : Int,
@@ -46,5 +46,6 @@ data class inputWire(
 data class outputWire(
     val targetGateId : Int,
     val portId : Int,
-    var value: Pin = Pin.UNDEFINED
+    var value: Pin = Pin.UNDEFINED,
+    val sourcePortId: Int = 0
 )

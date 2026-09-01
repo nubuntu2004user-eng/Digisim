@@ -2,6 +2,7 @@ package com.example.digisim.DrawingLogic
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
+import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Input
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.DragState
@@ -37,8 +38,27 @@ internal fun pokeComponent(
     if (hitGate is Input) {
         hitGate.switch()
         if (simulation != null && simulation.isRunning) {
-            scope?.launch {
-            simulation.runSimulation(viewModel, scope , clockManager)
+            if (scope != null) {
+                scope.launch {
+                    simulation.runSimulation(viewModel, scope, clockManager)
+                }
+            } else {
+                kotlinx.coroutines.runBlocking {
+                    simulation.runSimulation(viewModel, null, clockManager)
+                }
+            }
+        }
+    } else if (hitGate is Button) {
+        hitGate.press()
+        if (simulation != null && simulation.isRunning) {
+            if (scope != null) {
+                scope.launch {
+                    simulation.runSimulation(viewModel, scope, clockManager)
+                }
+            } else {
+                kotlinx.coroutines.runBlocking {
+                    simulation.runSimulation(viewModel, null, clockManager)
+                }
             }
         }
     }

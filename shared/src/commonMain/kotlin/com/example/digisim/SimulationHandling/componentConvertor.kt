@@ -1,6 +1,11 @@
 package com.example.digisim.SimulationHandling
 
+import com.example.digisim.FlipFlops.DFlipFlop
+import com.example.digisim.FlipFlops.JKFlipFlop
+import com.example.digisim.FlipFlops.RSFlipFlop
+import com.example.digisim.FlipFlops.TFlipFlop
 import com.example.digisim.LogicGates.And
+import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Input
 import com.example.digisim.LogicGates.Nand
 import com.example.digisim.LogicGates.Nor
@@ -44,12 +49,22 @@ fun convertForSimulation(input : Component , clockManager : ClockManager): List<
         is XNor -> return listOf( logicGates.XNor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Xor ->return listOf( logicGates.Xor(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Clock -> return listOf(wiring.CLOCK(input.ID ,mutableListOf() , mutableListOf(input.outputPin), input.inputCount , mutableListOf(), mutableListOf(), delayTicks = input.delay , clockManager = clockManager))
+        is Button -> return listOf(
+            wiring.Button(
+                input.ID,
+                mutableListOf(),
+                mutableListOf(input.outputPin),
+                input.inputCount,
+                mutableListOf(),
+                mutableListOf()
+            )
+        )
+        is RSFlipFlop -> return listOf(flipFlops.RSFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is JKFlipFlop -> return listOf(flipFlops.JKFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is DFlipFlop -> return listOf(flipFlops.DFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is TFlipFlop -> return listOf(flipFlops.TFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
         else -> return null
-
-
     }
-
-
 }
 fun convertAll (input: MutableList<MutableList<Component>> , clockManager: ClockManager): MutableList<MutableList<BasicComponent>>{
     val result = mutableListOf<MutableList<BasicComponent>>()
