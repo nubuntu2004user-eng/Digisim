@@ -1,7 +1,11 @@
 package com.example.digisim.Persistance
 
-import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.Wire
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.exists
+import io.github.vinceglb.filekit.parent
+import io.github.vinceglb.filekit.readString
+import io.github.vinceglb.filekit.writeString
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -24,16 +28,14 @@ internal object persistanceRepository {
         }
         return File(base , "DigiSim").apply { mkdirs() }
         }
-    internal fun saveAs(file: File, components: MutableList<ComponentDto>, wires : MutableList<Wire>) {
-        file.parentFile?.mkdirs()
+    internal suspend fun saveAs(file: PlatformFile, components: MutableList<ComponentDto>, wires: MutableList<Wire>) {
         val circuitData = CircuitData(components, wires)
-        val content = json.encodeToString(  circuitData)
-        file.writeText(content)
-
+        val content = json.encodeToString(circuitData)
+        file.writeString(content)
     }
-    internal fun load(file: File): CircuitData {
-        if (!file.exists()) return CircuitData(mutableListOf(), mutableListOf())
-        return json.decodeFromString(file.readText())
+    internal suspend fun load(file: PlatformFile?): CircuitData? {
+        file?.exists()?.let { if (!it) return CircuitData(mutableListOf(), mutableListOf()) }
+        return file?.readString()?.let { json.decodeFromString(it) }
     }
 
 }

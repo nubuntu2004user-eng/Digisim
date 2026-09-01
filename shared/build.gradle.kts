@@ -23,6 +23,7 @@ kotlin {
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
             implementation(project(":SimulationEngine"))
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+            implementation("io.github.vinceglb:filekit-dialogs-compose:0.15.0")
         }
 //        commonTest.dependencies {
 //            implementation(libs.kotlin.test)

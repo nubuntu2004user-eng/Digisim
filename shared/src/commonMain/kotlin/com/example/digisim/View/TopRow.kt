@@ -35,7 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager){
     Row {
-        controlButtons(viewModel)
+        controlButtons(viewModel , scope)
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
         if(!simulation.isRunning){
             IconButton(onClick = {simulation.startSimulation(viewModel , scope , clockManager = clockManager) ; viewModel.currentMode = CanvasViewModel.editingMode.POKE}){

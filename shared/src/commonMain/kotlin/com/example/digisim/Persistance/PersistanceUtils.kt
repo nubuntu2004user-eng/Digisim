@@ -1,6 +1,5 @@
 package com.example.digisim.Persistance
 
-import androidx.compose.ui.window.WindowPosition.PlatformDefault.x
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.FlipFlops.DFlipFlop
 import com.example.digisim.FlipFlops.JKFlipFlop
@@ -14,39 +13,36 @@ import com.example.digisim.LogicGates.Or
 import com.example.digisim.LogicGates.XNor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
-import com.example.digisim.ParsingLogic.Wire
 import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Clock
 import com.example.digisim.Wiring.Input
 import com.example.digisim.Wiring.Output
+import io.github.vinceglb.filekit.PlatformFile
 import java.io.File
 
-internal fun saveFileAs(viewModel: CanvasViewModel){
-    val target = File(persistanceRepository.defaultDataDir(), "circuit1.json")
-    val componentDto = mutableListOf<ComponentDto>()
-    viewModel.components.forEach { component ->
-        componentDto += component.toDto()
-    }
-    persistanceRepository.saveAs(
-        file = target,
-        components = componentDto,
-        wires = viewModel.wires
-    )
+//internal fun saveFile(viewModel: CanvasViewModel , file: File){
+//    val componentDto = mutableListOf<ComponentDto>()
+//    viewModel.components.forEach { component ->
+//        componentDto += component.toDto()
+//    }
+//    persistanceRepository.saveAs(
+//        file = file,
+//        components = componentDto,
+//        wires = viewModel.wires
+//    )
+//
+//}
 
-}
-
-internal fun loadFile( viewModel: CanvasViewModel  ){
-    val target = File(persistanceRepository.defaultDataDir(), "circuit1.json")
-
-    val data = persistanceRepository.load(target)
+internal suspend fun loadFile(viewModel: CanvasViewModel, file: PlatformFile?){
+    val data = persistanceRepository.load(file)
     viewModel.components.clear()
     viewModel.wires.clear()
     val component = mutableListOf<Component>()
-    data.components.forEach { componentDto ->
+    data?.components?.forEach { componentDto ->
         component += componentDto.toComponent()
     }
     viewModel.components += component
-    viewModel.wires += data.wires
+    data?.wires.let{ viewModel.wires.addAll(it!!)}
 }
 fun Component.toDto(): ComponentDto = ComponentDto(
     id = ID,
