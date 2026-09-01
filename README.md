@@ -1,29 +1,70 @@
+# Digital Logic Simulator
+
+A digital logic simulator inspired by [Logisim](https://github.com/logisim-evolution/logisim-evolution) and [Digital](https://github.com/hneemann/Digital).
+
+> ⚠️ **This is a very early pre-release build.** Expect bugs and missing features — but it's already usable by beginners looking to learn the basics of digital logic.
+
+## Features
+
+- All basic logic gates and clocks
+
+- Asynchronous clock support
+
+- Customizable wire colors
+
+- Pannable canvas
+
+- Adjustable input count (up to 64)
+
+- Pause / resume simulation
+
+## Getting Started
+
+1. Go to the [Releases](../../releases) tab
+
+2. Download the latest `.jar` file
+
+3. Run it with Java 21+
+
+### Requirements
+
+| Use case | Minimum version |
+| - | - |
+| Run the `.jar` | JRE 21 |
+| Build with Gradle | JDK 21 |
+
+
+## For Developers
+
 This is a Kotlin Multiplatform project targeting Desktop (JVM).
 
-* [/shared](./shared/src) is for code that will be shared across your Compose Multiplatform applications. It contains
-  several subfolders:
-    - [commonMain](./shared/src/commonMain/kotlin) is for code that’s common for all targets.
-    - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name. For
-      example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-      the [iosMain](./shared/src/iosMain/kotlin) folder would be the right place for such calls. Similarly, if you want
-      to edit the Desktop (JVM) specific part, the [jvmMain](./shared/src/jvmMain/kotlin)
-      folder is the appropriate location.
+### Project Structure
 
-### Running the apps
+- `/shared` — code shared across Compose Multiplatform targets
 
-Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and
-options:
+  - `commonMain` — code common to all targets
 
-- Desktop app:
-    - Hot reload: `./gradlew :desktopApp:hotRun --auto`
-    - Standard run: `./gradlew :desktopApp:run`
+  - other folders (e.g. `jvmMain`, `iosMain`) contain platform-specific code
 
-### Running tests
+### Running the App
 
-Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:
+Use your IDE's run configurations, or the command line:
 
-- Desktop tests: `./gradlew :shared:jvmTest`
+```
+\# Desktop app (hot reload)  
+./gradlew :desktopApp:hotRun --auto  
+  
+\# Desktop app (standard)  
+./gradlew :desktopApp:run
+```
 
----
+### Running Tests
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+```
+./gradlew :shared:jvmTest
+```
+
+### Learn More
+
+[Kotlin Multiplatform documentation →](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)
+

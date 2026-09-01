@@ -61,14 +61,14 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
 
         }
         else{
-                IconButton(onClick = {simulation.isRunning = false ; simulation.isAuto = false ; simulation.componentsState.clear()}){
+                IconButton(onClick = {simulation.isRunning = false ; simulation.isAuto = false ; simulation.componentsState.clear() ; clockManager.tick = 0.0f}){
                     Icon(
                         imageVector = Icons.Filled.Stop,
                         contentDescription = null
                     )
                 }
                 if (simulation.isAuto){
-                    IconButton(onClick = {simulation.isAuto = false}){
+                    IconButton(onClick = {simulation.isAuto = false }){
                         Icon(
                             imageVector = Icons.Filled.Pause,
                             contentDescription = null
@@ -77,7 +77,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                     }
                 }
             else{
-                    IconButton(onClick = {simulation.isAuto = true}){
+                    IconButton(onClick = {simulation.isAuto = true ; simulation.startSimulation(viewModel , scope , clockManager = clockManager)}){
                         Icon(
                             imageVector = Icons.Filled.DoubleArrow,
                             contentDescription = null
