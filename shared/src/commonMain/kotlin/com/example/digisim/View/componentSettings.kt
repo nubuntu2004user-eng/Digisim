@@ -1,6 +1,7 @@
 package com.example.digisim.View
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +33,9 @@ import kotlin.math.roundToInt
 fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel){
     Column(modifier = Modifier.fillMaxSize()) {
         if (viewModel.selectedGateId != null ){
-            val component = viewModel.components.find{ it.ID == viewModel.selectedGateId}
+            val component by mutableStateOf(viewModel.components.find{ it.ID == viewModel.selectedGateId})
+            val wiresIn by mutableStateOf(viewModel.wires.filter{it.targetGateId == component?.ID})
+            val wiresOut by mutableStateOf(viewModel.wires.filter { it.sourceGateId == component?.ID })
             Text("Properties" ,  fontSize = 18.sp , modifier = Modifier.padding(10.dp).drawBehind{
                 val spaceBeneath = 3f
                 val textHeight = this.size.height
@@ -81,10 +84,29 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     }
                 )
             }
+            Text("Wires in: ")
+            wiresIn.forEach { wireIn ->
+             Row{
+                 Text("From component: " + wireIn.sourceGateId + "Port: " + wireIn.sourcePortIndex)
+                 Button(onClick = {viewModel.wires.remove(wireIn)}){
+                     Text("Delete")
+                 }
+             }
+            }
+            Text("Wires Out: ")
+            wiresOut.forEach { wireOut ->
+                Row{
+                    Text("To component: " + wireOut.targetGateId + "Port: " + wireOut.targetPortIndex)
+                    Button(onClick = {viewModel.wires.remove(wireOut)}){
+                        Text("Delete")
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
             if (component?.componentType == ComponentType.CLOCK) {
-                if (convertHzToDelay(component.delay) != null) {
-                    Text("Frequency: " + convertHzToDelay(component.delay ?: 1000.0f)?.toString() + "Hz")
+                if (convertHzToDelay(component?.delay) != null) {
+                    Text("Frequency: " + convertHzToDelay(component?.delay ?: 1000.0f)?.toString() + "Hz")
                 } else {
                     Text("Frequency: 1KHz")
                 }
@@ -99,7 +121,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                                 val output = convertHzToDelay(freq)
                                 if (output != null) {
                                     val rounded = output.roundToInt()
-                                    component.delay = if (rounded % 2 == 0) output else output - 1.0f
+                                    component?.delay = if (rounded % 2 == 0) output else output - 1.0f
                                 }
                             }
                         }) {

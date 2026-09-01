@@ -28,16 +28,4 @@ data class DragState(
     val originalX: Float,
     val originalY: Float
 )
-//enum class GateType(
-//    val label: String,
-//    val inputCount: Int,
-//    val outputCount: Int
-//) {
-//    AND("AND", 2, 1),
-//    NAND("NAND", 2, 1),
-//    OR("OR", 2, 1),
-//    NOR("NOR", 2, 1),
-//    XOR("XOR", 2, 1),
-//    NOT("NOT", 1, 1)
-//}
 
