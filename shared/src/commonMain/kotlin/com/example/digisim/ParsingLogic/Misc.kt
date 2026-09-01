@@ -2,14 +2,16 @@ package com.example.digisim.ParsingLogic
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-
-
+import com.example.digisim.Persistance.ColorSerializer
+import kotlinx.serialization.Serializable
+@Serializable
 data class Wire(
     val id: Int,
     val sourceGateId: Int,
     val sourcePortIndex: Int,
     val targetGateId: Int,
     val targetPortIndex: Int ,
+    @Serializable(with = ColorSerializer::class)
     var color: Color = Color.Blue
 )
 

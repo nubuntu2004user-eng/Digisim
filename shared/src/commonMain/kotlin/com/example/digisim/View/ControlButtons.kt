@@ -14,9 +14,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.digisim.DrawingLogic.CanvasViewModel
+import com.example.digisim.Persistance.loadFile
+import com.example.digisim.Persistance.saveFileAs
 
 @Composable
-fun controlButtons(){
+fun controlButtons(viewModel: CanvasViewModel){
     Row{
         Column{
             var showFileMenu by remember { mutableStateOf(false)}
@@ -41,11 +44,11 @@ fun controlButtons(){
                 )
                 DropdownMenuItem(
                     text = {Text("Save as")},
-                    onClick = {}
+                    onClick = { saveFileAs(viewModel) }
                 )
                 DropdownMenuItem(
                     text = {Text("Load")},
-                    onClick = {}
+                    onClick = { loadFile(viewModel,   ) }
                 )
             }
 

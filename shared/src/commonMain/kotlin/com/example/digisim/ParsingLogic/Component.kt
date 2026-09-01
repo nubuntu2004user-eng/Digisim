@@ -4,8 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import kotlinx.serialization.Serializable
 import logicGates.Pin
-
+@Serializable
 abstract class Component(val ID : Int) {
     abstract var x : Float
     abstract var y : Float
