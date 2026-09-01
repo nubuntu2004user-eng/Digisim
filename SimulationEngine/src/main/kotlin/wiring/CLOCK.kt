@@ -6,6 +6,7 @@ import logicGates.ComponentType
 import logicGates.Pin
 import logicGates.inputWire
 import logicGates.outputWire
+import kotlin.math.roundToInt
 
 class CLOCK(
     id : Int,
@@ -21,15 +22,15 @@ class CLOCK(
     val clockManager: ClockManager
     ): BasicComponent(id) {
     override suspend fun evaluate(): MutableList<Pin> {
-        if (delayTicks !== null){
-            if ((clockManager.tick % delayTicks!!) == 0.0f){
+        if (delayTicks != null) {
+            val roundedDelayTicks = delayTicks!!.roundToInt().coerceAtLeast(1)
+
+            if ((clockManager.tick % roundedDelayTicks) == 0) {
                 output = if (output[0] == Pin.LOW) mutableListOf(Pin.HIGH) else mutableListOf(Pin.LOW)
             }
-        }
-        else {
+        } else {
             output = if (output[0] == Pin.LOW) mutableListOf(Pin.HIGH) else mutableListOf(Pin.LOW)
         }
-
 
         return output.toMutableList()
     }

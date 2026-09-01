@@ -54,7 +54,7 @@ class SimulationViewModel : ViewModel() {
                 val splitToStages = convertAll(tmp , clockManager)
                 val mappedToWires = mapWires(splitToStages, viewModel)
                 val result = computeSimulation(mappedToWires)
-                clockManager.tick += 1.0f
+                clockManager.tick += 1
                 componentsState.clear()
                 componentsState.addAll(result)
                 for (stage in result) {

@@ -133,11 +133,23 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
 
             if (component?.componentType == ComponentType.CLOCK) {
-                if (convertHzToDelay(component?.delay) != null) {
-                    Text(translationViewModel.getString("Frequency") + ": " + convertHzToDelay(component?.delay ?: 1000.0f)?.toString() + "Hz")
+                val frequencyHz = toggleDelayTicksToFrequencyHz(component?.delay)
+
+                if (frequencyHz != null) {
+                    Text(
+                        translationViewModel.getString("Frequency") +
+                                ": " +
+                                frequencyHz.toString() +
+                                "Hz"
+                    )
                 } else {
-                    Text(translationViewModel.getString("Frequency") + ": " + translationViewModel.getString("1KHz"))
+                    Text(
+                        translationViewModel.getString("Frequency") +
+                                ": " +
+                                translationViewModel.getString("Not set")
+                    )
                 }
+
                 var userInputDelay by remember { mutableStateOf("") }
                 Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
@@ -147,11 +159,11 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     placeholder = { Text(translationViewModel.getString("Change frequency")) },
                     trailingIcon = {
                         IconButton(onClick = {
-                            userInputDelay.toFloatOrNull()?.let { freq ->
-                                val output = convertHzToDelay(freq)
-                                if (output != null) {
-                                    val rounded = output.roundToInt()
-                                    component?.delay = if (rounded % 2 == 0) output else output - 1.0f
+                            userInputDelay.toFloatOrNull()?.let { frequencyHz ->
+                                val delayTicks = frequencyHzToToggleDelayTicks(frequencyHz)
+
+                                if (delayTicks != null) {
+                                    component?.delay = delayTicks
                                 }
                             }
                         }) {
@@ -176,15 +188,19 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
     }
 }
 
-private fun convertHzToDelay(input : Float?):Float?{
-    if (input == null){
+private const val TICKS_PER_SECOND = 1000.0f
+
+private fun frequencyHzToToggleDelayTicks(frequencyHz: Float?): Float? {
+    if (frequencyHz == null || frequencyHz <= 0.0f) {
         return null
     }
-    if(input > 999.0f){
+
+    return TICKS_PER_SECOND / (frequencyHz * 2.0f)
+}
+
+private fun toggleDelayTicksToFrequencyHz(delayTicks: Float?): Float? {
+    if (delayTicks == null || delayTicks <= 0.0f) {
         return null
     }
-    if (input > 1.0f){
-        return 1000.0f / input
-    }
-     return 1000.0f
+    return TICKS_PER_SECOND / (delayTicks * 2.0f)
 }

@@ -25,11 +25,12 @@ import com.example.digisim.SettingsViewModel
 import com.example.digisim.UiUtils.Language
 import com.example.digisim.UiUtils.TranslationViewModel
 import com.example.digisim.UiUtils.undoOnce
+import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , translationViewModel: TranslationViewModel){
+fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , translationViewModel: TranslationViewModel ,clockManager: ClockManager){
     val settingsViewModel = SettingsViewModel.default
     Row{
         var showInputDialog by remember { mutableStateOf(false) }
@@ -44,7 +45,7 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
       ){
           DropdownMenuItem(
               text = {Text(translationViewModel.getString("Clear") , color = settingsViewModel.textColor)},
-              onClick = {viewModel.components.clear() ; viewModel.wires.clear() ; viewModel.nextId = 0}
+              onClick = {viewModel.components.clear() ; viewModel.wires.clear() ; viewModel.nextId = 0;clockManager.tick = 0}
           )
           DropdownMenuItem(
               text = {Text(translationViewModel.getString("Save as") , color = settingsViewModel.textColor)},

@@ -38,7 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager, translationViewModel: TranslationViewModel){
     val settingsViewModel = SettingsViewModel.default
     Row {
-        controlButtons(viewModel , scope, translationViewModel)
+        controlButtons(viewModel , scope, translationViewModel , clockManager)
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
         if(!simulation.isRunning){
             IconButton(onClick = {simulation.startSimulation(viewModel , scope , clockManager = clockManager) ; viewModel.currentMode = CanvasViewModel.editingMode.POKE}){
@@ -56,7 +56,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
 
         }
         else{
-                IconButton(onClick = {simulation.isRunning = false ; simulation.isAuto = false ; simulation.componentsState.clear() ; clockManager.tick = 0.0f}){
+                IconButton(onClick = {simulation.isRunning = false ; simulation.isAuto = false ; simulation.componentsState.clear() ; clockManager.tick = 0}){
                     Icon(
                         imageVector = Icons.Filled.Stop,
                         contentDescription = null
