@@ -13,7 +13,7 @@ abstract class BasicComponent(val id : Int) {
     abstract val componentType : ComponentType
 
     //componentSpecial things
-    abstract var delayTicks: Int?
+    abstract var delayTicks: Float?
     abstract var highDuration : Int?
     abstract var lowDuration : Int?
     abstract suspend fun evaluate(): MutableList<Pin>

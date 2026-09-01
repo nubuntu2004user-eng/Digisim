@@ -9,7 +9,7 @@ class Invertor(id : Int,
                override val componentType: ComponentType = ComponentType.NOT,
                override var highDuration: Int? = null,
                override var lowDuration: Int? = null,
-               override var delayTicks: Int? = null
+               override var delayTicks: Float? = null
 
 ): BasicComponent(id) {
 

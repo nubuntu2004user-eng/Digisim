@@ -20,7 +20,7 @@ abstract class Component(val ID : Int) {
 
     open var outputPin: Pin by mutableStateOf(Pin.LOW)
 
-    abstract var delay : Int?
+    abstract var delay: Float?
 
     abstract fun inputPortPositions():List<Offset>
 

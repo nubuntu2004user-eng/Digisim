@@ -13,7 +13,7 @@ class Input(id : Int,
             override val inputFrom: MutableList<inputWire>,
             override val outputTo: MutableList<outputWire>,
             override val componentType : ComponentType = ComponentType.INPUT,
-            override var delayTicks: Int? = null,
+            override var delayTicks: Float? = null,
             override var highDuration: Int? = null,
             override var lowDuration: Int? = null
 ): BasicComponent(id) {

@@ -13,7 +13,7 @@ class Clock(
     initialY: Float = 0f,
     initialInputCount: Int,
     initialOutputCount: Int,
-    initialDelay : Int?
+    initialDelay: Float?
     ): Component(id) {
     override var x: Float by mutableStateOf(initialX)
     override var y: Float by mutableStateOf(initialY)
@@ -21,7 +21,7 @@ class Clock(
     override var height: Float by mutableStateOf(60f)
     override var inputCount: Int by mutableStateOf(initialInputCount)
     override var outputCount: Int by mutableStateOf(initialOutputCount)
-    override var delay: Int? by mutableStateOf(initialDelay)
+    override var delay: Float? by mutableStateOf(initialDelay)
 
     override val componentType = ComponentType.CLOCK
     val portOffset = Offset(width , height / 2)

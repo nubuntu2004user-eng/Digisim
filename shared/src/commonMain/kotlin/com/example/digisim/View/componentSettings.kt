@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel){
@@ -74,8 +75,8 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
             }
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
             if(component?.componentType == ComponentType.CLOCK){
-                if (convertHzToMills(component?.delay) !== null) {
-                    Text("Frequency: " + convertHzToMills(component.delay ?: 1000).toString() + "Hz")
+                if (convertHzToDelay(component.delay?.toFloat()) !== null) {
+                    Text("Frequency: " + convertHzToDelay(component.delay?.toFloat() ?: 1000.0f)?.toString() + "Hz")
                 }
                 else {
                     Text("Frequency: 1KHz" )
@@ -85,7 +86,17 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     trailingIcon = {
                         IconButton(onClick = {
                             userInputDelay.toIntOrNull()?.let {
-                                component?.delay = convertHzToMills(userInputDelay.toInt())
+                                val output = convertHzToDelay(userInputDelay.toFloat())
+                                if (output !== null){
+                                if (((output?.roundToInt())?.rem(2))!! == 0){
+                                    component?.delay = output
+                                }
+                                    else{
+                                    component?.delay = output -1.0f
+
+                                }
+
+                                }
                             }
                         }){
                             Icon(
@@ -106,15 +117,15 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
     }
 }
 
-private fun convertHzToMills(input : Int?):Int?{
+private fun convertHzToDelay(input : Float?):Float?{
     if (input == null){
         return null
     }
-    if(input > 999){
+    if(input > 999.0f){
         return null
     }
-    if (input >1){
-        return 1000 / input
+    if (input > 1.0f){
+        return 1000.0f / input
     }
-    else return 999
+     return 1000.0f
 }

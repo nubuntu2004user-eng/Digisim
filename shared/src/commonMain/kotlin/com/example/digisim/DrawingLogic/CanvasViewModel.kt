@@ -104,6 +104,6 @@ fun createComponent(
         ComponentType.NOT -> Not(id, x, y, 1, 1)
         ComponentType.OUTPUT -> Output(id, x, y, 1, 0)
         ComponentType.INPUT -> Input(id, x, y, 0, 1)
-        ComponentType.CLOCK -> Clock(id , x , y ,0 , 1, 999)
+        ComponentType.CLOCK -> Clock(id , x , y ,0 , 1, 999.0f)
     }
 }

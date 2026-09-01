@@ -9,7 +9,7 @@ class XNor(id : Int,
            override val componentType: ComponentType = ComponentType.XNOR,
            override var highDuration: Int?= null,
            override var lowDuration: Int? = null,
-           override var delayTicks: Int? = null
+           override var delayTicks: Float? = null
 
 ):BasicComponent(id) {
     override suspend fun evaluate(): MutableList<Pin> {

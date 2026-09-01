@@ -1,13 +1,11 @@
 package wiring
 
 import engineLogic.ClockManager
-import kotlinx.coroutines.delay
 import logicGates.BasicComponent
 import logicGates.ComponentType
 import logicGates.Pin
 import logicGates.inputWire
 import logicGates.outputWire
-import kotlin.time.Duration.Companion.milliseconds
 
 class CLOCK(
     id : Int,
@@ -17,14 +15,14 @@ class CLOCK(
     override val inputFrom: MutableList<inputWire>,
     override val outputTo: MutableList<outputWire>,
     override val componentType : ComponentType = ComponentType.CLOCK,
-    override var delayTicks: Int? = null,
+    override var delayTicks: Float? = null,
     override var highDuration: Int? = null,
     override var lowDuration: Int? = null,
     val clockManager: ClockManager
     ): BasicComponent(id) {
     override suspend fun evaluate(): MutableList<Pin> {
         if (delayTicks !== null){
-            if ((clockManager.tick % delayTicks!!) == 0){
+            if ((clockManager.tick % delayTicks!!) == 0.0f){
                 output = if (output[0] == Pin.LOW) mutableListOf(Pin.HIGH) else mutableListOf(Pin.LOW)
             }
         }
