@@ -27,16 +27,17 @@ import androidx.compose.ui.unit.sp
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import com.example.digisim.UiUtils.TranslationViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel){
+fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel, translationViewModel: TranslationViewModel){
     Column(modifier = Modifier.fillMaxSize()) {
         if (viewModel.selectedGateId != null ){
             val component by mutableStateOf(viewModel.components.find{ it.ID == viewModel.selectedGateId})
             val wiresIn by mutableStateOf(viewModel.wires.filter{it.targetGateId == component?.ID})
             val wiresOut by mutableStateOf(viewModel.wires.filter { it.sourceGateId == component?.ID })
-            Text("Properties" ,  fontSize = 18.sp , modifier = Modifier.padding(10.dp).drawBehind{
+            Text(translationViewModel.getString("Properties") ,  fontSize = 18.sp , modifier = Modifier.padding(10.dp).drawBehind{
                 val spaceBeneath = 3f
                 val textHeight = this.size.height
                 val textWith = this.size.width
@@ -47,8 +48,8 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                 )
 
         })
-        Text( "ID: " + component?.ID.toString())
-        Text("Component type:" + component?.componentType)
+        Text( translationViewModel.getString("ID: ") + component?.ID.toString())
+        Text(translationViewModel.getString("Component type: ") + component?.componentType)
             val isMultiInputGate = component?.componentType in listOf(
                 ComponentType.AND,
                 ComponentType.OR,
@@ -58,12 +59,12 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                 ComponentType.XNOR
             )
             if (isMultiInputGate) {
-                Text("Input count: " + component?.inputCount)
+                Text(translationViewModel.getString("Input count: ") + component?.inputCount)
                 var userInputCount by remember { mutableStateOf("") }
                 OutlinedTextField(
                     value = userInputCount,
                     onValueChange = { userInputCount = it },
-                    placeholder = { Text("Change input count") },
+                    placeholder = { Text(translationViewModel.getString("Change input count")) },
                     trailingIcon = {
                         IconButton(onClick = {
                             userInputCount.toIntOrNull()?.let {
@@ -84,21 +85,21 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     }
                 )
             }
-            Text("Wires in: ")
+            Text(translationViewModel.getString("Wires in: "))
             wiresIn.forEach { wireIn ->
              Row{
-                 Text("From component: " + wireIn.sourceGateId + "Port: " + wireIn.sourcePortIndex)
+                 Text(translationViewModel.getString("From component: ") + wireIn.sourceGateId + translationViewModel.getString("Port: ") + wireIn.sourcePortIndex)
                  Button(onClick = {viewModel.wires.remove(wireIn)}){
-                     Text("Delete")
+                     Text(translationViewModel.getString("Delete"))
                  }
              }
             }
-            Text("Wires Out: ")
+            Text(translationViewModel.getString("Wires Out: "))
             wiresOut.forEach { wireOut ->
                 Row{
-                    Text("To component: " + wireOut.targetGateId + "Port: " + wireOut.targetPortIndex)
+                    Text(translationViewModel.getString("To component: ") + wireOut.targetGateId + translationViewModel.getString("Port: ") + wireOut.targetPortIndex)
                     Button(onClick = {viewModel.wires.remove(wireOut)}){
-                        Text("Delete")
+                        Text(translationViewModel.getString("Delete"))
                     }
                 }
             }
@@ -106,15 +107,15 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
             if (component?.componentType == ComponentType.CLOCK) {
                 if (convertHzToDelay(component?.delay) != null) {
-                    Text("Frequency: " + convertHzToDelay(component?.delay ?: 1000.0f)?.toString() + "Hz")
+                    Text(translationViewModel.getString("Frequency") + ": " + convertHzToDelay(component?.delay ?: 1000.0f)?.toString() + "Hz")
                 } else {
-                    Text("Frequency: 1KHz")
+                    Text(translationViewModel.getString("Frequency") + ": " + translationViewModel.getString("1KHz"))
                 }
                 var userInputDelay by remember { mutableStateOf("") }
                 OutlinedTextField(
                     value = userInputDelay,
                     onValueChange = { userInputDelay = it },
-                    placeholder = { Text("Change frequency") },
+                    placeholder = { Text(translationViewModel.getString("Change frequency")) },
                     trailingIcon = {
                         IconButton(onClick = {
                             userInputDelay.toFloatOrNull()?.let { freq ->
@@ -137,7 +138,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                 viewModel.components.remove(component)
                 viewModel.selectedGateId = null
             }){
-                Text("Delete")
+                Text(translationViewModel.getString("Delete"))
             }
         }
     }

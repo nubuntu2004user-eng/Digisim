@@ -28,14 +28,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import com.example.digisim.UiUtils.TranslationViewModel
 import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager){
+fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager, translationViewModel: TranslationViewModel){
     Row {
-        controlButtons(viewModel , scope)
+        controlButtons(viewModel , scope, translationViewModel)
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
         if(!simulation.isRunning){
             IconButton(onClick = {simulation.startSimulation(viewModel , scope , clockManager = clockManager) ; viewModel.currentMode = CanvasViewModel.editingMode.POKE}){
@@ -81,10 +82,14 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
         }
         if (viewModel.currentMode == CanvasViewModel.editingMode.WIRE){
             val colorButtonList = listOf(
-                colorButton(Color.Blue , "Blue"),
-                colorButton(Color.Black , "Black")
+                colorButton(Color.Blue , translationViewModel.getString("Blue")),
+                colorButton(Color.Black , translationViewModel.getString("Black")),
+                colorButton(Color.Red , translationViewModel.getString("Red")),
+                colorButton(Color.Green , translationViewModel.getString("Green")),
+                colorButton(Color.Magenta , translationViewModel.getString("Magenta")),
+                colorButton(Color.Cyan , translationViewModel.getString("Cyan"))
             )
-            Text("Select Color: " , modifier = Modifier.padding(10.dp))
+            Text(translationViewModel.getString("Select Color: ") , modifier = Modifier.padding(10.dp))
             for (i in colorButtonList){
                 Button(onClick = {viewModel.currentWiringColor = i.color}, colors = ButtonColors(i.color , i.color , i.color , i.color)){}
             }

@@ -31,39 +31,40 @@ import com.example.digisim.DrawingLogic.drawComponent
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import com.example.digisim.UiUtils.TranslationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ToolSelectorRow(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel) {
+fun ToolSelectorRow(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel, translationViewModel: TranslationViewModel) {
     val buttonList = listOf(
         ToolButtonParams(Icons.Filled.TouchApp, {
             viewModel.currentMode = CanvasViewModel.editingMode.POKE
             viewModel.pendingComponent = null },
             simulationViewModel.isRunning,
-            "Poke"
+            translationViewModel.getString("Poke")
             ),
         ToolButtonParams(Icons.Filled.Edit, {
             viewModel.currentMode = CanvasViewModel.editingMode.EDIT
             viewModel.pendingComponent = null },
             !simulationViewModel.isRunning,
-            "Edit"
+            translationViewModel.getString("Edit")
             ),
         ToolButtonParams(Icons.Filled.AdsClick, {
             viewModel.currentMode = CanvasViewModel.editingMode.DRAG
             viewModel.pendingComponent = null },
             !simulationViewModel.isRunning,
-            "Drag"
+            translationViewModel.getString("Drag")
             ),
         ToolButtonParams(Icons.Filled.Cable, {
             viewModel.currentMode = CanvasViewModel.editingMode.WIRE
             viewModel.pendingComponent = null },
             !simulationViewModel.isRunning,
-            "Wire"
+            translationViewModel.getString("Wire")
             ),
         ToolButtonParams(Icons.Filled.TextFields, {
             viewModel.pendingComponent = null },
             !simulationViewModel.isRunning,
-            "Text"
+            translationViewModel.getString("Text")
         ),
     )
 

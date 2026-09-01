@@ -19,6 +19,7 @@ import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.DrawingLogic.DigitalLogicSimulator
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.ComponentLibrariesViewModel
+import com.example.digisim.UiUtils.TranslationViewModel
 import com.example.digisim.UiUtils.undoOnce
 import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
@@ -35,6 +36,7 @@ fun App() {
         val simulation = remember { SimulationViewModel() }
         val librariesViewModel  = remember { ComponentLibrariesViewModel() }
         val clockManager = remember { ClockManager() }
+        val translationViewModel = remember<TranslationViewModel> { TranslationViewModel() }
         Column(modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
@@ -51,13 +53,13 @@ fun App() {
             }
 
         ) {
-            TopRow(simulation , viewModel , scope , clockManager)
+            TopRow(simulation , viewModel , scope , clockManager, translationViewModel)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
-                    leftPanel(viewModel, simulation , librariesViewModel)
+                    leftPanel(viewModel, simulation , librariesViewModel, translationViewModel)
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    ToolSelectorRow(viewModel , simulation)
+                    ToolSelectorRow(viewModel , simulation, translationViewModel)
                     Box(modifier = Modifier.weight(1f)) {
                         DigitalLogicSimulator(viewModel = viewModel, simulation = simulation, scope = scope , clockManager = clockManager)
                     }

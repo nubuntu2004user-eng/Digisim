@@ -44,9 +44,10 @@ import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.UiUtils.ComponentLibrariesViewModel
+import com.example.digisim.UiUtils.TranslationViewModel
 
 @Composable
-fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: ComponentLibrariesViewModel){
+fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: ComponentLibrariesViewModel, translationViewModel: TranslationViewModel){
     val selectedLibrary = libraryViewModel.libraries[libraryViewModel.currentLibraryIndex]
     val componentList = selectedLibrary.components
     val currentLibraryName = selectedLibrary.name
@@ -63,7 +64,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                     imageVector = Icons.Filled.ChevronLeft,
                     contentDescription = null
                 )}
-                Text(" Library: $currentLibraryName" , modifier = Modifier.padding(10.dp))
+                Text(translationViewModel.getString("Library: ") + translationViewModel.getString(currentLibraryName) , modifier = Modifier.padding(10.dp))
                 IconButton(onClick = {libraryViewModel.nextLib()} , modifier = Modifier){
                     Icon(
                         imageVector = Icons.Filled.ChevronRight,
@@ -79,7 +80,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                     positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                     tooltip = {
                         PlainTooltip {
-                            Text(i.description)
+                            Text(translationViewModel.getString(i.description))
                         }
                     },
                     state = rememberTooltipState()
@@ -108,7 +109,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                                     }
                                 }
                             }
-                        Text(i.name , modifier = Modifier.padding(10.dp))
+                        Text(translationViewModel.getString(i.name) , modifier = Modifier.padding(10.dp))
                          }
                         }
                     }
