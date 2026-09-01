@@ -48,6 +48,7 @@ import com.example.digisim.UiUtils.TranslationViewModel
 
 @Composable
 fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: ComponentLibrariesViewModel, translationViewModel: TranslationViewModel){
+    val settingsViewModel = SettingsViewModel.default
     val selectedLibrary = libraryViewModel.libraries[libraryViewModel.currentLibraryIndex]
     val componentList = selectedLibrary.components
     val currentLibraryName = selectedLibrary.name
@@ -64,7 +65,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                     imageVector = Icons.Filled.ChevronLeft,
                     contentDescription = null
                 )}
-                Text(translationViewModel.getString("Library: ") + translationViewModel.getString(currentLibraryName) , modifier = Modifier.padding(10.dp))
+                Text(translationViewModel.getString("Library: ") + translationViewModel.getString(currentLibraryName), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
                 IconButton(onClick = {libraryViewModel.nextLib()} , modifier = Modifier){
                     Icon(
                         imageVector = Icons.Filled.ChevronRight,
@@ -109,7 +110,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                                     }
                                 }
                             }
-                        Text(translationViewModel.getString(i.name) , modifier = Modifier.padding(10.dp))
+                        Text(translationViewModel.getString(i.name), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
                          }
                         }
                     }

@@ -14,6 +14,7 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
 
     var drawText: Boolean by mutableStateOf(drawText)
 
+    var textColor by mutableStateOf(Color.Black)
     var highPinColor: Color by mutableStateOf(Color(0xFF2E7D32))
     var lowPinColor: Color by mutableStateOf(Color(0xFF81C784))
     var errorPinColor: Color by mutableStateOf(Color(0xFFE57373))

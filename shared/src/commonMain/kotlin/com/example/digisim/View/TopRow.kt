@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.digisim.DrawingLogic.CanvasViewModel
+import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.TranslationViewModel
 import engineLogic.ClockManager
@@ -35,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager, translationViewModel: TranslationViewModel){
+    val settingsViewModel = SettingsViewModel.default
     Row {
         controlButtons(viewModel , scope, translationViewModel)
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
@@ -89,7 +91,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                 colorButton(Color.Magenta , translationViewModel.getString("Magenta")),
                 colorButton(Color.Cyan , translationViewModel.getString("Cyan"))
             )
-            Text(translationViewModel.getString("Select Color: ") , modifier = Modifier.padding(10.dp))
+            Text(translationViewModel.getString("Select Color: ") , color = settingsViewModel.textColor, modifier = Modifier.padding(10.dp))
             for (i in colorButtonList){
                 Button(onClick = {viewModel.currentWiringColor = i.color}, colors = ButtonColors(i.color , i.color , i.color , i.color)){}
             }

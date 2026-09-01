@@ -21,6 +21,7 @@ import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.Persistance.loadFile
 import com.example.digisim.Persistance.loadWrapper
 import com.example.digisim.Persistance.saveFileAs
+import com.example.digisim.SettingsViewModel
 import com.example.digisim.UiUtils.Language
 import com.example.digisim.UiUtils.TranslationViewModel
 import com.example.digisim.UiUtils.undoOnce
@@ -29,30 +30,31 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , translationViewModel: TranslationViewModel){
+    val settingsViewModel = SettingsViewModel.default
     Row{
         var showInputDialog by remember { mutableStateOf(false) }
         Column{
             var showFileMenu by remember { mutableStateOf(false)}
       TextButton(onClick = {showFileMenu = !showFileMenu}){
-      Text(translationViewModel.getString("File"))
+      Text(translationViewModel.getString("File") , color = settingsViewModel.textColor)
       }
       DropdownMenu(
           expanded = showFileMenu,
           onDismissRequest = {showFileMenu = false}
       ){
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Clear"))},
+              text = {Text(translationViewModel.getString("Clear") , color = settingsViewModel.textColor)},
               onClick = {viewModel.components.clear() ; viewModel.wires.clear() ; viewModel.nextId = 0}
           )
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Save as"))},
+              text = {Text(translationViewModel.getString("Save as") , color = settingsViewModel.textColor)},
               onClick = { scope.launch {
                   saveFileAs(viewModel)
               }
               }
           )
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Load"))},
+              text = {Text(translationViewModel.getString("Load") , color = settingsViewModel.textColor)},
               onClick = { scope.launch{
                   loadWrapper(viewModel)
               } }
@@ -63,17 +65,17 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
       Spacer(modifier = Modifier.fillMaxWidth(0.01f))
       var showEditMenu by remember{ mutableStateOf(false)}
       TextButton(onClick = {showEditMenu = !showEditMenu}){
-      Text(translationViewModel.getString("Edit"))
+      Text(translationViewModel.getString("Edit"), color = settingsViewModel.textColor)
       DropdownMenu(
           expanded = showEditMenu,
           onDismissRequest = {showEditMenu = false}
       ){
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Undo"))},
+              text = {Text(translationViewModel.getString("Undo") , color = settingsViewModel.textColor)},
               onClick = { undoOnce(viewModel) }
           )
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Undo multiple"))},
+              text = {Text(translationViewModel.getString("Undo multiple") , color = settingsViewModel.textColor)},
               onClick = {showInputDialog = !showInputDialog}
           )
 
@@ -85,15 +87,15 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
 
       Spacer(modifier = Modifier.fillMaxWidth(0.01f))
       TextButton(onClick = {translationViewModel.currentLanguage = Language.ENGLISH}){
-      Text("EN")
+      Text("EN" , color = settingsViewModel.textColor)
       }
       Spacer(modifier = Modifier.fillMaxWidth(0.01f))
       TextButton(onClick = {translationViewModel.currentLanguage = Language.DEUTSCH}){
-      Text("DE")
+      Text("DE", color = settingsViewModel.textColor)
       }
       Spacer(modifier = Modifier.fillMaxWidth(0.01f))
       TextButton(onClick = {translationViewModel.currentLanguage = Language.UKRAINIAN}){
-      Text("UA")
+      Text("UA", color = settingsViewModel.textColor)
       }
 
       Box{
@@ -101,12 +103,12 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
       var userInput by remember { mutableStateOf("") }
       AlertDialog(
           onDismissRequest = { showInputDialog = false },
-          title = { Text(translationViewModel.getString("How many steps to undo")) },
+          title = { Text(translationViewModel.getString("How many steps to undo"), color = settingsViewModel.textColor) },
           text = {
               TextField(
                   value = userInput,
                   onValueChange = { userInput = it },
-                  label = { Text(translationViewModel.getString("Enter number here")) }
+                  label = { Text(translationViewModel.getString("Enter number here"), color = settingsViewModel.textColor) }
               )
           },
           confirmButton = {
@@ -117,7 +119,7 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
                   }
                   showInputDialog = false}
                   else userInput = "Must be number!"
-              }) { Text(translationViewModel.getString("Undo")) }
+              }) { Text(translationViewModel.getString("Undo"), color = settingsViewModel.textColor) }
           }
       )
       }

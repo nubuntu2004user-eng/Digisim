@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
@@ -32,11 +34,12 @@ import kotlin.math.roundToInt
 
 @Composable
 fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel, translationViewModel: TranslationViewModel){
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
         if (viewModel.selectedGateId != null ){
             val component by mutableStateOf(viewModel.components.find{ it.ID == viewModel.selectedGateId})
             val wiresIn by mutableStateOf(viewModel.wires.filter{it.targetGateId == component?.ID})
             val wiresOut by mutableStateOf(viewModel.wires.filter { it.sourceGateId == component?.ID })
+
             Text(translationViewModel.getString("Properties") ,  fontSize = 18.sp , modifier = Modifier.padding(10.dp).drawBehind{
                 val spaceBeneath = 3f
                 val textHeight = this.size.height
@@ -48,8 +51,13 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                 )
 
         })
-        Text( translationViewModel.getString("ID: ") + component?.ID.toString())
-        Text(translationViewModel.getString("Component type: ") + component?.componentType)
+            Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
+            Text( translationViewModel.getString("ID: ") + component?.ID.toString())
+
+            Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
+            Text(translationViewModel.getString("Component type: ") + component?.componentType)
             val isMultiInputGate = component?.componentType in listOf(
                 ComponentType.AND,
                 ComponentType.OR,
@@ -59,12 +67,19 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                 ComponentType.XNOR
             )
             if (isMultiInputGate) {
+
+                Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
                 Text(translationViewModel.getString("Input count: ") + component?.inputCount)
+
+                Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
                 var userInputCount by remember { mutableStateOf("") }
                 OutlinedTextField(
                     value = userInputCount,
                     onValueChange = { userInputCount = it },
                     placeholder = { Text(translationViewModel.getString("Change input count")) },
+                    shape = RoundedCornerShape(30),
                     trailingIcon = {
                         IconButton(onClick = {
                             userInputCount.toIntOrNull()?.let {
@@ -85,7 +100,12 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     }
                 )
             }
+            Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
+            if (wiresIn.isNotEmpty()){
+
             Text(translationViewModel.getString("Wires in: "))
+
             wiresIn.forEach { wireIn ->
              Row{
                  Text(translationViewModel.getString("From component: ") + wireIn.sourceGateId + translationViewModel.getString("Port: ") + wireIn.sourcePortIndex)
@@ -94,7 +114,12 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                  }
              }
             }
+            }
+            Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
+            if (wiresOut.isNotEmpty()){
             Text(translationViewModel.getString("Wires Out: "))
+
             wiresOut.forEach { wireOut ->
                 Row{
                     Text(translationViewModel.getString("To component: ") + wireOut.targetGateId + translationViewModel.getString("Port: ") + wireOut.targetPortIndex)
@@ -103,8 +128,10 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     }
                 }
             }
+            }
 
             Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+
             if (component?.componentType == ComponentType.CLOCK) {
                 if (convertHzToDelay(component?.delay) != null) {
                     Text(translationViewModel.getString("Frequency") + ": " + convertHzToDelay(component?.delay ?: 1000.0f)?.toString() + "Hz")
@@ -112,6 +139,8 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     Text(translationViewModel.getString("Frequency") + ": " + translationViewModel.getString("1KHz"))
                 }
                 var userInputDelay by remember { mutableStateOf("") }
+                Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
                 OutlinedTextField(
                     value = userInputDelay,
                     onValueChange = { userInputDelay = it },
@@ -134,6 +163,9 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     }
                 )
             }
+
+            Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
             Button(onClick = {
                 viewModel.components.remove(component)
                 viewModel.selectedGateId = null
