@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DoubleArrow
 import androidx.compose.material.icons.filled.Pause
@@ -21,6 +22,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -72,6 +74,12 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                     }
                 }
             else{
+                    IconButton(onClick = {simulation.startSimulation(viewModel, scope, clockManager ,true)}){
+                        Icon(
+                            imageVector = Icons.Filled.ChevronRight,
+                            contentDescription = null
+                        )
+                    }
                     IconButton(onClick = {simulation.isAuto = true ; simulation.startSimulation(viewModel , scope , clockManager = clockManager)}){
                         Icon(
                             imageVector = Icons.Filled.DoubleArrow,

@@ -22,7 +22,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.ivanplisko.digisim"
-            packageVersion = "0.1.0"
+            packageVersion = "0.9.0"
         }
     }
 }

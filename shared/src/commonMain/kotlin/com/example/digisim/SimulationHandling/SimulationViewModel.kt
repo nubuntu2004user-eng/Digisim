@@ -28,13 +28,15 @@ class SimulationViewModel : ViewModel() {
     var isAuto by mutableStateOf(false)
     val componentsState by mutableStateOf(mutableListOf<MutableList<BasicComponent>>())
 
-    fun startSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null, clockManager: ClockManager) {
+    fun startSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null, clockManager: ClockManager , forward : Boolean = false) {
         isRunning = true
 //        isAuto = false
+        if(!forward){
         viewModel.components.forEach {
             if (it is Input) {
                 it.outputPin = Pin.LOW
             }
+        }
         }
         if (scope != null) {
             scope.launch {
@@ -46,7 +48,6 @@ class SimulationViewModel : ViewModel() {
             }
         }
     }
-
     suspend fun runSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null , clockManager: ClockManager) {
         val action: suspend () -> Unit = {
             val tmp = splitToStages(viewModel)
