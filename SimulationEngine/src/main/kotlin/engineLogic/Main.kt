@@ -27,11 +27,24 @@ suspend fun computeSimulation ( input : MutableList<MutableList<BasicComponent>>
             }
             else {
                 element.inputs.clear()
-                for (i in element.inputFrom){
-                    element.inputs.add(i.value)
-                }
-                while (element.inputs.size < element.inputCount) {
-                    element.inputs.add(Pin.UNDEFINED)
+                val hasSpecificPorts = element.inputFrom.any { it.portId > 0 } &&
+                        element.inputFrom.map { it.portId }.toSet().size == element.inputFrom.size
+
+                if (hasSpecificPorts) {
+                    val portMap = MutableList(element.inputCount) { Pin.UNDEFINED }
+                    for (i in element.inputFrom) {
+                        if (i.portId in 0 until element.inputCount) {
+                            portMap[i.portId] = i.value
+                        }
+                    }
+                    element.inputs.addAll(portMap)
+                } else {
+                    for (i in element.inputFrom){
+                        element.inputs.add(i.value)
+                    }
+                    while (element.inputs.size < element.inputCount) {
+                        element.inputs.add(Pin.UNDEFINED)
+                    }
                 }
                 val evalList = element.evaluate()
                 element.output = evalList

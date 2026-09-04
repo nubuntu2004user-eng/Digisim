@@ -21,6 +21,16 @@ import com.example.digisim.ComponentsDrawing.drawDFlipFlop
 import com.example.digisim.ComponentsDrawing.drawJKFlipFlop
 import com.example.digisim.ComponentsDrawing.drawRSFlipFlop
 import com.example.digisim.ComponentsDrawing.drawTFlipFlop
+import com.example.digisim.ComponentsDrawing.drawDFlipFlopAsync
+import com.example.digisim.ComponentsDrawing.drawJKFlipFlopAsync
+import com.example.digisim.ComponentsDrawing.drawSRFlipFlopAsync
+import com.example.digisim.ComponentsDrawing.drawTFlipFlopAsync
+import com.example.digisim.ComponentsDrawing.drawIC7400
+import com.example.digisim.ComponentsDrawing.drawIC7402
+import com.example.digisim.ComponentsDrawing.drawIC7404
+import com.example.digisim.ComponentsDrawing.drawIC7408
+import com.example.digisim.ComponentsDrawing.drawIC7432
+import com.example.digisim.ComponentsDrawing.drawIC7486
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
@@ -131,6 +141,16 @@ fun DrawScope.drawComponent(
         ComponentType.JK_FLIP_FLOP -> { drawJKFlipFlop(component, textMeasurer, settings) }
         ComponentType.D_FLIP_FLOP -> { drawDFlipFlop(component, textMeasurer, settings) }
         ComponentType.T_FLIP_FLOP -> { drawTFlipFlop(component, textMeasurer, settings) }
+        ComponentType.JK_FLIP_FLOP_ASYNC -> { drawJKFlipFlopAsync(component, textMeasurer, settings) }
+        ComponentType.SR_FLIP_FLOP_ASYNC -> { drawSRFlipFlopAsync(component, textMeasurer, settings) }
+        ComponentType.D_FLIP_FLOP_ASYNC -> { drawDFlipFlopAsync(component, textMeasurer, settings) }
+        ComponentType.T_FLIP_FLOP_ASYNC -> { drawTFlipFlopAsync(component, textMeasurer, settings) }
+        ComponentType.IC_7400 -> { drawIC7400(component, textMeasurer, settings) }
+        ComponentType.IC_7402 -> { drawIC7402(component, textMeasurer, settings) }
+        ComponentType.IC_7404 -> { drawIC7404(component, textMeasurer, settings) }
+        ComponentType.IC_7408 -> { drawIC7408(component, textMeasurer, settings) }
+        ComponentType.IC_7432 -> { drawIC7432(component, textMeasurer, settings) }
+        ComponentType.IC_7486 -> { drawIC7486(component, textMeasurer, settings) }
     }
 }
 

@@ -11,6 +11,16 @@ import com.example.digisim.FlipFlops.DFlipFlop
 import com.example.digisim.FlipFlops.JKFlipFlop
 import com.example.digisim.FlipFlops.RSFlipFlop
 import com.example.digisim.FlipFlops.TFlipFlop
+import com.example.digisim.FlipFlops.DFlipFlopAsync
+import com.example.digisim.FlipFlops.JKFlipFlopAsync
+import com.example.digisim.FlipFlops.SRFlipFlopAsync
+import com.example.digisim.FlipFlops.TFlipFlopAsync
+import com.example.digisim.Chips74.IC7400
+import com.example.digisim.Chips74.IC7402
+import com.example.digisim.Chips74.IC7404
+import com.example.digisim.Chips74.IC7408
+import com.example.digisim.Chips74.IC7432
+import com.example.digisim.Chips74.IC7486
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
 import com.example.digisim.LogicGates.Nor
@@ -113,5 +123,15 @@ fun createComponent(
         ComponentType.JK_FLIP_FLOP -> JKFlipFlop(id, x, y, 3, 2)
         ComponentType.D_FLIP_FLOP -> DFlipFlop(id, x, y, 2, 2)
         ComponentType.T_FLIP_FLOP -> TFlipFlop(id, x, y, 2, 2)
+        ComponentType.JK_FLIP_FLOP_ASYNC -> JKFlipFlopAsync(id, x, y, 5, 2)
+        ComponentType.SR_FLIP_FLOP_ASYNC -> SRFlipFlopAsync(id, x, y, 5, 2)
+        ComponentType.D_FLIP_FLOP_ASYNC -> DFlipFlopAsync(id, x, y, 4, 2)
+        ComponentType.T_FLIP_FLOP_ASYNC -> TFlipFlopAsync(id, x, y, 4, 2)
+        ComponentType.IC_7400 -> IC7400(id, x, y, 10, 4)
+        ComponentType.IC_7402 -> IC7402(id, x, y, 10, 4)
+        ComponentType.IC_7404 -> IC7404(id, x, y, 8, 6)
+        ComponentType.IC_7408 -> IC7408(id, x, y, 10, 4)
+        ComponentType.IC_7432 -> IC7432(id, x, y, 10, 4)
+        ComponentType.IC_7486 -> IC7486(id, x, y, 10, 4)
     }
 }

@@ -5,6 +5,16 @@ import com.example.digisim.FlipFlops.DFlipFlop
 import com.example.digisim.FlipFlops.JKFlipFlop
 import com.example.digisim.FlipFlops.RSFlipFlop
 import com.example.digisim.FlipFlops.TFlipFlop
+import com.example.digisim.FlipFlops.DFlipFlopAsync
+import com.example.digisim.FlipFlops.JKFlipFlopAsync
+import com.example.digisim.FlipFlops.SRFlipFlopAsync
+import com.example.digisim.FlipFlops.TFlipFlopAsync
+import com.example.digisim.Chips74.IC7400
+import com.example.digisim.Chips74.IC7402
+import com.example.digisim.Chips74.IC7404
+import com.example.digisim.Chips74.IC7408
+import com.example.digisim.Chips74.IC7432
+import com.example.digisim.Chips74.IC7486
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
 import com.example.digisim.LogicGates.Nor
@@ -155,6 +165,76 @@ fun ComponentDto.toComponent(): Component = when (type) {
         initialOutputCount = outputCount
     )
     ComponentType.T_FLIP_FLOP -> TFlipFlop(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.JK_FLIP_FLOP_ASYNC -> JKFlipFlopAsync(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.SR_FLIP_FLOP_ASYNC -> SRFlipFlopAsync(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.D_FLIP_FLOP_ASYNC -> DFlipFlopAsync(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.T_FLIP_FLOP_ASYNC -> TFlipFlopAsync(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.IC_7400 -> IC7400(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.IC_7402 -> IC7402(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.IC_7404 -> IC7404(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.IC_7408 -> IC7408(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.IC_7432 -> IC7432(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount
+    )
+    ComponentType.IC_7486 -> IC7486(
         id = id,
         initialX = x,
         initialY = y,

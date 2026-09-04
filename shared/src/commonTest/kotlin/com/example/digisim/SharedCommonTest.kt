@@ -16,6 +16,10 @@ import com.example.digisim.FlipFlops.DFlipFlop
 import com.example.digisim.FlipFlops.JKFlipFlop
 import com.example.digisim.FlipFlops.RSFlipFlop
 import com.example.digisim.FlipFlops.TFlipFlop
+import com.example.digisim.FlipFlops.DFlipFlopAsync
+import com.example.digisim.FlipFlops.JKFlipFlopAsync
+import com.example.digisim.FlipFlops.SRFlipFlopAsync
+import com.example.digisim.FlipFlops.TFlipFlopAsync
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Not
 import com.example.digisim.ParsingLogic.ComponentType
@@ -247,7 +251,7 @@ class SharedCommonTest {
         val libVm = ComponentLibrariesViewModel()
         val flipFlopsLib = libVm.libraries.find { it.name == "Flip-Flops" }
         assertNotNull(flipFlopsLib)
-        assertEquals(4, flipFlopsLib.components.size)
+        assertEquals(8, flipFlopsLib.components.size)
 
         val rsComp = createComponent(ComponentType.RS_FLIP_FLOP, 1, 10f, 20f)
         assertTrue(rsComp is RSFlipFlop)
@@ -269,7 +273,28 @@ class SharedCommonTest {
         assertEquals(2, tComp.inputCount)
         assertEquals(2, tComp.outputCount)
 
-        val btnComp = createComponent(ComponentType.BUTTON, 5, 10f, 20f)
+        // Asynchronous Flip-Flops
+        val jkAsync = createComponent(ComponentType.JK_FLIP_FLOP_ASYNC, 5, 10f, 20f)
+        assertTrue(jkAsync is JKFlipFlopAsync)
+        assertEquals(5, jkAsync.inputCount)
+        assertEquals(2, jkAsync.outputCount)
+
+        val srAsync = createComponent(ComponentType.SR_FLIP_FLOP_ASYNC, 6, 10f, 20f)
+        assertTrue(srAsync is SRFlipFlopAsync)
+        assertEquals(5, srAsync.inputCount)
+        assertEquals(2, srAsync.outputCount)
+
+        val dAsync = createComponent(ComponentType.D_FLIP_FLOP_ASYNC, 7, 10f, 20f)
+        assertTrue(dAsync is DFlipFlopAsync)
+        assertEquals(4, dAsync.inputCount)
+        assertEquals(2, dAsync.outputCount)
+
+        val tAsync = createComponent(ComponentType.T_FLIP_FLOP_ASYNC, 8, 10f, 20f)
+        assertTrue(tAsync is TFlipFlopAsync)
+        assertEquals(4, tAsync.inputCount)
+        assertEquals(2, tAsync.outputCount)
+
+        val btnComp = createComponent(ComponentType.BUTTON, 9, 10f, 20f)
         assertTrue(btnComp is com.example.digisim.Wiring.Button)
         assertEquals(0, btnComp.inputCount)
         assertEquals(1, btnComp.outputCount)
@@ -277,6 +302,34 @@ class SharedCommonTest {
         val wiringLib = libVm.libraries.find { it.name == "Wiring" }
         assertNotNull(wiringLib)
         assertTrue(wiringLib.components.any { it.type == ComponentType.BUTTON })
+    }
+
+    @Test
+    fun testAsyncFlipFlopCircuitSimulation() = runTest {
+        val viewModel = CanvasViewModel()
+        val setInput = Input(0, 0f, 0f, 0, 1).apply { outputPin = Pin.HIGH } // SET active
+        val clkInput = Input(1, 0f, 50f, 0, 1).apply { outputPin = Pin.LOW }
+        val rstInput = Input(2, 0f, 100f, 0, 1).apply { outputPin = Pin.LOW }
+        val dInput = Input(3, 0f, 150f, 0, 1).apply { outputPin = Pin.LOW }
+        val dAsync = DFlipFlopAsync(4, 200f, 50f, 4, 2)
+        val qOut = Output(5, 400f, 50f, 1, 0)
+        val clockManager = ClockManager()
+
+        viewModel.components.addAll(listOf(setInput, clkInput, rstInput, dInput, dAsync, qOut))
+        viewModel.wires.addAll(listOf(
+            Wire(10, 0, 0, 4, 0), // SET -> DAsync port 0 (SET)
+            Wire(11, 3, 0, 4, 1), // D -> DAsync port 1 (D)
+            Wire(12, 1, 0, 4, 2), // CLK -> DAsync port 2 (CLK)
+            Wire(13, 2, 0, 4, 3), // RST -> DAsync port 3 (RST)
+            Wire(14, 4, 0, 5, 0)  // DAsync Q -> Output
+        ))
+
+        val simulation = SimulationViewModel()
+        simulation.runSimulation(viewModel, clockManager = clockManager)
+
+        // Asynchronous SET overrides clock: Q must be HIGH
+        assertEquals(Pin.HIGH, dAsync.outputPin)
+        assertEquals(Pin.HIGH, qOut.outputPin)
     }
 
     @Test

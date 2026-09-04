@@ -4,6 +4,16 @@ import com.example.digisim.FlipFlops.DFlipFlop
 import com.example.digisim.FlipFlops.JKFlipFlop
 import com.example.digisim.FlipFlops.RSFlipFlop
 import com.example.digisim.FlipFlops.TFlipFlop
+import com.example.digisim.FlipFlops.DFlipFlopAsync
+import com.example.digisim.FlipFlops.JKFlipFlopAsync
+import com.example.digisim.FlipFlops.SRFlipFlopAsync
+import com.example.digisim.FlipFlops.TFlipFlopAsync
+import com.example.digisim.Chips74.IC7400
+import com.example.digisim.Chips74.IC7402
+import com.example.digisim.Chips74.IC7404
+import com.example.digisim.Chips74.IC7408
+import com.example.digisim.Chips74.IC7432
+import com.example.digisim.Chips74.IC7486
 import com.example.digisim.LogicGates.And
 import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Input
@@ -63,6 +73,16 @@ fun convertForSimulation(input : Component , clockManager : ClockManager): List<
         is JKFlipFlop -> return listOf(flipFlops.JKFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
         is DFlipFlop -> return listOf(flipFlops.DFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
         is TFlipFlop -> return listOf(flipFlops.TFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is JKFlipFlopAsync -> return listOf(flipFlops.JKFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is SRFlipFlopAsync -> return listOf(flipFlops.SRFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is DFlipFlopAsync -> return listOf(flipFlops.DFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is TFlipFlopAsync -> return listOf(flipFlops.TFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is IC7400 -> return listOf(chips74.IC7400(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7402 -> return listOf(chips74.IC7402(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7404 -> return listOf(chips74.IC7404(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7408 -> return listOf(chips74.IC7408(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7432 -> return listOf(chips74.IC7432(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7486 -> return listOf(chips74.IC7486(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         else -> return null
     }
 }

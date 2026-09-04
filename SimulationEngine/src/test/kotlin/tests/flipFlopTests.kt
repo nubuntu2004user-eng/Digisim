@@ -5,6 +5,10 @@ import flipFlops.DFlipFlop
 import flipFlops.JKFlipFlop
 import flipFlops.RSFlipFlop
 import flipFlops.TFlipFlop
+import flipFlops.DFlipFlopAsync
+import flipFlops.JKFlipFlopAsync
+import flipFlops.SRFlipFlopAsync
+import flipFlops.TFlipFlopAsync
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import logicGates.BasicComponent
@@ -297,5 +301,232 @@ class FlipFlopTests {
         assertEquals(Pin.LOW, outWireQNot.value)
         assertEquals(listOf(Pin.HIGH), qOutput.evaluate())
         assertEquals(listOf(Pin.LOW), qNotOutput.evaluate())
+    }
+
+    @Test
+    fun testJKFlipFlopAsyncTruthTableAndAsyncOverrides() = runBlocking {
+        val jkAsync = JKFlipFlopAsync(
+            id = 10,
+            inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW), // SET=0, J=0, CLK=0, K=0, RST=0
+            output = mutableListOf(),
+            inputCount = 5,
+            inputFrom = mutableListOf(),
+            outputTo = mutableListOf()
+        )
+
+        // Initial hold: Q=LOW, Q_not=HIGH
+        var eval = jkAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Asynchronous SET overrides clock and J/K: SET=1, RST=0 -> Q=HIGH immediately
+        jkAsync.inputs = mutableListOf(Pin.HIGH, Pin.LOW, Pin.LOW, Pin.HIGH, Pin.LOW)
+        eval = jkAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // De-assert SET: hold state
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW)
+        eval = jkAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // Asynchronous RESET overrides clock and J/K: SET=0, RST=1 -> Q=LOW immediately
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.LOW, Pin.HIGH)
+        eval = jkAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Invalid condition: SET=1 and RST=1 -> ERROR
+        jkAsync.inputs = mutableListOf(Pin.HIGH, Pin.LOW, Pin.LOW, Pin.LOW, Pin.HIGH)
+        eval = jkAsync.evaluate()
+        assertEquals(listOf(Pin.ERROR, Pin.ERROR), eval)
+
+        // Clear error with Reset
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW, Pin.HIGH)
+        eval = jkAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Synchronous operation: SET=0, RST=0
+        // J=1, K=0 on rising edge -> Set (Q=HIGH)
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.LOW, Pin.LOW, Pin.LOW)
+        jkAsync.evaluate() // clk low
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.LOW, Pin.LOW)
+        eval = jkAsync.evaluate() // clk rising edge
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // J=0, K=1 on rising edge -> Reset (Q=LOW)
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.HIGH, Pin.LOW)
+        jkAsync.evaluate() // clk low
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.LOW)
+        eval = jkAsync.evaluate() // clk rising edge
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // J=1, K=1 on rising edge -> Toggle to HIGH
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.LOW, Pin.HIGH, Pin.LOW)
+        jkAsync.evaluate() // clk low
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.HIGH, Pin.LOW)
+        eval = jkAsync.evaluate() // clk rising edge
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // J=1, K=1 on next rising edge -> Toggle to LOW
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.LOW, Pin.HIGH, Pin.LOW)
+        jkAsync.evaluate() // clk low
+        jkAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.HIGH, Pin.LOW)
+        eval = jkAsync.evaluate() // clk rising edge
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+    }
+
+    @Test
+    fun testSRFlipFlopAsyncTruthTableAndAsyncOverrides() = runBlocking {
+        val srAsync = SRFlipFlopAsync(
+            id = 11,
+            inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW), // SET=0, S=0, CLK=0, R=0, RST=0
+            output = mutableListOf(),
+            inputCount = 5,
+            inputFrom = mutableListOf(),
+            outputTo = mutableListOf()
+        )
+
+        // Initial state
+        var eval = srAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Asynchronous SET=HIGH -> Q=HIGH
+        srAsync.inputs = mutableListOf(Pin.HIGH, Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW)
+        eval = srAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // Asynchronous RST=HIGH -> Q=LOW
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW, Pin.HIGH)
+        eval = srAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Asynchronous SET=HIGH and RST=HIGH -> ERROR
+        srAsync.inputs = mutableListOf(Pin.HIGH, Pin.LOW, Pin.LOW, Pin.LOW, Pin.HIGH)
+        eval = srAsync.evaluate()
+        assertEquals(listOf(Pin.ERROR, Pin.ERROR), eval)
+
+        // Reset to normal LOW
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW, Pin.HIGH)
+        srAsync.evaluate()
+
+        // Synchronous Set: S=1, R=0 on rising edge -> Q=HIGH
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.LOW, Pin.LOW, Pin.LOW)
+        srAsync.evaluate()
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.LOW, Pin.LOW)
+        eval = srAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // Hold: S=0, R=0 on rising edge -> Q remains HIGH
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW)
+        srAsync.evaluate()
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.HIGH, Pin.LOW, Pin.LOW)
+        eval = srAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // Synchronous Reset: S=0, R=1 on rising edge -> Q=LOW
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.HIGH, Pin.LOW)
+        srAsync.evaluate()
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.LOW)
+        eval = srAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Synchronous Invalid: S=1, R=1 on rising edge -> ERROR
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.LOW, Pin.HIGH, Pin.LOW)
+        srAsync.evaluate()
+        srAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.HIGH, Pin.LOW)
+        eval = srAsync.evaluate()
+        assertEquals(listOf(Pin.ERROR, Pin.ERROR), eval)
+    }
+
+    @Test
+    fun testDFlipFlopAsyncTruthTableAndAsyncOverrides() = runBlocking {
+        val dAsync = DFlipFlopAsync(
+            id = 12,
+            inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW), // SET=0, D=0, CLK=0, RST=0
+            output = mutableListOf(),
+            inputCount = 4,
+            inputFrom = mutableListOf(),
+            outputTo = mutableListOf()
+        )
+
+        // Initial state
+        var eval = dAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Asynchronous SET -> Q=HIGH
+        dAsync.inputs = mutableListOf(Pin.HIGH, Pin.LOW, Pin.LOW, Pin.LOW)
+        eval = dAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // Asynchronous RST -> Q=LOW
+        dAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.HIGH)
+        eval = dAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Both SET and RST -> ERROR
+        dAsync.inputs = mutableListOf(Pin.HIGH, Pin.LOW, Pin.LOW, Pin.HIGH)
+        eval = dAsync.evaluate()
+        assertEquals(listOf(Pin.ERROR, Pin.ERROR), eval)
+
+        // Normal D=HIGH on rising edge -> Q=HIGH
+        dAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.LOW, Pin.LOW)
+        dAsync.evaluate()
+        dAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.LOW)
+        eval = dAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // Normal D=LOW on rising edge -> Q=LOW
+        dAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW)
+        dAsync.evaluate()
+        dAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.HIGH, Pin.LOW)
+        eval = dAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+    }
+
+    @Test
+    fun testTFlipFlopAsyncTruthTableAndAsyncOverrides() = runBlocking {
+        val tAsync = TFlipFlopAsync(
+            id = 13,
+            inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.LOW), // SET=0, T=0, CLK=0, RST=0
+            output = mutableListOf(),
+            inputCount = 4,
+            inputFrom = mutableListOf(),
+            outputTo = mutableListOf()
+        )
+
+        // Initial state
+        var eval = tAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Asynchronous SET -> Q=HIGH
+        tAsync.inputs = mutableListOf(Pin.HIGH, Pin.LOW, Pin.LOW, Pin.LOW)
+        eval = tAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // Asynchronous RST -> Q=LOW
+        tAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.HIGH)
+        eval = tAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
+
+        // Both SET and RST -> ERROR
+        tAsync.inputs = mutableListOf(Pin.HIGH, Pin.LOW, Pin.LOW, Pin.HIGH)
+        eval = tAsync.evaluate()
+        assertEquals(listOf(Pin.ERROR, Pin.ERROR), eval)
+
+        // Reset to clean state
+        tAsync.inputs = mutableListOf(Pin.LOW, Pin.LOW, Pin.LOW, Pin.HIGH)
+        tAsync.evaluate()
+
+        // Normal T=HIGH on rising edge -> Toggle to HIGH
+        tAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.LOW, Pin.LOW)
+        tAsync.evaluate()
+        tAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.LOW)
+        eval = tAsync.evaluate()
+        assertEquals(listOf(Pin.HIGH, Pin.LOW), eval)
+
+        // T=HIGH on next rising edge -> Toggle to LOW
+        tAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.LOW, Pin.LOW)
+        tAsync.evaluate()
+        tAsync.inputs = mutableListOf(Pin.LOW, Pin.HIGH, Pin.HIGH, Pin.LOW)
+        eval = tAsync.evaluate()
+        assertEquals(listOf(Pin.LOW, Pin.HIGH), eval)
     }
 }

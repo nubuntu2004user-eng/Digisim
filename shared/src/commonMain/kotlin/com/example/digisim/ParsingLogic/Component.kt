@@ -30,4 +30,4 @@ abstract class Component(val ID : Int) {
     abstract fun findPortOffset() : Offset //for elements with one pin
 }
 
-enum class ComponentType { AND, NAND, NOR, OR, XNOR, XOR, NOT, INPUT, OUTPUT, CLOCK, RS_FLIP_FLOP, JK_FLIP_FLOP, D_FLIP_FLOP, T_FLIP_FLOP, BUTTON }
+enum class ComponentType { AND, NAND, NOR, OR, XNOR, XOR, NOT, INPUT, OUTPUT, CLOCK, RS_FLIP_FLOP, JK_FLIP_FLOP, D_FLIP_FLOP, T_FLIP_FLOP, BUTTON, JK_FLIP_FLOP_ASYNC, SR_FLIP_FLOP_ASYNC, D_FLIP_FLOP_ASYNC, T_FLIP_FLOP_ASYNC, IC_7400, IC_7402, IC_7404, IC_7408, IC_7432, IC_7486 }

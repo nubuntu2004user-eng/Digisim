@@ -28,12 +28,25 @@ class ComponentLibrariesViewModel: ViewModel() {
         LibraryComponent("RS Flip-Flop", "add RS Flip-Flop", null, ComponentType.RS_FLIP_FLOP),
         LibraryComponent("JK Flip-Flop", "add JK Flip-Flop", null, ComponentType.JK_FLIP_FLOP),
         LibraryComponent("D Flip-Flop", "add D Flip-Flop", null, ComponentType.D_FLIP_FLOP),
-        LibraryComponent("T Flip-Flop", "add T Flip-Flop", null, ComponentType.T_FLIP_FLOP)
+        LibraryComponent("T Flip-Flop", "add T Flip-Flop", null, ComponentType.T_FLIP_FLOP),
+        LibraryComponent("JK Flip-Flop (Async)", "add Asynchronous JK Flip-Flop (with Set/Reset)", null, ComponentType.JK_FLIP_FLOP_ASYNC),
+        LibraryComponent("SR Flip-Flop (Async)", "add Asynchronous SR Flip-Flop (with Set/Reset)", null, ComponentType.SR_FLIP_FLOP_ASYNC),
+        LibraryComponent("D Flip-Flop (Async)", "add Asynchronous D Flip-Flop (with Set/Reset)", null, ComponentType.D_FLIP_FLOP_ASYNC),
+        LibraryComponent("T Flip-Flop (Async)", "add Asynchronous T Flip-Flop (with Set/Reset)", null, ComponentType.T_FLIP_FLOP_ASYNC)
+    )
+    val chips74 = listOf(
+        LibraryComponent("7400", "add 7400 Quad 2-input NAND Gate IC", null, ComponentType.IC_7400),
+        LibraryComponent("7402", "add 7402 Quad 2-input NOR Gate IC", null, ComponentType.IC_7402),
+        LibraryComponent("7404", "add 7404 Hex Inverter IC", null, ComponentType.IC_7404),
+        LibraryComponent("7408", "add 7408 Quad 2-input AND Gate IC", null, ComponentType.IC_7408),
+        LibraryComponent("7432", "add 7432 Quad 2-input OR Gate IC", null, ComponentType.IC_7432),
+        LibraryComponent("7486", "add 7486 Quad 2-input XOR Gate IC", null, ComponentType.IC_7486)
     )
     val libraries = listOf(
         Libraries("Gates", gates),
         Libraries("Wiring", wiring),
-        Libraries("Flip-Flops", flipFlops)
+        Libraries("Flip-Flops", flipFlops),
+        Libraries("74**", chips74)
     )
 
      fun nextLib() {
