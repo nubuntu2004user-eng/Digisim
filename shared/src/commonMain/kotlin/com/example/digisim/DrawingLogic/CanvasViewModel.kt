@@ -108,7 +108,7 @@ fun createComponent(
         ComponentType.OUTPUT -> Output(id, x, y, 1, 0)
         ComponentType.INPUT -> Input(id, x, y, 0, 1)
         ComponentType.BUTTON -> Button(id, x, y, 0, 1)
-        ComponentType.CLOCK -> Clock(id, x, y, 0, 1, 999.0f)
+        ComponentType.CLOCK -> Clock(id, x, y, 0, 1, 500.0f)
         ComponentType.RS_FLIP_FLOP -> RSFlipFlop(id, x, y, 2, 2)
         ComponentType.JK_FLIP_FLOP -> JKFlipFlop(id, x, y, 3, 2)
         ComponentType.D_FLIP_FLOP -> DFlipFlop(id, x, y, 2, 2)

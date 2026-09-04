@@ -17,8 +17,12 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,12 +47,31 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
         controlButtons(viewModel , scope, translationViewModel , clockManager)
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
         if(!simulation.isRunning){
+            TooltipBox(
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                tooltip = {
+                    PlainTooltip {
+                        Text(translationViewModel.getString("Start"))
+                    }
+                },
+                state = rememberTooltipState()
+            ){
             IconButton(onClick = {simulation.startSimulation(viewModel , scope , clockManager = clockManager) ; viewModel.currentMode = CanvasViewModel.editingMode.POKE}){
                 Icon(
                     imageVector = Icons.Filled.PlayArrow,
                     contentDescription = null
                 )
             }
+            }
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                tooltip = {
+                    PlainTooltip {
+                        Text(translationViewModel.getString("Clear"))
+                    }
+                },
+                state = rememberTooltipState()
+            ){
             IconButton(onClick = {viewModel.components.clear() ; viewModel.wires.clear() ; viewModel.nextId = 0}){
                 Icon(
                     imageVector = Icons.Filled.Clear,
@@ -57,14 +80,34 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
             }
 
         }
+        }
         else{
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                tooltip = {
+                    PlainTooltip {
+                        Text(translationViewModel.getString("Stop"))
+                    }
+                },
+                state = rememberTooltipState()
+            ){
                 IconButton(onClick = {simulation.isRunning = false ; simulation.isAuto = false ; simulation.componentsState.clear() ; clockManager.tick = 0}){
                     Icon(
                         imageVector = Icons.Filled.Stop,
                         contentDescription = null
                     )
                 }
+            }
                 if (simulation.isAuto){
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip {
+                                Text(translationViewModel.getString("Pause"))
+                            }
+                        },
+                        state = rememberTooltipState()
+                    ){
                     IconButton(onClick = {simulation.isAuto = false }){
                         Icon(
                             imageVector = Icons.Filled.Pause,
@@ -73,13 +116,33 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                         )
                     }
                 }
+                }
             else{
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip {
+                                Text(translationViewModel.getString("One step"))
+                            }
+                        },
+                        state = rememberTooltipState()
+                    ){
                     IconButton(onClick = {simulation.startSimulation(viewModel, scope, clockManager ,true)}){
                         Icon(
                             imageVector = Icons.Filled.ChevronRight,
                             contentDescription = null
                         )
                     }
+                    }
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip {
+                                Text(translationViewModel.getString("Auto"))
+                            }
+                        },
+                        state = rememberTooltipState()
+                    ){
                     IconButton(onClick = {simulation.isAuto = true ; simulation.startSimulation(viewModel , scope , clockManager = clockManager)}){
                         Icon(
                             imageVector = Icons.Filled.DoubleArrow,
@@ -87,6 +150,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
 
                         )
                     }
+            }
             }
 
         }

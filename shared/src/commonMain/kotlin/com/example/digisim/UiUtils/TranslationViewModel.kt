@@ -77,8 +77,14 @@ class TranslationViewModel : ViewModel() {
         "add T Flip-Flop" to mapOf(Language.ENGLISH to "add T Flip-Flop", Language.DEUTSCH to "T-Flipflop hinzufügen", Language.UKRAINIAN to "додати T-тригер"),
         "Gates" to mapOf(Language.ENGLISH to "Gates", Language.DEUTSCH to "Gatter", Language.UKRAINIAN to "Вентилі"),
         "Wiring" to mapOf(Language.ENGLISH to "Wiring", Language.DEUTSCH to "Verkabelung", Language.UKRAINIAN to "З'єднання"),
-        "Flip-Flops" to mapOf(Language.ENGLISH to "Flip-Flops", Language.DEUTSCH to "Flipflops", Language.UKRAINIAN to "Тригери")
-    )
+        "Flip-Flops" to mapOf(Language.ENGLISH to "Flip-Flops", Language.DEUTSCH to "Flipflops", Language.UKRAINIAN to "Тригери"),
+        "Start" to mapOf(Language.ENGLISH to "Start" , Language.DEUTSCH to "Start" , Language.UKRAINIAN to "Старт"),
+        "Stop" to mapOf(Language.ENGLISH to "Stop" , Language.DEUTSCH to "Stop" , Language.UKRAINIAN to "Стоп"),
+        "Pause" to mapOf(Language.ENGLISH to "Pause", Language.DEUTSCH to "Pause", Language.UKRAINIAN to "Пауза"),
+        "One step" to mapOf(Language.ENGLISH to "One step", Language.DEUTSCH to "Einzelschritt", Language.UKRAINIAN to "Один крок"),
+        "Auto" to mapOf(Language.ENGLISH to "Auto", Language.DEUTSCH to "Auto", Language.UKRAINIAN to "Авто"),
+
+        )
 
     fun getString(key: String): String {
         return translations[key]?.get(currentLanguage) ?: key

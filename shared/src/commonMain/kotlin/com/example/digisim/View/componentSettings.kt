@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -157,30 +159,32 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     )
                 }
 
-                var userInputDelay by remember { mutableStateOf("") }
+                var dropdownExpanded by remember { mutableStateOf(false) }
                 Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
-                OutlinedTextField(
-                    value = userInputDelay,
-                    onValueChange = { userInputDelay = it },
-                    placeholder = { Text(translationViewModel.getString("Change frequency")) },
-                    trailingIcon = {
-                        IconButton(onClick = {
-                            userInputDelay.toFloatOrNull()?.let { frequencyHz ->
-                                val delayTicks = frequencyHzToToggleDelayTicks(frequencyHz)
-
-                                if (delayTicks != null) {
-                                    component?.delay = delayTicks
+                Column {
+                    Button(onClick = { dropdownExpanded = true }) {
+                        Text(translationViewModel.getString("Change frequency"))
+                    }
+                    DropdownMenu(
+                        expanded = dropdownExpanded,
+                        onDismissRequest = { dropdownExpanded = false }
+                    ) {
+                        val frequencies = listOf(500f, 250f, 125f, 100f, 50f, 25f, 20f, 10f, 5f, 4f, 1f)
+                        frequencies.forEach { freq ->
+                            DropdownMenuItem(
+                                text = { Text("${freq.toInt()} Hz") },
+                                onClick = {
+                                    val delayTicks = frequencyHzToToggleDelayTicks(freq)
+                                    if (delayTicks != null) {
+                                        component?.delay = delayTicks
+                                    }
+                                    dropdownExpanded = false
                                 }
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = null
                             )
                         }
                     }
-                )
+                }
             }
 
             Spacer(modifier = Modifier.fillMaxHeight(0.01f))
