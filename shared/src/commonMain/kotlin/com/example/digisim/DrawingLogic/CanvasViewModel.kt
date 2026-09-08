@@ -21,6 +21,7 @@ import com.example.digisim.Chips74.IC7404
 import com.example.digisim.Chips74.IC7408
 import com.example.digisim.Chips74.IC7432
 import com.example.digisim.Chips74.IC7486
+import com.example.digisim.LibraryLoader.CustomComponent
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
 import com.example.digisim.LogicGates.Nor
@@ -37,6 +38,7 @@ import com.example.digisim.Wiring.Output
 import com.example.digisim.ParsingLogic.PortHit
 import com.example.digisim.ParsingLogic.Wire
 import com.example.digisim.Wiring.Clock
+import logicGates.SimulationComponent
 import kotlin.math.sqrt
 
 class CanvasViewModel: ViewModel() {
@@ -62,7 +64,7 @@ class CanvasViewModel: ViewModel() {
 //    var isPanning by mutableStateOf(false)
 
     fun addComponent(type: ComponentType) {
-        pendingComponent = createComponent(type, id = -1, x = -1000f, y = -1000f)
+        pendingComponent = createComponent(type, id = -1, x = -1000f, y = -1000f , 2 ,1 , null , null )  //might be broken
     }
 
 
@@ -105,15 +107,19 @@ fun createComponent(
     type: ComponentType,
     id: Int = -1,
     x: Float = 0f,
-    y: Float = 0f
+    y: Float = 0f,
+    inputCount: Int = 2,
+    outputCount :Int = 1,
+    logic : MutableList<MutableList<SimulationComponent>>?,
+    name : String?
 ): Component {
     return when (type) {
-        ComponentType.AND -> And(id, x, y, 2, 1)
-        ComponentType.OR -> Or(id, x, y, 2, 1)
-        ComponentType.NAND -> Nand(id, x, y, 2, 1)
-        ComponentType.NOR -> Nor(id, x, y, 2, 1)
-        ComponentType.XOR -> Xor(id, x, y, 2, 1)
-        ComponentType.XNOR -> XNor(id, x, y, 2, 1)
+        ComponentType.AND -> And(id, x, y, inputCount, outputCount)
+        ComponentType.OR -> Or(id, x, y, 2, outputCount)
+        ComponentType.NAND -> Nand(id, x, y, 2, outputCount)
+        ComponentType.NOR -> Nor(id, x, y, 2, outputCount)
+        ComponentType.XOR -> Xor(id, x, y, 2, outputCount)
+        ComponentType.XNOR -> XNor(id, x, y, 2, outputCount)
         ComponentType.NOT -> Not(id, x, y, 1, 1)
         ComponentType.OUTPUT -> Output(id, x, y, 1, 0)
         ComponentType.INPUT -> Input(id, x, y, 0, 1)
@@ -133,5 +139,6 @@ fun createComponent(
         ComponentType.IC_7408 -> IC7408(id, x, y, 10, 4)
         ComponentType.IC_7432 -> IC7432(id, x, y, 10, 4)
         ComponentType.IC_7486 -> IC7486(id, x, y, 10, 4)
+        ComponentType.CUSTOM -> CustomComponent(id , x, y , inputCount , outputCount , abstractedLogic = logic , customComponentName = name )
     }
 }

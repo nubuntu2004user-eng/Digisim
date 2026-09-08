@@ -6,13 +6,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
+import logicGates.SimulationComponent
 
 class JKFlipFlop(
     id: Int,
     initialX: Float = 0f,
     initialY: Float = 0f,
     initialInputCount: Int = 3,
-    initialOutputCount: Int = 2
+    initialOutputCount: Int = 2,
+    override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
+    override val customComponentName: String? = null
 ) : Component(id) {
 
     override var x: Float by mutableStateOf(initialX)

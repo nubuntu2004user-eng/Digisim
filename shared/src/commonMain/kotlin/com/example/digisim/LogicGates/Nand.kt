@@ -7,13 +7,16 @@ import androidx.compose.ui.geometry.Offset
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.DrawingLogic.calculateInputPinPositions
+import logicGates.SimulationComponent
 
- class Nand(
-     id: Int,
-     initialX: Float = 0f,
-     initialY: Float = 0f,
-     initialInputCount: Int,
-     initialOutputCount: Int
+class Nand(
+    id: Int,
+    initialX: Float = 0f,
+    initialY: Float = 0f,
+    initialInputCount: Int,
+    initialOutputCount: Int,
+    override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
+    override val customComponentName: String? = null
  ) : Component(id) {
 
      override var x: Float by mutableStateOf(initialX)

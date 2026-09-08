@@ -11,14 +11,13 @@ import flipFlops.SRFlipFlopAsync
 import flipFlops.TFlipFlopAsync
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 import logicGates.ComponentType
 import logicGates.Pin
 import logicGates.inputWire
 import logicGates.outputWire
 import org.junit.Test
 import wiring.Button
-import wiring.Input
 import wiring.Output
 
 class FlipFlopTests {
@@ -235,9 +234,9 @@ class FlipFlopTests {
         )
 
         val stages = mutableListOf(
-            mutableListOf<BasicComponent>(outComp),
-            mutableListOf<BasicComponent>(tFf),
-            mutableListOf<BasicComponent>(btn)
+            mutableListOf<SimulationComponent>(outComp),
+            mutableListOf<SimulationComponent>(tFf),
+            mutableListOf<SimulationComponent>(btn)
         )
 
         // Initial tick: Button is LOW -> Q is LOW
@@ -291,8 +290,8 @@ class FlipFlopTests {
             outputTo = mutableListOf()
         )
 
-        val stageOut = mutableListOf<BasicComponent>(qOutput, qNotOutput)
-        val stageFf = mutableListOf<BasicComponent>(dFf)
+        val stageOut = mutableListOf<SimulationComponent>(qOutput, qNotOutput)
+        val stageFf = mutableListOf<SimulationComponent>(dFf)
 
         val result = computeSimulation(mutableListOf(stageOut, stageFf))
 

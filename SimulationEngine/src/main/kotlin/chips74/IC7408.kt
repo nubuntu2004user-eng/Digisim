@@ -1,6 +1,6 @@
 package chips74
 
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 import logicGates.ComponentType
 import logicGates.Pin
 import logicGates.inputWire
@@ -16,8 +16,8 @@ class IC7408(
     override val componentType: ComponentType = ComponentType.IC_7408,
     override var highDuration: Int? = null,
     override var lowDuration: Int? = null,
-    override var delayTicks: Float? = null
-) : BasicComponent(id) {
+    override var delayTicks: Float? = null,
+) : SimulationComponent(id) {
 
     override suspend fun evaluate(): MutableList<Pin> {
         val in1A = inputs.getOrElse(0) { Pin.UNDEFINED }

@@ -1,10 +1,10 @@
 package engineLogic
 
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 import logicGates.ComponentType
 import logicGates.Pin
 
-suspend fun computeSimulation ( input : MutableList<MutableList<BasicComponent>>): MutableList<MutableList<BasicComponent>>{
+suspend fun computeSimulation ( input : MutableList<MutableList<SimulationComponent>>): MutableList<MutableList<SimulationComponent>>{
     val result = input.reversed().toMutableList()
     for (stage in result){
         for (element in stage){

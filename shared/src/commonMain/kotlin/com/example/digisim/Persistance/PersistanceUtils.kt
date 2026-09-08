@@ -15,6 +15,7 @@ import com.example.digisim.Chips74.IC7404
 import com.example.digisim.Chips74.IC7408
 import com.example.digisim.Chips74.IC7432
 import com.example.digisim.Chips74.IC7486
+import com.example.digisim.LibraryLoader.CustomComponent
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
 import com.example.digisim.LogicGates.Nor
@@ -28,7 +29,6 @@ import com.example.digisim.Wiring.Clock
 import com.example.digisim.Wiring.Input
 import com.example.digisim.Wiring.Output
 import io.github.vinceglb.filekit.PlatformFile
-import java.io.File
 
 //internal fun saveFile(viewModel: CanvasViewModel , file: File){
 //    val componentDto = mutableListOf<ComponentDto>()
@@ -60,7 +60,10 @@ fun Component.toDto(): ComponentDto = ComponentDto(
     x = x,
     y = y,
     inputCount = inputCount,
-    outputCount = outputCount
+    outputCount = outputCount,
+    customLogic = abstractedLogic,
+    customName = customComponentName
+
 )
 
 fun ComponentDto.toComponent(): Component = when (type) {
@@ -240,5 +243,15 @@ fun ComponentDto.toComponent(): Component = when (type) {
         initialY = y,
         initialInputCount = inputCount,
         initialOutputCount = outputCount
+    )
+
+    ComponentType.CUSTOM -> CustomComponent(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        abstractedLogic = customLogic,
+        customComponentName = customName
     )
 }

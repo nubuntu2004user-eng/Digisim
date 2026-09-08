@@ -2,6 +2,7 @@ package com.example.digisim.Persistance
 
 import com.example.digisim.ParsingLogic.ComponentType
 import kotlinx.serialization.Serializable
+import logicGates.SimulationComponent
 
 @Serializable
 data class ComponentDto(
@@ -10,5 +11,7 @@ data class ComponentDto(
     val x: Float,
     val y: Float,
     val inputCount: Int,
-    val outputCount: Int
+    val outputCount: Int,
+    val customLogic: MutableList<MutableList<SimulationComponent>>?,
+    val customName: String?
 )

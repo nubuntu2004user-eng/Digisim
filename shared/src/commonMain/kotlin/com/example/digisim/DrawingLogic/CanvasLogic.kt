@@ -182,7 +182,11 @@ internal fun placePendingComponent(
         type = pending.componentType,
         id = viewModel.nextId++,
         x = finalX,
-        y = finalY
+        y = finalY,
+        inputCount = pending.inputCount,
+        outputCount = pending.outputCount,
+        logic = pending.abstractedLogic,
+        name = pending.customComponentName
     )
     viewModel.components.add(placedComponent)
     viewModel.pendingComponent = null

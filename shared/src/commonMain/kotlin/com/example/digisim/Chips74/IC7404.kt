@@ -10,13 +10,16 @@ import com.example.digisim.ComponentsDrawing.drawIC7404
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
+import logicGates.SimulationComponent
 
 class IC7404(
     id: Int,
     initialX: Float = 0f,
     initialY: Float = 0f,
     initialInputCount: Int = 8,
-    initialOutputCount: Int = 6
+    initialOutputCount: Int = 6,
+    override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
+    override val customComponentName: String? = null
 ) : Component(id) {
 
     override var x: Float by mutableStateOf(initialX)

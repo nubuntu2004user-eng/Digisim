@@ -61,11 +61,11 @@ fun ToolSelectorRow(viewModel: CanvasViewModel , simulationViewModel: Simulation
             !simulationViewModel.isRunning,
             translationViewModel.getString("Wire")
             ),
-        ToolButtonParams(Icons.Filled.TextFields, {
-            viewModel.pendingComponent = null },
-            !simulationViewModel.isRunning,
-            translationViewModel.getString("Text")
-        ),
+//        ToolButtonParams(Icons.Filled.TextFields, {
+//            viewModel.pendingComponent = null },
+//            !simulationViewModel.isRunning,
+//            translationViewModel.getString("Text")
+//        ),
     )
 
     val componentButtonList = listOf(
@@ -81,7 +81,7 @@ fun ToolSelectorRow(viewModel: CanvasViewModel , simulationViewModel: Simulation
     )
 
     val previewComponents = remember {
-        componentButtonList.associate { it.type to createComponent(it.type, id = -1, x = 0f, y = 0f) }
+        componentButtonList.associate { it.type to createComponent(it.type, id = -1, x = 0f, y = 0f , name = null , logic = null) }
     }
     val previewSettings = remember { SettingsViewModel(drawText = false) }
     val textMeasurer = rememberTextMeasurer()

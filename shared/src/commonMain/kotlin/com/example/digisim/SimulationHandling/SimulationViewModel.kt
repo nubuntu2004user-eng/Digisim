@@ -15,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 import logicGates.Pin
 import logicGates.inputWire
 import logicGates.outputWire
@@ -26,11 +26,10 @@ class SimulationViewModel : ViewModel() {
     var isRunning by mutableStateOf(false)
 
     var isAuto by mutableStateOf(false)
-    val componentsState by mutableStateOf(mutableListOf<MutableList<BasicComponent>>())
+    val componentsState by mutableStateOf(mutableListOf<MutableList<SimulationComponent>>())
 
     fun startSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null, clockManager: ClockManager , forward : Boolean = false) {
         isRunning = true
-//        isAuto = false
         if(!forward){
         viewModel.components.forEach {
             if (it is Input) {
@@ -152,7 +151,7 @@ class SimulationViewModel : ViewModel() {
         return true
     }
 
-    private fun mapWires(input: MutableList<MutableList<BasicComponent>>, viewModel: CanvasViewModel): MutableList<MutableList<BasicComponent>> {
+    private fun mapWires(input: MutableList<MutableList<SimulationComponent>>, viewModel: CanvasViewModel): MutableList<MutableList<SimulationComponent>> {
         val result = input
         val wires = viewModel.wires
         for (stage in result) {

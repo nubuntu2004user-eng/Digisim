@@ -1,6 +1,6 @@
 package flipFlops
 
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 import logicGates.ComponentType
 import logicGates.Pin
 import logicGates.inputWire
@@ -19,7 +19,7 @@ class DFlipFlop(
     override var delayTicks: Float? = null,
     var currentQ: Pin = Pin.LOW,
     var prevClock: Pin = Pin.LOW
-) : BasicComponent(id) {
+) : SimulationComponent(id) {
 
     override suspend fun evaluate(): MutableList<Pin> {
         val d = inputs.getOrElse(0) { Pin.LOW }

@@ -1,6 +1,6 @@
 package wiring
 
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 import logicGates.ComponentType
 import logicGates.Pin
 import logicGates.inputWire
@@ -15,8 +15,8 @@ class Output(id : Int,
              override val componentType: ComponentType = ComponentType.OUTPUT,
              override var highDuration: Int? = null,
              override var lowDuration: Int? = null,
-             override var delayTicks: Float? = null
-    ): BasicComponent(id) {
+             override var delayTicks: Float? = null,
+): SimulationComponent(id) {
     override suspend fun evaluate(): MutableList<Pin> {
         return inputs.toMutableList()
     }

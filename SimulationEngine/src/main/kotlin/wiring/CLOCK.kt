@@ -1,7 +1,7 @@
 package wiring
 
 import engineLogic.ClockManager
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 import logicGates.ComponentType
 import logicGates.Pin
 import logicGates.inputWire
@@ -20,7 +20,7 @@ class CLOCK(
     override var highDuration: Int? = null,
     override var lowDuration: Int? = null,
     val clockManager: ClockManager
-    ): BasicComponent(id) {
+    ): SimulationComponent(id) {
     override suspend fun evaluate(): MutableList<Pin> {
         if (delayTicks != null) {
             val roundedDelayTicks = delayTicks!!.roundToInt().coerceAtLeast(1)

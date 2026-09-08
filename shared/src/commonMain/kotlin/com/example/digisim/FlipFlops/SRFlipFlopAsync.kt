@@ -10,13 +10,16 @@ import com.example.digisim.ComponentsDrawing.drawSRFlipFlopAsync
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
+import logicGates.SimulationComponent
 
 class SRFlipFlopAsync(
     id: Int,
     initialX: Float = 0f,
     initialY: Float = 0f,
     initialInputCount: Int = 5,
-    initialOutputCount: Int = 2
+    initialOutputCount: Int = 2,
+    override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
+    override val customComponentName: String? = null
 ) : Component(id) {
 
     override var x: Float by mutableStateOf(initialX)

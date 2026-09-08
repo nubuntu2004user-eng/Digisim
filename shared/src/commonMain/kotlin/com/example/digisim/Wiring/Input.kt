@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
+import logicGates.SimulationComponent
 import logicGates.Pin
 
 class Input(
@@ -13,7 +14,9 @@ class Input(
     initialX: Float = 0f,
     initialY: Float = 0f,
     initialInputCount: Int,
-    initialOutputCount: Int
+    initialOutputCount: Int,
+    override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
+    override val customComponentName: String? = null
 ) : Component(id) {
 
     override var x: Float by mutableStateOf(initialX)

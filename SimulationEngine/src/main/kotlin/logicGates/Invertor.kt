@@ -9,9 +9,9 @@ class Invertor(id : Int,
                override val componentType: ComponentType = ComponentType.NOT,
                override var highDuration: Int? = null,
                override var lowDuration: Int? = null,
-               override var delayTicks: Float? = null
+               override var delayTicks: Float? = null,
 
-): BasicComponent(id) {
+): SimulationComponent(id) {
 
     override suspend fun evaluate(): MutableList<Pin> {
         val result = mutableListOf<Pin>()

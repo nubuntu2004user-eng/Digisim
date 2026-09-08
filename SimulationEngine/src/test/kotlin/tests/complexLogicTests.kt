@@ -160,9 +160,9 @@ class ComplexLogicTests {
         val andComp = createAnd(2, mutableListOf(inputWire(1, 0, Pin.HIGH)))
         val outputComp = createOutput(3, mutableListOf(inputWire(2, 0, Pin.HIGH)))
 
-        val stage0 = mutableListOf<BasicComponent>(outputComp)
-        val stage1 = mutableListOf<BasicComponent>(andComp)
-        val stage2 = mutableListOf<BasicComponent>(inputComp)
+        val stage0 = mutableListOf<SimulationComponent>(outputComp)
+        val stage1 = mutableListOf<SimulationComponent>(andComp)
+        val stage2 = mutableListOf<SimulationComponent>(inputComp)
 
         val simulationInput = mutableListOf(stage0, stage1, stage2)
         val result = computeSimulation(simulationInput)
@@ -182,7 +182,7 @@ class ComplexLogicTests {
         val outWire3 = outputWire(4, 0)
         val inputLow = createInput(2, Pin.LOW, mutableListOf(outWire3))
 
-        val simulationInput = mutableListOf(mutableListOf<BasicComponent>(inputHigh, inputLow))
+        val simulationInput = mutableListOf(mutableListOf<SimulationComponent>(inputHigh, inputLow))
         computeSimulation(simulationInput)
 
         assertEquals(Pin.HIGH, outWire1.value)
@@ -198,13 +198,13 @@ class ComplexLogicTests {
         input.switch()
         assertEquals(listOf(Pin.HIGH), input.output)
 
-        computeSimulation(mutableListOf(mutableListOf<BasicComponent>(input)))
+        computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(input)))
         assertEquals(Pin.HIGH, outWire.value)
 
         input.switch()
         assertEquals(listOf(Pin.LOW), input.output)
 
-        computeSimulation(mutableListOf(mutableListOf<BasicComponent>(input)))
+        computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(input)))
         assertEquals(Pin.LOW, outWire.value)
     }
 
@@ -215,8 +215,8 @@ class ComplexLogicTests {
         val notGate1 = createInvertor(2, mutableListOf(inputWire(1, 0, Pin.LOW)), mutableListOf(notOutWire1))
         val outputComp1 = createOutput(3, mutableListOf(inputWire(2, 0, Pin.HIGH)))
 
-        val stageOutputs1 = mutableListOf<BasicComponent>(outputComp1)
-        val stageGates1 = mutableListOf<BasicComponent>(notGate1)
+        val stageOutputs1 = mutableListOf<SimulationComponent>(outputComp1)
+        val stageGates1 = mutableListOf<SimulationComponent>(notGate1)
         computeSimulation(mutableListOf(stageOutputs1, stageGates1))
 
         assertEquals(listOf(Pin.LOW), notGate1.inputs)
@@ -228,8 +228,8 @@ class ComplexLogicTests {
         val notGate2 = createInvertor(4, mutableListOf(inputWire(1, 0, Pin.HIGH)), mutableListOf(notOutWire2))
         val outputComp2 = createOutput(5, mutableListOf(inputWire(4, 0, Pin.LOW)))
 
-        val stageOutputs2 = mutableListOf<BasicComponent>(outputComp2)
-        val stageGates2 = mutableListOf<BasicComponent>(notGate2)
+        val stageOutputs2 = mutableListOf<SimulationComponent>(outputComp2)
+        val stageGates2 = mutableListOf<SimulationComponent>(notGate2)
         computeSimulation(mutableListOf(stageOutputs2, stageGates2))
 
         assertEquals(listOf(Pin.HIGH), notGate2.inputs)
@@ -239,7 +239,7 @@ class ComplexLogicTests {
         // Test ERROR input
         val notOutWire3 = outputWire(7, 0)
         val notGate3 = createInvertor(6, mutableListOf(inputWire(1, 0, Pin.ERROR)), mutableListOf(notOutWire3))
-        computeSimulation(mutableListOf(mutableListOf<BasicComponent>(notGate3)))
+        computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(notGate3)))
         assertEquals(Pin.ERROR, notOutWire3.value)
     }
 
@@ -263,8 +263,8 @@ class ComplexLogicTests {
             )
             val outputComp = createOutput(10, mutableListOf(inputWire(1, 0, expected)))
 
-            val stageOut = mutableListOf<BasicComponent>(outputComp)
-            val stageGate = mutableListOf<BasicComponent>(andGate)
+            val stageOut = mutableListOf<SimulationComponent>(outputComp)
+            val stageGate = mutableListOf<SimulationComponent>(andGate)
 
             computeSimulation(mutableListOf(stageOut, stageGate))
 
@@ -293,7 +293,7 @@ class ComplexLogicTests {
                 outputWires = mutableListOf(outWire)
             )
 
-            computeSimulation(mutableListOf(mutableListOf<BasicComponent>(orGate)))
+            computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(orGate)))
 
             assertEquals("OR($pinA, $pinB) should be $expected", expected, outWire.value)
             assertEquals(listOf(pinA, pinB), orGate.inputs)
@@ -319,7 +319,7 @@ class ComplexLogicTests {
                 outputWires = mutableListOf(outWire)
             )
 
-            computeSimulation(mutableListOf(mutableListOf<BasicComponent>(nandGate)))
+            computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(nandGate)))
 
             assertEquals("NAND($pinA, $pinB) should be $expected", expected, outWire.value)
             assertEquals(listOf(pinA, pinB), nandGate.inputs)
@@ -345,7 +345,7 @@ class ComplexLogicTests {
                 outputWires = mutableListOf(outWire)
             )
 
-            computeSimulation(mutableListOf(mutableListOf<BasicComponent>(norGate)))
+            computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(norGate)))
 
             assertEquals("NOR($pinA, $pinB) should be $expected", expected, outWire.value)
             assertEquals(listOf(pinA, pinB), norGate.inputs)
@@ -371,7 +371,7 @@ class ComplexLogicTests {
                 outputWires = mutableListOf(outWire)
             )
 
-            computeSimulation(mutableListOf(mutableListOf<BasicComponent>(xorGate)))
+            computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(xorGate)))
 
             assertEquals("XOR($pinA, $pinB) should be $expected", expected, outWire.value)
             assertEquals(listOf(pinA, pinB), xorGate.inputs)
@@ -397,7 +397,7 @@ class ComplexLogicTests {
                 outputWires = mutableListOf(outWire)
             )
 
-            computeSimulation(mutableListOf(mutableListOf<BasicComponent>(xnorGate)))
+            computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(xnorGate)))
 
             assertEquals("XNOR($pinA, $pinB) should be $expected", expected, outWire.value)
             assertEquals(listOf(pinA, pinB), xnorGate.inputs)
@@ -438,8 +438,8 @@ class ComplexLogicTests {
             val sumOutput = createOutput(5, mutableListOf(inputWire(3, 0, expectedSum)))
             val carryOutput = createOutput(6, mutableListOf(inputWire(4, 0, expectedCarry)))
 
-            val stageOutputs = mutableListOf<BasicComponent>(sumOutput, carryOutput)
-            val stageGates = mutableListOf<BasicComponent>(xorGate, andGate)
+            val stageOutputs = mutableListOf<SimulationComponent>(sumOutput, carryOutput)
+            val stageGates = mutableListOf<SimulationComponent>(xorGate, andGate)
 
             computeSimulation(mutableListOf(stageOutputs, stageGates))
 
@@ -493,9 +493,9 @@ class ComplexLogicTests {
             val finalOutput = createOutput(8, mutableListOf(inputWire(7, 0, expectedOutput)))
 
             // Stages: Output -> Stage 2 (OR) -> Stage 1 (ANDs)
-            val stage3 = mutableListOf<BasicComponent>(finalOutput)
-            val stage2 = mutableListOf<BasicComponent>(orGate)
-            val stage1 = mutableListOf<BasicComponent>(andGate1, andGate2)
+            val stage3 = mutableListOf<SimulationComponent>(finalOutput)
+            val stage2 = mutableListOf<SimulationComponent>(orGate)
+            val stage1 = mutableListOf<SimulationComponent>(andGate1, andGate2)
 
             val result = computeSimulation(mutableListOf(stage3, stage2, stage1))
 
@@ -520,10 +520,10 @@ class ComplexLogicTests {
         val not3 = createInvertor(3, mutableListOf(inputWire(2, 0, Pin.LOW)), mutableListOf(not3Out))
         val outputComp = createOutput(4, mutableListOf(inputWire(3, 0, Pin.HIGH)))
 
-        val stageOutput = mutableListOf<BasicComponent>(outputComp)
-        val stageNot3 = mutableListOf<BasicComponent>(not3)
-        val stageNot2 = mutableListOf<BasicComponent>(not2)
-        val stageNot1 = mutableListOf<BasicComponent>(not1)
+        val stageOutput = mutableListOf<SimulationComponent>(outputComp)
+        val stageNot3 = mutableListOf<SimulationComponent>(not3)
+        val stageNot2 = mutableListOf<SimulationComponent>(not2)
+        val stageNot1 = mutableListOf<SimulationComponent>(not1)
 
         val result = computeSimulation(mutableListOf(stageOutput, stageNot3, stageNot2, stageNot1))
 
@@ -544,7 +544,7 @@ class ComplexLogicTests {
         // Set stale dirty input values
         andGate.inputs = mutableListOf(Pin.LOW, Pin.ERROR, Pin.UNDEFINED)
 
-        computeSimulation(mutableListOf(mutableListOf<BasicComponent>(andGate)))
+        computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(andGate)))
 
         assertEquals(listOf(Pin.HIGH, Pin.HIGH), andGate.inputs)
         assertEquals(listOf(Pin.HIGH), andGate.evaluate())
@@ -563,7 +563,7 @@ class ComplexLogicTests {
             outputWires = mutableListOf(outWire1, outWire2, outWire3)
         )
 
-        computeSimulation(mutableListOf(mutableListOf<BasicComponent>(orGate)))
+        computeSimulation(mutableListOf(mutableListOf<SimulationComponent>(orGate)))
 
         assertEquals(Pin.HIGH, outWire1.value)
         assertEquals(Pin.HIGH, outWire2.value)
@@ -572,14 +572,14 @@ class ComplexLogicTests {
 
     @Test
     fun testEmptySimulationInput() = runBlocking {
-        val emptyInput = mutableListOf<MutableList<BasicComponent>>()
+        val emptyInput = mutableListOf<MutableList<SimulationComponent>>()
         val result = computeSimulation(emptyInput)
         assertTrue(result.isEmpty())
     }
 
     @Test
     fun testEmptyStagesInSimulation() = runBlocking {
-        val emptyStage = mutableListOf<BasicComponent>()
+        val emptyStage = mutableListOf<SimulationComponent>()
         val result = computeSimulation(mutableListOf(emptyStage, emptyStage))
         assertEquals(2, result.size)
         assertTrue(result[0].isEmpty())

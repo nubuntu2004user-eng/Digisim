@@ -4,7 +4,7 @@ import chips74.*
 import engineLogic.computeSimulation
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 import logicGates.Pin
 import logicGates.inputWire
 import logicGates.outputWire
@@ -172,8 +172,8 @@ class Chip74Tests {
         val out1 = Output(20, mutableListOf(), mutableListOf(Pin.UNDEFINED), 1, mutableListOf(inputWire(1, 0)), mutableListOf())
         val out2 = Output(21, mutableListOf(), mutableListOf(Pin.UNDEFINED), 1, mutableListOf(inputWire(1, 0)), mutableListOf())
 
-        val stageOut = mutableListOf<BasicComponent>(out1, out2)
-        val stageChip = mutableListOf<BasicComponent>(chip)
+        val stageOut = mutableListOf<SimulationComponent>(out1, out2)
+        val stageChip = mutableListOf<SimulationComponent>(chip)
 
         val result = computeSimulation(mutableListOf(stageOut, stageChip))
         assertEquals(2, result.size)

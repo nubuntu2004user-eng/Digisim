@@ -9,9 +9,9 @@ package logicGates
             override val componentType: ComponentType = ComponentType.NAND,
             override var highDuration: Int? = null,
             override var lowDuration: Int? = null,
-            override var delayTicks: Float? = null
+            override var delayTicks: Float? = null,
 
- ):BasicComponent(id) {
+ ):SimulationComponent(id) {
 
      override suspend fun evaluate(): MutableList<Pin> {
          val result: Pin = when{
@@ -21,4 +21,5 @@ package logicGates
          }
          return mutableListOf(result)
      }
+
 }

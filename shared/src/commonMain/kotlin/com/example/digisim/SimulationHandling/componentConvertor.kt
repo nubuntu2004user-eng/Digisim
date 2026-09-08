@@ -27,9 +27,9 @@ import com.example.digisim.LogicGates.Xor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.Wiring.Clock
 import engineLogic.ClockManager
-import logicGates.BasicComponent
+import logicGates.SimulationComponent
 
-fun convertForSimulation(input : Component , clockManager : ClockManager): List<BasicComponent>?{
+fun convertForSimulation(input : Component , clockManager : ClockManager): List<SimulationComponent>?{
     when (input){
         is And -> return listOf( logicGates.And(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
         is Nand ->return listOf( logicGates.Nand(input.ID , mutableListOf() ,mutableListOf(input.outputPin) , input.inputCount , mutableListOf() , mutableListOf() ))
@@ -86,10 +86,10 @@ fun convertForSimulation(input : Component , clockManager : ClockManager): List<
         else -> return null
     }
 }
-fun convertAll (input: MutableList<MutableList<Component>> , clockManager: ClockManager): MutableList<MutableList<BasicComponent>>{
-    val result = mutableListOf<MutableList<BasicComponent>>()
+fun convertAll (input: MutableList<MutableList<Component>> , clockManager: ClockManager): MutableList<MutableList<SimulationComponent>>{
+    val result = mutableListOf<MutableList<SimulationComponent>>()
     for (stage in input){
-        val tmp = mutableListOf<BasicComponent>()
+        val tmp = mutableListOf<SimulationComponent>()
         for (i in stage){
             val converted = convertForSimulation(i , clockManager = clockManager)
             if (converted != null && converted.isNotEmpty()) {

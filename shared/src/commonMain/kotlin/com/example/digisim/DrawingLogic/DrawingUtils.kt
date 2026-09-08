@@ -151,6 +151,7 @@ fun DrawScope.drawComponent(
         ComponentType.IC_7408 -> { drawIC7408(component, textMeasurer, settings) }
         ComponentType.IC_7432 -> { drawIC7432(component, textMeasurer, settings) }
         ComponentType.IC_7486 -> { drawIC7486(component, textMeasurer, settings) }
+        ComponentType.CUSTOM -> {}
     }
 }
 

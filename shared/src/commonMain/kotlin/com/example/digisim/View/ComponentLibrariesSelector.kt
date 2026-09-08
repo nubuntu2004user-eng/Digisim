@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.PlusOne
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,7 +55,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
     val componentList = selectedLibrary.components
     val currentLibraryName = selectedLibrary.name
     val previewComponents = remember(componentList) {
-        componentList.associate { it.type to createComponent(it.type, id = -1, x = 0f, y = 0f) }
+        componentList.associate { it.type to createComponent(it.type, id = -1, x = 0f, y = 0f , name = null , logic = null) }
     }
     val previewSettings = remember { SettingsViewModel(drawText = false) }
     val textMeasurer = rememberTextMeasurer()
@@ -66,6 +68,13 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                     contentDescription = null
                 )}
                 Text(translationViewModel.getString("Library: ") + translationViewModel.getString(currentLibraryName), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
+
+            IconButton(onClick = {}){
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = null
+                )
+            }
                 IconButton(onClick = {libraryViewModel.nextLib()} , modifier = Modifier){
                     Icon(
                         imageVector = Icons.Filled.ChevronRight,
