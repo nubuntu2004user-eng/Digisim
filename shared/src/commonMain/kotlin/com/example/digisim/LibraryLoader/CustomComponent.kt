@@ -29,16 +29,17 @@ class CustomComponent(
 
     override val componentType = ComponentType.CUSTOM
 
-    override fun findPortOffset(): Offset {
-        TODO("Not yet implemented")
-    }
-
     override fun inputPortPositions(): List<Offset> {
-        TODO("Not yet implemented")
+        if (inputCount <= 0) return emptyList()
+        val spacing = height / (inputCount + 1)
+        return (1..inputCount).map { i -> Offset(x, y + spacing * i) }
     }
 
     override fun outputPortPositions(): List<Offset> {
-        TODO("Not yet implemented")
+        if (outputCount <= 0) return emptyList()
+        val spacing = height / (outputCount + 1)
+        return (1..outputCount).map { i -> Offset(x + width, y + spacing * i) }
     }
 
+    override fun findPortOffset(): Offset = Offset(x, y + height / 2f)
 }

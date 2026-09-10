@@ -9,6 +9,7 @@ import androidx.compose.ui.text.TextMeasurer
 import com.example.digisim.ComponentsDrawing.drawAnd
 import com.example.digisim.ComponentsDrawing.drawButton
 import com.example.digisim.ComponentsDrawing.drawClock
+import com.example.digisim.ComponentsDrawing.drawCustomComponent
 import com.example.digisim.ComponentsDrawing.drawInput
 import com.example.digisim.ComponentsDrawing.drawNand
 import com.example.digisim.ComponentsDrawing.drawNor
@@ -151,7 +152,7 @@ fun DrawScope.drawComponent(
         ComponentType.IC_7408 -> { drawIC7408(component, textMeasurer, settings) }
         ComponentType.IC_7432 -> { drawIC7432(component, textMeasurer, settings) }
         ComponentType.IC_7486 -> { drawIC7486(component, textMeasurer, settings) }
-        ComponentType.CUSTOM -> {}
+        ComponentType.CUSTOM -> { drawCustomComponent(component, textMeasurer, settings) }
     }
 }
 

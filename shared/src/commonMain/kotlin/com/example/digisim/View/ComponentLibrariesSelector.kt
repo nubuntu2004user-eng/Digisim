@@ -48,8 +48,20 @@ import com.example.digisim.SettingsViewModel
 import com.example.digisim.UiUtils.ComponentLibrariesViewModel
 import com.example.digisim.UiUtils.TranslationViewModel
 
+import androidx.compose.runtime.rememberCoroutineScope
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.openFilePicker
+import com.example.digisim.Persistance.persistanceRepository
+import com.example.digisim.UiUtils.LibraryComponent
+import io.github.vinceglb.filekit.name
+import kotlinx.coroutines.launch
+import engineLogic.ClockManager
+import com.example.digisim.SimulationHandling.convertCircuit
+import com.example.digisim.Persistance.toComponent
+
 @Composable
 fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: ComponentLibrariesViewModel, translationViewModel: TranslationViewModel){
+    val scope = rememberCoroutineScope()
     val settingsViewModel = SettingsViewModel.default
     val selectedLibrary = libraryViewModel.libraries[libraryViewModel.currentLibraryIndex]
     val componentList = selectedLibrary.components
@@ -69,7 +81,45 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                 )}
                 Text(translationViewModel.getString("Library: ") + translationViewModel.getString(currentLibraryName), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
 
-            IconButton(onClick = {}){
+            IconButton(onClick = {
+                scope.launch {
+                    val file = FileKit.openFilePicker()
+                    if (file != null) {
+                        val data = persistanceRepository.load(file)
+                        if (data != null) {
+                            
+                            val componentName = file.name.substringBeforeLast(".")
+                            
+                            // Input components as per SimulationEngine
+                            val inputTypes = listOf(
+                                ComponentType.INPUT, 
+                                ComponentType.BUTTON, 
+                                ComponentType.CLOCK
+                            )
+                            val inputCount = data.components.count { it.type in inputTypes }
+                            val outputCount = data.components.count { it.type == ComponentType.OUTPUT }
+                            
+                            // Map loaded components to abstracted logic
+                            val clockManager = ClockManager()
+                            val componentsList = data.components.map { it.toComponent() }
+                            val stages = mutableListOf(componentsList.toMutableList())
+                            val abstractedLogic = convertCircuit(stages, data.wires, clockManager)
+                            
+                            libraryViewModel.addCustomComponent(
+                                LibraryComponent(
+                                    name = componentName,
+                                    description = "Custom component: $componentName",
+                                    icon = null,
+                                    type = ComponentType.CUSTOM,
+                                    abstractedLogic = abstractedLogic,
+                                    inputCount = inputCount,
+                                    outputCount = outputCount
+                                )
+                            )
+                        }
+                    }
+                }
+            }){
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = null
@@ -95,7 +145,13 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                     },
                     state = rememberTooltipState()
                 ){
-                ElevatedButton(onClick = {viewModel.addComponent(i.type)} , modifier = Modifier.padding(5.dp)){
+                ElevatedButton(onClick = {
+                    if (i.type == ComponentType.CUSTOM) {
+                        viewModel.addComponent(i.type, i.abstractedLogic, i.name, i.inputCount, i.outputCount)
+                    } else {
+                        viewModel.addComponent(i.type)
+                    }
+                } , modifier = Modifier.padding(5.dp)){
                     if (i.icon !== null){
                         Icon(
                             imageVector = i.icon,

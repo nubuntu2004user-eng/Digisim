@@ -63,8 +63,8 @@ class CanvasViewModel: ViewModel() {
     var viewportY by mutableStateOf(0f)
 //    var isPanning by mutableStateOf(false)
 
-    fun addComponent(type: ComponentType) {
-        pendingComponent = createComponent(type, id = -1, x = -1000f, y = -1000f , 2 ,1 , null , null )  //might be broken
+    fun addComponent(type: ComponentType, logic: MutableList<MutableList<SimulationComponent>>? = null, name: String? = null, inputCount: Int = 2, outputCount: Int = 1) {
+        pendingComponent = createComponent(type, id = -1, x = -1000f, y = -1000f , inputCount, outputCount , logic, name)
     }
 
 

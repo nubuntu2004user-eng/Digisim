@@ -51,7 +51,7 @@ class SimulationViewModel : ViewModel() {
         val action: suspend () -> Unit = {
             val tmp = splitToStages(viewModel)
             if (tmp.isNotEmpty() && tmp.any { it.isNotEmpty() }) {
-                val splitToStages = convertAll(tmp , clockManager)
+                val splitToStages = convertCircuit(tmp, viewModel.wires, clockManager)
                 val mappedToWires = mapWires(splitToStages, viewModel)
                 val result = computeSimulation(mappedToWires)
                 clockManager.tick += 1

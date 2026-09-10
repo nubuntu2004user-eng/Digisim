@@ -27,6 +27,9 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
     
     var gridColor: Color by mutableStateOf(Color.LightGray)
     var gridSize: Float by mutableStateOf(20f)
+    
+    var customComponentFillColor: Color by mutableStateOf(Color.Yellow)
+    var customComponentOutlineColor: Color by mutableStateOf(Color.Green)
 
     fun getComponentInnerRectColor(pin: Pin): Color {
         return when (pin) {

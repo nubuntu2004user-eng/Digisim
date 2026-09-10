@@ -13,6 +13,7 @@ import com.example.digisim.Chips74.IC7402
 import com.example.digisim.Chips74.IC7404
 import com.example.digisim.Chips74.IC7408
 import com.example.digisim.Chips74.IC7432
+import com.example.digisim.LibraryLoader.CustomComponent
 import com.example.digisim.Chips74.IC7486
 import com.example.digisim.LogicGates.And
 import com.example.digisim.Wiring.Button
@@ -28,6 +29,10 @@ import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.Wiring.Clock
 import engineLogic.ClockManager
 import logicGates.SimulationComponent
+import logicGates.SimulationCustomComponent
+import com.example.digisim.ParsingLogic.Wire
+import logicGates.inputWire
+import logicGates.outputWire
 
 fun convertForSimulation(input : Component , clockManager : ClockManager): List<SimulationComponent>?{
     when (input){
@@ -69,6 +74,17 @@ fun convertForSimulation(input : Component , clockManager : ClockManager): List<
                 mutableListOf()
             )
         )
+        is CustomComponent -> return listOf(
+            SimulationCustomComponent(
+                input.ID,
+                mutableListOf(),
+                mutableListOf(),
+                input.inputCount,
+                mutableListOf(),
+                mutableListOf(),
+                input.abstractedLogic ?: mutableListOf()
+            )
+        )
         is RSFlipFlop -> return listOf(flipFlops.RSFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
         is JKFlipFlop -> return listOf(flipFlops.JKFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
         is DFlipFlop -> return listOf(flipFlops.DFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
@@ -86,17 +102,39 @@ fun convertForSimulation(input : Component , clockManager : ClockManager): List<
         else -> return null
     }
 }
-fun convertAll (input: MutableList<MutableList<Component>> , clockManager: ClockManager): MutableList<MutableList<SimulationComponent>>{
+
+fun convertCircuit(
+    components: MutableList<MutableList<Component>>,
+    wires: List<Wire>,
+    clockManager: ClockManager
+): MutableList<MutableList<SimulationComponent>> {
+    val simComponents = mutableMapOf<Int, SimulationComponent>()
+    
+    // 1. Convert all components
     val result = mutableListOf<MutableList<SimulationComponent>>()
-    for (stage in input){
+    for (stage in components) {
         val tmp = mutableListOf<SimulationComponent>()
-        for (i in stage){
-            val converted = convertForSimulation(i , clockManager = clockManager)
+        for (i in stage) {
+            val converted = convertForSimulation(i, clockManager)
             if (converted != null && converted.isNotEmpty()) {
-                tmp.add(converted.first())
+                val comp = converted.first()
+                tmp.add(comp)
+                simComponents[i.ID] = comp
             }
         }
         result.add(tmp)
     }
-    return  result
+    
+    // 2. Map wires
+    for (wire in wires) {
+        val source = simComponents[wire.sourceGateId]
+        val target = simComponents[wire.targetGateId]
+        
+        if (source != null && target != null) {
+            source.outputTo.add(outputWire(targetGateId = target.id, portId = wire.targetPortIndex, sourcePortId = wire.sourcePortIndex))
+            target.inputFrom.add(inputWire(sourceGateId = source.id, portId = wire.targetPortIndex))
+        }
+    }
+    
+    return result
 }

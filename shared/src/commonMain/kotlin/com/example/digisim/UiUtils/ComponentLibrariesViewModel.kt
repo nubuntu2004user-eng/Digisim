@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import com.example.digisim.ParsingLogic.ComponentType
+import logicGates.SimulationComponent
 
 class ComponentLibrariesViewModel: ViewModel() {
     var currentLibraryIndex by mutableStateOf(0)
@@ -42,11 +43,12 @@ class ComponentLibrariesViewModel: ViewModel() {
         LibraryComponent("7432", "add 7432 Quad 2-input OR Gate IC", null, ComponentType.IC_7432),
         LibraryComponent("7486", "add 7486 Quad 2-input XOR Gate IC", null, ComponentType.IC_7486)
     )
-    val libraries = listOf(
+    val libraries = mutableListOf(
         Libraries("Gates", gates),
         Libraries("Wiring", wiring),
         Libraries("Flip-Flops", flipFlops),
-        Libraries("74**", chips74)
+        Libraries("74**", chips74),
+        Libraries("Custom", mutableListOf())
     )
 
      fun nextLib() {
@@ -62,14 +64,23 @@ class ComponentLibrariesViewModel: ViewModel() {
         }
          else currentLibraryIndex = libraries.lastIndex
     }
+
+    fun addCustomComponent(component: LibraryComponent) {
+        val customLibrary = libraries.find { it.name == "Custom" }
+        (customLibrary?.components as? MutableList<LibraryComponent>)?.add(component)
+    }
 }
   class Libraries(
     val name : String,
     val components : List<LibraryComponent>
 )
+
 class LibraryComponent(
     val name: String,
     val description : String ,
     val icon : ImageVector? ,
-    val type : ComponentType
+    val type : ComponentType,
+    val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
+    val inputCount: Int = 0,
+    val outputCount: Int = 0
 )
