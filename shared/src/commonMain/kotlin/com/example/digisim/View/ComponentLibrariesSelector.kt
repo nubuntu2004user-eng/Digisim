@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
@@ -141,6 +142,19 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                 }){
                     Icon(
                         imageVector = Icons.Filled.Add,
+                        contentDescription = null
+                    )
+                }
+            }
+            if (selectedLibrary.isMutable){
+                IconButton(onClick = {
+                    scope.launch {
+                        libraryViewModel.libraries.remove(selectedLibrary)
+                        libraryViewModel.previousLib()
+                    }
+                }){
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
                         contentDescription = null
                     )
                 }

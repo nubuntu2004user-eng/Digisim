@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -24,13 +25,14 @@ import com.example.digisim.Persistance.saveFileAs
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.UiUtils.Language
 import com.example.digisim.UiUtils.TranslationViewModel
+import com.example.digisim.UiUtils.UiState
 import com.example.digisim.UiUtils.undoOnce
 import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , translationViewModel: TranslationViewModel ,clockManager: ClockManager){
+fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , translationViewModel: TranslationViewModel ,clockManager: ClockManager ,  uiState : UiState){
     val settingsViewModel = SettingsViewModel.default
     Row{
         var showInputDialog by remember { mutableStateOf(false) }
@@ -85,19 +87,11 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
       //TextButton(onClick = {}){ will contain links to docks once they are released
       //        Text("Help")
       //        }
+        Spacer(modifier = Modifier.fillMaxWidth(0.01f))
 
-      Spacer(modifier = Modifier.fillMaxWidth(0.01f))
-      TextButton(onClick = {translationViewModel.currentLanguage = Language.ENGLISH}){
-      Text("EN" , color = settingsViewModel.textColor)
-      }
-      Spacer(modifier = Modifier.fillMaxWidth(0.01f))
-      TextButton(onClick = {translationViewModel.currentLanguage = Language.DEUTSCH}){
-      Text("DE", color = settingsViewModel.textColor)
-      }
-      Spacer(modifier = Modifier.fillMaxWidth(0.01f))
-      TextButton(onClick = {translationViewModel.currentLanguage = Language.UKRAINIAN}){
-      Text("UA", color = settingsViewModel.textColor)
-      }
+        TextButton(onClick = {uiState.showSettings = !uiState.showSettings}){
+            Text("Settings" , color = settingsViewModel.textColor)
+        }
 
       Box{
       if(showInputDialog){
@@ -125,6 +119,5 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
       )
       }
       }
-
     }
 }

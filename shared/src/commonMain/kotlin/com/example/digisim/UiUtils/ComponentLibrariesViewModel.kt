@@ -45,7 +45,7 @@ class ComponentLibrariesViewModel: ViewModel() {
         LibraryComponent("7432", "add 7432 Quad 2-input OR Gate IC", null, ComponentType.IC_7432),
         LibraryComponent("7486", "add 7486 Quad 2-input XOR Gate IC", null, ComponentType.IC_7486)
     )
-    val libraries = mutableListOf(
+    val libraries = mutableStateListOf(
         Libraries("Gates", gates , false),
         Libraries("Wiring", wiring , false),
         Libraries("Flip-Flops", flipFlops , false),

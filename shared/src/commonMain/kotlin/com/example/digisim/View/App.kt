@@ -26,6 +26,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.coroutineContext
 import androidx.compose.ui.input.key.*
+import com.example.digisim.SettingsViewModel
+import com.example.digisim.UiUtils.UiState
 
 @Composable
 @Preview
@@ -37,6 +39,7 @@ fun App() {
         val librariesViewModel  = remember { ComponentLibrariesViewModel() }
         val clockManager = remember { ClockManager() }
         val translationViewModel = remember<TranslationViewModel> { TranslationViewModel() }
+        val uiState = remember { UiState() }
         Column(modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
@@ -53,10 +56,10 @@ fun App() {
             }
 
         ) {
-            TopRow(simulation , viewModel , scope , clockManager, translationViewModel)
+            TopRow(simulation , viewModel , scope , clockManager, translationViewModel , uiState)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
-                    leftPanel(viewModel, simulation , librariesViewModel, translationViewModel)
+                    leftPanel(viewModel, simulation , librariesViewModel, translationViewModel , uiState , SettingsViewModel.default)
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     ToolSelectorRow(viewModel , simulation, translationViewModel)

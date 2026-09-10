@@ -36,15 +36,16 @@ import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.TranslationViewModel
+import com.example.digisim.UiUtils.UiState
 import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager, translationViewModel: TranslationViewModel){
+fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager, translationViewModel: TranslationViewModel , uiState : UiState){
     val settingsViewModel = SettingsViewModel.default
     Row {
-        controlButtons(viewModel , scope, translationViewModel , clockManager)
+        controlButtons(viewModel , scope, translationViewModel , clockManager , uiState)
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
         if(!simulation.isRunning){
             TooltipBox(
