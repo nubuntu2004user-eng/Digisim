@@ -48,12 +48,22 @@ internal suspend fun loadFile(viewModel: CanvasViewModel, file: PlatformFile?){
     val data = persistanceRepository.load(file)
     viewModel.components.clear()
     viewModel.wires.clear()
+    val ids = mutableListOf<Int>()
     val component = mutableListOf<Component>()
     data?.components?.forEach { componentDto ->
         component += componentDto.toComponent()
+        ids += componentDto.id
     }
     viewModel.components += component
-    data?.wires.let{ viewModel.wires.addAll(it!!)}
+    data?.wires.let{ viewModel.wires.addAll(it!!)
+            it.forEach { wire ->
+                ids += wire.id
+            }
+    }
+    val maxId = ids.max()
+    viewModel.nextId = maxId + 1
+
+
 }
 fun Component.toDto(): ComponentDto = ComponentDto(
     id = ID,
