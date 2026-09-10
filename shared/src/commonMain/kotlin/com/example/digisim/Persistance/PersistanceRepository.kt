@@ -1,9 +1,12 @@
 package com.example.digisim.Persistance
 
 import com.example.digisim.ParsingLogic.Wire
+import com.example.digisim.UiUtils.AppState
+import com.example.digisim.UiUtils.Language
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.exists
 import io.github.vinceglb.filekit.parent
+import io.github.vinceglb.filekit.path
 import io.github.vinceglb.filekit.readString
 import io.github.vinceglb.filekit.writeString
 import kotlinx.serialization.Serializable
@@ -18,16 +21,28 @@ internal object persistanceRepository {
 
     }
 
-//    internal fun defaultDataDir(): File {
-//        val userHome = System.getProperty("user.home")
-//        val os = System.getProperty("os.name").lowercase()
-//        val base = if(os.contains("win")){
-//                System.getenv("APPDATA") ?: "$userHome\\AppData\\Roaming"
-//        } else {
-//            "$userHome/.local/share"
-//        }
-//        return File(base , "DigiSim").apply { mkdirs() }
-//        }
+    internal fun defaultDataDir(): PlatformFile {
+        val userHome = System.getProperty("user.home")
+        val os = System.getProperty("os.name").lowercase()
+        val base = if(os.contains("win")){
+                System.getenv("APPDATA") ?: "$userHome\\AppData\\Roaming"
+        } else {
+            "$userHome/.local/share/"
+        }
+        return PlatformFile(base + "DigiSim.json")
+        }
+    internal suspend fun saveState(appState: AppState){
+        val appStateDto = AppStateToDto(appState)
+        val content = json.encodeToString(appStateDto)
+        defaultDataDir().writeString(content)
+    }
+    internal suspend fun loadState(): AppStateDto{
+        if (defaultDataDir().exists() ){
+            return defaultDataDir().readString()?.let { json.decodeFromString(it) }!!
+        }
+        else return AppStateDto(currentLanguage = Language.ENGLISH)
+
+    }
     internal suspend fun saveAs(file: PlatformFile, components: MutableList<ComponentDto>, wires: MutableList<Wire>) {
         val circuitData = CircuitData(components, wires)
         val content = json.encodeToString(circuitData)

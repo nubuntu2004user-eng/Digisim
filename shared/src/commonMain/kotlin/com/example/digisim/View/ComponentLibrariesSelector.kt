@@ -49,12 +49,13 @@ import com.example.digisim.UiUtils.TranslationViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.example.digisim.LibraryLoader.addCustomComponent
+import com.example.digisim.UiUtils.AppState
 import com.example.digisim.UiUtils.Libraries
 import com.example.digisim.UiUtils.undoOnce
 import kotlinx.coroutines.launch
 
 @Composable
-fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: ComponentLibrariesViewModel, translationViewModel: TranslationViewModel){
+fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: ComponentLibrariesViewModel, translationViewModel: TranslationViewModel ,appState : AppState){
     val scope = rememberCoroutineScope()
     var showNewLibraryDialog by remember {mutableStateOf(false)}
     val settingsViewModel = SettingsViewModel.default
@@ -77,7 +78,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                     imageVector = Icons.Filled.ChevronLeft,
                     contentDescription = null
                 )}
-                Text(translationViewModel.getString("Library: ") + translationViewModel.getString(currentLibraryName), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
+                Text(translationViewModel.getString("Library: ", appState.currentLanguage) + translationViewModel.getString(currentLibraryName, appState.currentLanguage), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
 
                 IconButton(onClick = {libraryViewModel.nextLib()} , modifier = Modifier){
                     Icon(
@@ -94,7 +95,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                     positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                     tooltip = {
                         PlainTooltip {
-                            Text(translationViewModel.getString(i.description))
+                            Text(translationViewModel.getString(i.description , appState.currentLanguage))
                         }
                     },
                     state = rememberTooltipState()
@@ -129,7 +130,7 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                                     }
                                 }
                             }
-                        Text(translationViewModel.getString(i.name), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
+                        Text(translationViewModel.getString(i.name , appState.currentLanguage), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
                          }
                         }
                     }
@@ -166,19 +167,19 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
             var userInput by remember { mutableStateOf("") }
             AlertDialog(
                 onDismissRequest = { showNewLibraryDialog = false },
-                title = { Text(translationViewModel.getString("New library name"), color = settingsViewModel.textColor) },
+                title = { Text(translationViewModel.getString("New library name" , appState.currentLanguage), color = settingsViewModel.textColor) },
                 text = {
                     TextField(
                         value = userInput,
                         onValueChange = { userInput = it },
-                        label = { Text(translationViewModel.getString("Enter name here"), color = settingsViewModel.textColor) }
+                        label = { Text(translationViewModel.getString("Enter name here" , appState.currentLanguage), color = settingsViewModel.textColor) }
                     )
                 },
                 confirmButton = {
                     TextButton(onClick = {
                         libraryViewModel.libraries.add(Libraries(userInput , mutableStateListOf() , true))
                         showNewLibraryDialog = false
-                    }) { Text(translationViewModel.getString("Add library"), color = settingsViewModel.textColor) }
+                    }) { Text(translationViewModel.getString("Add library" , appState.currentLanguage), color = settingsViewModel.textColor) }
                 }
             )
         }

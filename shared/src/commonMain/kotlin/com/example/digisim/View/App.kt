@@ -23,11 +23,13 @@ import com.example.digisim.UiUtils.TranslationViewModel
 import com.example.digisim.UiUtils.undoOnce
 import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.coroutineContext
 import androidx.compose.ui.input.key.*
+import com.example.digisim.Persistance.AppStateDto
+import com.example.digisim.Persistance.persistanceRepository.loadState
 import com.example.digisim.SettingsViewModel
-import com.example.digisim.UiUtils.UiState
+import com.example.digisim.UiUtils.AppState
+import com.example.digisim.UiUtils.Language
+import kotlinx.coroutines.launch
 
 @Composable
 @Preview
@@ -39,7 +41,14 @@ fun App() {
         val librariesViewModel  = remember { ComponentLibrariesViewModel() }
         val clockManager = remember { ClockManager() }
         val translationViewModel = remember<TranslationViewModel> { TranslationViewModel() }
-        val uiState = remember { UiState() }
+        
+        val appState = remember { AppState() }
+        
+        LaunchedEffect(Unit) {
+            val loadedDto = loadState()
+            appState.applyDto(loadedDto)
+        }
+
         Column(modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
@@ -56,13 +65,13 @@ fun App() {
             }
 
         ) {
-            TopRow(simulation , viewModel , scope , clockManager, translationViewModel , uiState)
+            TopRow(simulation , viewModel , scope , clockManager, translationViewModel , appState)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
-                    leftPanel(viewModel, simulation , librariesViewModel, translationViewModel , uiState , SettingsViewModel.default)
+                    leftPanel(viewModel, simulation , librariesViewModel, translationViewModel , appState , SettingsViewModel.default , scope)
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    ToolSelectorRow(viewModel , simulation, translationViewModel)
+                    ToolSelectorRow(viewModel , simulation, translationViewModel ,appState)
                     Box(modifier = Modifier.weight(1f)) {
                         DigitalLogicSimulator(viewModel = viewModel, simulation = simulation, scope = scope , clockManager = clockManager)
                     }

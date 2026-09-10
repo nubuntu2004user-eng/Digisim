@@ -1,6 +1,5 @@
 package com.example.digisim.View
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,45 +13,38 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.TranslationViewModel
-import com.example.digisim.UiUtils.UiState
+import com.example.digisim.UiUtils.AppState
 import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scope : CoroutineScope , clockManager : ClockManager, translationViewModel: TranslationViewModel , uiState : UiState){
+fun TopRow(simulation : SimulationViewModel, viewModel : CanvasViewModel, scope : CoroutineScope, clockManager : ClockManager, translationViewModel: TranslationViewModel, appState : AppState){
     val settingsViewModel = SettingsViewModel.default
     Row {
-        controlButtons(viewModel , scope, translationViewModel , clockManager , uiState)
+        controlButtons(viewModel , scope, translationViewModel , clockManager , appState)
         Spacer(modifier = Modifier.fillMaxWidth(0.1f))
         if(!simulation.isRunning){
             TooltipBox(
             positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                 tooltip = {
                     PlainTooltip {
-                        Text(translationViewModel.getString("Start"))
+                        Text(translationViewModel.getString("Start" , appState.currentLanguage))
                     }
                 },
                 state = rememberTooltipState()
@@ -68,7 +60,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                 positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                 tooltip = {
                     PlainTooltip {
-                        Text(translationViewModel.getString("Clear"))
+                        Text(translationViewModel.getString("Clear", appState.currentLanguage))
                     }
                 },
                 state = rememberTooltipState()
@@ -87,7 +79,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                 positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                 tooltip = {
                     PlainTooltip {
-                        Text(translationViewModel.getString("Stop"))
+                        Text(translationViewModel.getString("Stop", appState.currentLanguage))
                     }
                 },
                 state = rememberTooltipState()
@@ -104,7 +96,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                         tooltip = {
                             PlainTooltip {
-                                Text(translationViewModel.getString("Pause"))
+                                Text(translationViewModel.getString("Pause", appState.currentLanguage))
                             }
                         },
                         state = rememberTooltipState()
@@ -123,7 +115,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                         tooltip = {
                             PlainTooltip {
-                                Text(translationViewModel.getString("One step"))
+                                Text(translationViewModel.getString("One step", appState.currentLanguage))
                             }
                         },
                         state = rememberTooltipState()
@@ -139,7 +131,7 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
                         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                         tooltip = {
                             PlainTooltip {
-                                Text(translationViewModel.getString("Auto"))
+                                Text(translationViewModel.getString("Auto", appState.currentLanguage))
                             }
                         },
                         state = rememberTooltipState()
@@ -157,14 +149,14 @@ fun TopRow(simulation : SimulationViewModel , viewModel : CanvasViewModel , scop
         }
         if (viewModel.currentMode == CanvasViewModel.editingMode.WIRE){
             val colorButtonList = listOf(
-                colorButton(Color.Blue , translationViewModel.getString("Blue")),
-                colorButton(Color.Black , translationViewModel.getString("Black")),
-                colorButton(Color.Red , translationViewModel.getString("Red")),
-                colorButton(Color.Green , translationViewModel.getString("Green")),
-                colorButton(Color.Magenta , translationViewModel.getString("Magenta")),
-                colorButton(Color.Cyan , translationViewModel.getString("Cyan"))
+                colorButton(Color.Blue , translationViewModel.getString("Blue", appState.currentLanguage)),
+                colorButton(Color.Black , translationViewModel.getString("Black", appState.currentLanguage)),
+                colorButton(Color.Red , translationViewModel.getString("Red", appState.currentLanguage)),
+                colorButton(Color.Green , translationViewModel.getString("Green", appState.currentLanguage)),
+                colorButton(Color.Magenta , translationViewModel.getString("Magenta", appState.currentLanguage)),
+                colorButton(Color.Cyan , translationViewModel.getString("Cyan", appState.currentLanguage))
             )
-            Text(translationViewModel.getString("Select Color: ") , color = settingsViewModel.textColor, modifier = Modifier.padding(10.dp))
+            Text(translationViewModel.getString("Select Color: ", appState.currentLanguage) , color = settingsViewModel.textColor, modifier = Modifier.padding(10.dp))
             for (i in colorButtonList){
                 Button(onClick = {viewModel.currentWiringColor = i.color}, colors = ButtonColors(i.color , i.color , i.color , i.color)){}
             }

@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class TranslationViewModel : ViewModel() {
-    var currentLanguage by mutableStateOf(Language.ENGLISH)
 
     private val translations = mapOf(
         "File" to mapOf(Language.ENGLISH to "File", Language.DEUTSCH to "Datei", Language.UKRAINIAN to "Файл"),
@@ -107,8 +106,8 @@ class TranslationViewModel : ViewModel() {
 
         )
 
-    fun getString(key: String): String {
-        return translations[key]?.get(currentLanguage) ?: key
+    fun getString(key: String , language: Language): String {
+        return translations[key]?.get(language) ?: key
     }
 }
 

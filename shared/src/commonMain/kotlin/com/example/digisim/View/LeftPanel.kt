@@ -9,22 +9,24 @@ import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.ComponentLibrariesViewModel
 import com.example.digisim.UiUtils.TranslationViewModel
-import com.example.digisim.UiUtils.UiState
+import com.example.digisim.UiUtils.AppState
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun leftPanel(viewModel: CanvasViewModel,
-              simulation: SimulationViewModel ,
+              simulation: SimulationViewModel,
               librariesViewModel: ComponentLibrariesViewModel,
-              translationViewModel: TranslationViewModel ,
-              uiState: UiState,
-              settingsViewModel: SettingsViewModel
+              translationViewModel: TranslationViewModel,
+              appState: AppState,
+              settingsViewModel: SettingsViewModel,
+              scope : CoroutineScope
 ){
     Column(modifier = Modifier.fillMaxSize()) {
-        if (!uiState.showSettings){
-        componentLibraries(viewModel , librariesViewModel, translationViewModel)
-        componentSettings(viewModel, simulation, translationViewModel)}
+        if (!appState.showSettings){
+        componentLibraries(viewModel , librariesViewModel, translationViewModel ,appState)
+        componentSettings(viewModel, simulation, translationViewModel , appState)}
         else{
-            settingsPanel(settingsViewModel, uiState , translationViewModel)
+            settingsPanel(settingsViewModel, appState , translationViewModel ,scope)
         }
     }
 }

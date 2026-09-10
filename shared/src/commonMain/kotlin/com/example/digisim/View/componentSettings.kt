@@ -31,17 +31,18 @@ import androidx.compose.ui.unit.sp
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import com.example.digisim.UiUtils.AppState
 import com.example.digisim.UiUtils.TranslationViewModel
 
 @Composable
-fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel, translationViewModel: TranslationViewModel){
+fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel, translationViewModel: TranslationViewModel , appState: AppState){
     Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
         if (viewModel.selectedGateId != null ){
             val component by mutableStateOf(viewModel.components.find{ it.ID == viewModel.selectedGateId})
             val wiresIn by mutableStateOf(viewModel.wires.filter{it.targetGateId == component?.ID})
             val wiresOut by mutableStateOf(viewModel.wires.filter { it.sourceGateId == component?.ID })
 
-            Text(translationViewModel.getString("Properties") ,  fontSize = 18.sp , modifier = Modifier.padding(10.dp).drawBehind{
+            Text(translationViewModel.getString("Properties" , appState.currentLanguage) ,  fontSize = 18.sp , modifier = Modifier.padding(10.dp).drawBehind{
                 val spaceBeneath = 3f
                 val textHeight = this.size.height
                 val textWith = this.size.width
@@ -54,7 +55,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
         })
             Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
-            Text( translationViewModel.getString("ID: ") + component?.ID.toString())
+            Text( translationViewModel.getString("ID: " , appState.currentLanguage) + component?.ID.toString())
 
             Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
@@ -62,7 +63,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
             OutlinedTextField(
                 value = userLabel,
                 onValueChange = { userLabel = it },
-                label = { Text(translationViewModel.getString("Component Label")) },
+                label = { Text(translationViewModel.getString("Component Label" , appState.currentLanguage)) },
                 shape = RoundedCornerShape(30),
                 trailingIcon = {
                     IconButton(onClick = {
@@ -78,7 +79,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
 
             Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
-            Text(translationViewModel.getString("Component type: ") + component?.componentType)
+            Text(translationViewModel.getString("Component type: " , appState.currentLanguage) + component?.componentType)
             val isMultiInputGate = component?.componentType in listOf(
                 ComponentType.AND,
                 ComponentType.OR,
@@ -91,7 +92,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
 
                 Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
-                Text(translationViewModel.getString("Input count: ") + component?.inputCount)
+                Text(translationViewModel.getString("Input count: " , appState.currentLanguage) + component?.inputCount)
 
                 Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
@@ -99,7 +100,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                 OutlinedTextField(
                     value = userInputCount,
                     onValueChange = { userInputCount = it },
-                    placeholder = { Text(translationViewModel.getString("Change input count")) },
+                    placeholder = { Text(translationViewModel.getString("Change input count" , appState.currentLanguage)) },
                     shape = RoundedCornerShape(30),
                     trailingIcon = {
                         IconButton(onClick = {
@@ -125,16 +126,16 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
 
             if (wiresIn.isNotEmpty()){
 
-            Text(translationViewModel.getString("Wires in: "))
+            Text(translationViewModel.getString("Wires in: " , appState.currentLanguage))
 
             wiresIn.forEach { wireIn ->
              Row{
-                 Text(translationViewModel.getString("From component: ") + wireIn.sourceGateId + translationViewModel.getString("Port: ") + wireIn.sourcePortIndex ,
+                 Text(translationViewModel.getString("From component: ", appState.currentLanguage) + wireIn.sourceGateId + translationViewModel.getString("Port: ", appState.currentLanguage) + wireIn.sourcePortIndex ,
                      modifier = Modifier.padding(10.dp))
                  Button(onClick = {viewModel.wires.remove(wireIn)} ,
                      colors = ButtonColors(Color.Red , Color.White , Color.Red , Color.White)
                      ){
-                     Text(translationViewModel.getString("Delete"))
+                     Text(translationViewModel.getString("Delete", appState.currentLanguage))
                  }
              }
             }
@@ -142,16 +143,16 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
             Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
             if (wiresOut.isNotEmpty()){
-            Text(translationViewModel.getString("Wires Out: "))
+            Text(translationViewModel.getString("Wires Out: ", appState.currentLanguage))
 
             wiresOut.forEach { wireOut ->
                 Row{
-                    Text(translationViewModel.getString("To component: ") + wireOut.targetGateId + translationViewModel.getString("Port: ") + wireOut.targetPortIndex,
+                    Text(translationViewModel.getString("To component: ", appState.currentLanguage) + wireOut.targetGateId + translationViewModel.getString("Port: ", appState.currentLanguage) + wireOut.targetPortIndex,
                         modifier = Modifier.padding(10.dp))
                     Button(onClick = {viewModel.wires.remove(wireOut)},
                         colors = ButtonColors(Color.Red , Color.White , Color.Red , Color.White)
                     ){
-                        Text(translationViewModel.getString("Delete"))
+                        Text(translationViewModel.getString("Delete", appState.currentLanguage))
                     }
                 }
             }
@@ -164,16 +165,16 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
 
                 if (frequencyHz != null) {
                     Text(
-                        translationViewModel.getString("Frequency") +
+                        translationViewModel.getString("Frequency", appState.currentLanguage) +
                                 ": " +
                                 frequencyHz.toString() +
                                 "Hz"
                     )
                 } else {
                     Text(
-                        translationViewModel.getString("Frequency") +
+                        translationViewModel.getString("Frequency", appState.currentLanguage) +
                                 ": " +
-                                translationViewModel.getString("Not set")
+                                translationViewModel.getString("Not set", appState.currentLanguage)
                     )
                 }
 
@@ -182,7 +183,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
 
                 Column {
                     Button(onClick = { dropdownExpanded = true }) {
-                        Text(translationViewModel.getString("Change frequency"))
+                        Text(translationViewModel.getString("Change frequency", appState.currentLanguage))
                     }
                     DropdownMenu(
                         expanded = dropdownExpanded,
@@ -214,7 +215,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                 colors = ButtonColors(Color.Red , Color.White , Color.Red , Color.White)
 
             ){
-                Text(translationViewModel.getString("Delete Component"))
+                Text(translationViewModel.getString("Delete Component", appState.currentLanguage))
             }
         }
     }

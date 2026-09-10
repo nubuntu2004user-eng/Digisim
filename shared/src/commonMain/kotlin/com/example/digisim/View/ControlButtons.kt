@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -19,44 +18,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.digisim.DrawingLogic.CanvasViewModel
-import com.example.digisim.Persistance.loadFile
 import com.example.digisim.Persistance.loadWrapper
 import com.example.digisim.Persistance.saveFileAs
 import com.example.digisim.SettingsViewModel
-import com.example.digisim.UiUtils.Language
 import com.example.digisim.UiUtils.TranslationViewModel
-import com.example.digisim.UiUtils.UiState
+import com.example.digisim.UiUtils.AppState
 import com.example.digisim.UiUtils.undoOnce
 import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , translationViewModel: TranslationViewModel ,clockManager: ClockManager ,  uiState : UiState){
+fun controlButtons(viewModel: CanvasViewModel, scope : CoroutineScope, translationViewModel: TranslationViewModel, clockManager: ClockManager, appState : AppState){
     val settingsViewModel = SettingsViewModel.default
     Row{
         var showInputDialog by remember { mutableStateOf(false) }
         Column{
             var showFileMenu by remember { mutableStateOf(false)}
       TextButton(onClick = {showFileMenu = !showFileMenu}){
-      Text(translationViewModel.getString("File") , color = settingsViewModel.textColor)
+      Text(translationViewModel.getString("File" , appState.currentLanguage) , color = settingsViewModel.textColor)
       }
       DropdownMenu(
           expanded = showFileMenu,
           onDismissRequest = {showFileMenu = false}
       ){
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Clear") , color = settingsViewModel.textColor)},
+              text = {Text(translationViewModel.getString("Clear" , appState.currentLanguage) , color = settingsViewModel.textColor)},
               onClick = {viewModel.components.clear() ; viewModel.wires.clear() ; viewModel.nextId = 0;clockManager.tick = 0}
           )
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Load") , color = settingsViewModel.textColor)},
+              text = {Text(translationViewModel.getString("Load" , appState.currentLanguage) , color = settingsViewModel.textColor)},
               onClick = { scope.launch{
                   loadWrapper(viewModel)
               } }
           )
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Save as") , color = settingsViewModel.textColor)},
+              text = {Text(translationViewModel.getString("Save as" , appState.currentLanguage) , color = settingsViewModel.textColor)},
               onClick = { scope.launch {
                   saveFileAs(viewModel)
               }
@@ -68,17 +65,17 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
       Spacer(modifier = Modifier.fillMaxWidth(0.01f))
       var showEditMenu by remember{ mutableStateOf(false)}
       TextButton(onClick = {showEditMenu = !showEditMenu}){
-      Text(translationViewModel.getString("Edit"), color = settingsViewModel.textColor)
+      Text(translationViewModel.getString("Edit" , appState.currentLanguage), color = settingsViewModel.textColor)
       DropdownMenu(
           expanded = showEditMenu,
           onDismissRequest = {showEditMenu = false}
       ){
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Undo") , color = settingsViewModel.textColor)},
+              text = {Text(translationViewModel.getString("Undo" , appState.currentLanguage) , color = settingsViewModel.textColor)},
               onClick = { undoOnce(viewModel) }
           )
           DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Undo multiple") , color = settingsViewModel.textColor)},
+              text = {Text(translationViewModel.getString("Undo multiple" , appState.currentLanguage) , color = settingsViewModel.textColor)},
               onClick = {showInputDialog = !showInputDialog}
           )
 
@@ -89,7 +86,7 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
       //        }
         Spacer(modifier = Modifier.fillMaxWidth(0.01f))
 
-        TextButton(onClick = {uiState.showSettings = !uiState.showSettings}){
+        TextButton(onClick = {appState.showSettings = !appState.showSettings}){
             Text("Settings" , color = settingsViewModel.textColor)
         }
 
@@ -98,12 +95,12 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
       var userInput by remember { mutableStateOf("") }
       AlertDialog(
           onDismissRequest = { showInputDialog = false },
-          title = { Text(translationViewModel.getString("How many steps to undo"), color = settingsViewModel.textColor) },
+          title = { Text(translationViewModel.getString("How many steps to undo" , appState.currentLanguage), color = settingsViewModel.textColor) },
           text = {
               TextField(
                   value = userInput,
                   onValueChange = { userInput = it },
-                  label = { Text(translationViewModel.getString("Enter number here"), color = settingsViewModel.textColor) }
+                  label = { Text(translationViewModel.getString("Enter number here" , appState.currentLanguage), color = settingsViewModel.textColor) }
               )
           },
           confirmButton = {
@@ -114,7 +111,7 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
                   }
                   showInputDialog = false}
                   else userInput = "Must be number!"
-              }) { Text(translationViewModel.getString("Undo"), color = settingsViewModel.textColor) }
+              }) { Text(translationViewModel.getString("Undo" , appState.currentLanguage), color = settingsViewModel.textColor) }
           }
       )
       }

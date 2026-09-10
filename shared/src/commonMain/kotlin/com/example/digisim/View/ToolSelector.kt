@@ -31,35 +31,36 @@ import com.example.digisim.DrawingLogic.drawComponent
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
+import com.example.digisim.UiUtils.AppState
 import com.example.digisim.UiUtils.TranslationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ToolSelectorRow(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel, translationViewModel: TranslationViewModel) {
+fun ToolSelectorRow(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel, translationViewModel: TranslationViewModel ,appState: AppState) {
     val buttonList = listOf(
         ToolButtonParams(Icons.Filled.TouchApp, {
             viewModel.currentMode = CanvasViewModel.editingMode.POKE
             viewModel.pendingComponent = null },
             simulationViewModel.isRunning,
-            translationViewModel.getString("Poke")
+            translationViewModel.getString("Poke" , appState.currentLanguage)
             ),
         ToolButtonParams(Icons.Filled.Edit, {
             viewModel.currentMode = CanvasViewModel.editingMode.EDIT
             viewModel.pendingComponent = null },
             !simulationViewModel.isRunning,
-            translationViewModel.getString("Edit")
+            translationViewModel.getString("Edit", appState.currentLanguage)
             ),
         ToolButtonParams(Icons.Filled.AdsClick, {
             viewModel.currentMode = CanvasViewModel.editingMode.DRAG
             viewModel.pendingComponent = null },
             !simulationViewModel.isRunning,
-            translationViewModel.getString("Drag")
+            translationViewModel.getString("Drag" , appState.currentLanguage)
             ),
         ToolButtonParams(Icons.Filled.Cable, {
             viewModel.currentMode = CanvasViewModel.editingMode.WIRE
             viewModel.pendingComponent = null },
             !simulationViewModel.isRunning,
-            translationViewModel.getString("Wire")
+            translationViewModel.getString("Wire" , appState.currentLanguage)
             ),
 //        ToolButtonParams(Icons.Filled.TextFields, {
 //            viewModel.pendingComponent = null },
