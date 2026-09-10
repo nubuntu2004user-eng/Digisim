@@ -1,14 +1,12 @@
 package com.example.digisim.View
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,61 +16,60 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.PlusOne
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.DrawingLogic.createComponent
 import com.example.digisim.DrawingLogic.drawComponent
-import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.UiUtils.ComponentLibrariesViewModel
 import com.example.digisim.UiUtils.TranslationViewModel
 
 import androidx.compose.runtime.rememberCoroutineScope
-import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.dialogs.openFilePicker
-import com.example.digisim.Persistance.persistanceRepository
-import com.example.digisim.UiUtils.LibraryComponent
-import io.github.vinceglb.filekit.name
+import androidx.compose.runtime.setValue
+import com.example.digisim.LibraryLoader.addCustomComponent
+import com.example.digisim.UiUtils.Libraries
+import com.example.digisim.UiUtils.undoOnce
 import kotlinx.coroutines.launch
-import engineLogic.ClockManager
-import com.example.digisim.SimulationHandling.convertCircuit
-import com.example.digisim.Persistance.toComponent
 
 @Composable
 fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: ComponentLibrariesViewModel, translationViewModel: TranslationViewModel){
     val scope = rememberCoroutineScope()
+    var showNewLibraryDialog by remember {mutableStateOf(false)}
     val settingsViewModel = SettingsViewModel.default
     val selectedLibrary = libraryViewModel.libraries[libraryViewModel.currentLibraryIndex]
     val componentList = selectedLibrary.components
     val currentLibraryName = selectedLibrary.name
-    val previewComponents = remember(componentList) {
+    val previewComponents = remember(componentList.size) {
         componentList.associate { it.type to createComponent(it.type, id = -1, x = 0f, y = 0f , name = null , logic = null) }
     }
     val previewSettings = remember { SettingsViewModel(drawText = false) }
     val textMeasurer = rememberTextMeasurer()
     Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.3f)) {
         Row(modifier = Modifier.fillMaxWidth()){
+            TextButton(onClick = {showNewLibraryDialog = true}){
+                Text("New Library" , color = settingsViewModel.textColor)
+            }
             Spacer(modifier = Modifier.fillMaxWidth(0.2f))
             IconButton(onClick = {libraryViewModel.previousLib()} , modifier = Modifier){
                 Icon(
@@ -81,50 +78,6 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                 )}
                 Text(translationViewModel.getString("Library: ") + translationViewModel.getString(currentLibraryName), color = settingsViewModel.textColor , modifier = Modifier.padding(10.dp))
 
-            IconButton(onClick = {
-                scope.launch {
-                    val file = FileKit.openFilePicker()
-                    if (file != null) {
-                        val data = persistanceRepository.load(file)
-                        if (data != null) {
-                            
-                            val componentName = file.name.substringBeforeLast(".")
-                            
-                            // Input components as per SimulationEngine
-                            val inputTypes = listOf(
-                                ComponentType.INPUT, 
-                                ComponentType.BUTTON, 
-                                ComponentType.CLOCK
-                            )
-                            val inputCount = data.components.count { it.type in inputTypes }
-                            val outputCount = data.components.count { it.type == ComponentType.OUTPUT }
-                            
-                            // Map loaded components to abstracted logic
-                            val clockManager = ClockManager()
-                            val componentsList = data.components.map { it.toComponent() }
-                            val stages = mutableListOf(componentsList.toMutableList())
-                            val abstractedLogic = convertCircuit(stages, data.wires, clockManager)
-                            
-                            libraryViewModel.addCustomComponent(
-                                LibraryComponent(
-                                    name = componentName,
-                                    description = "Custom component: $componentName",
-                                    icon = null,
-                                    type = ComponentType.CUSTOM,
-                                    abstractedLogic = abstractedLogic,
-                                    inputCount = inputCount,
-                                    outputCount = outputCount
-                                )
-                            )
-                        }
-                    }
-                }
-            }){
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null
-                )
-            }
                 IconButton(onClick = {libraryViewModel.nextLib()} , modifier = Modifier){
                     Icon(
                         imageVector = Icons.Filled.ChevronRight,
@@ -180,8 +133,42 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                         }
                     }
                 }
+            if (selectedLibrary.isMutable){
+                IconButton(onClick = {
+                    scope.launch {
+                        addCustomComponent(libraryViewModel , selectedLibrary.name)
+                    }
+                }){
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = null
+                    )
+                }
+            }
             }
         }
+    Box{
+        if(showNewLibraryDialog){
+            var userInput by remember { mutableStateOf("") }
+            AlertDialog(
+                onDismissRequest = { showNewLibraryDialog = false },
+                title = { Text(translationViewModel.getString("New library name"), color = settingsViewModel.textColor) },
+                text = {
+                    TextField(
+                        value = userInput,
+                        onValueChange = { userInput = it },
+                        label = { Text(translationViewModel.getString("Enter name here"), color = settingsViewModel.textColor) }
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        libraryViewModel.libraries.add(Libraries(userInput , mutableStateListOf() , true))
+                        showNewLibraryDialog = false
+                    }) { Text(translationViewModel.getString("Add library"), color = settingsViewModel.textColor) }
+                }
+            )
+        }
+    }
     }
 
 
