@@ -18,9 +18,21 @@ A digital logic simulator inspired by [Logisim](https://github.com/logisim-evolu
 
 - Pause / resume simulation
 
+- 74 series chips
+
+- Persistance and ability to add custom libraries
+
+- Avalible in 3 languages
+
+- Colorable wires
+
+- Undo button (Ctrl +z)
+
+- Undo multiple button ( under “Edit” menu)
+
 ## Getting Started
 
-1. Go to the [Releases](../../releases) tab
+1. Go to the [Releases](file:///home/nubuntu/releases) tab
 
 2. Download the latest `.jar` file
 

@@ -15,12 +15,12 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
     var drawText: Boolean by mutableStateOf(drawText)
 
     var textColor by mutableStateOf(Color.Black)
-    var highPinColor: Color by mutableStateOf(Color(0xFF2E7D32))
-    var lowPinColor: Color by mutableStateOf(Color(0xFF81C784))
+    var highPinColor: Color by mutableStateOf(Color(255, 179, 0))
+    var lowPinColor: Color by mutableStateOf(Color(96, 125, 139))
     var errorPinColor: Color by mutableStateOf(Color(0xFFE57373))
-    var undefinedPinColor: Color by mutableStateOf(Color(0xFFC8E6C9))
+    var undefinedPinColor: Color by mutableStateOf(Color(189, 189, 189))
     var gateOutlineColor: Color by mutableStateOf(Color(0xFF4CAF50))
-    var portColor: Color by mutableStateOf(Color.Black)
+    var portColor: Color by mutableStateOf(Color(43, 43, 43))
     var wireHighlightColor: Color by mutableStateOf(Color.Red)
     var textHighColor: Color by mutableStateOf(Color.Black)
     var textLowColor: Color by mutableStateOf(Color.White)
@@ -28,8 +28,8 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
     var gridColor: Color by mutableStateOf(Color.LightGray)
     var gridSize: Float by mutableStateOf(20f)
     
-    var customComponentFillColor: Color by mutableStateOf(Color.Yellow)
-    var customComponentOutlineColor: Color by mutableStateOf(Color.Green)
+    var customComponentFillColor: Color by mutableStateOf(Color(232, 162, 75))
+    var customComponentOutlineColor: Color by mutableStateOf(Color(138, 90, 30))
 
     fun getComponentInnerRectColor(pin: Pin): Color {
         return when (pin) {

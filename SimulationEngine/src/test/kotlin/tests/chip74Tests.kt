@@ -157,15 +157,26 @@ class Chip74Tests {
         val outWire1Y = outputWire(targetGateId = 20, portId = 0, sourcePortId = 0)
         val outWire2Y = outputWire(targetGateId = 21, portId = 0, sourcePortId = 1)
 
+        // Drive chip inputs via inputFrom wires (sourceGateId=0 = "external"/constant source),
+        // in exact pin order: 1A,1B,2A,2B,GND,3A,3B,4A,4B,VCC
+        val chipInputs = mutableListOf(
+            inputWire(sourceGateId = 0, portId = 0, value = Pin.HIGH), // 1A
+            inputWire(sourceGateId = 0, portId = 1, value = Pin.HIGH), // 1B
+            inputWire(sourceGateId = 0, portId = 2, value = Pin.LOW),  // 2A
+            inputWire(sourceGateId = 0, portId = 3, value = Pin.HIGH), // 2B
+            inputWire(sourceGateId = 0, portId = 4, value = Pin.LOW),  // GND
+            inputWire(sourceGateId = 0, portId = 5, value = Pin.UNDEFINED), // 3A
+            inputWire(sourceGateId = 0, portId = 6, value = Pin.UNDEFINED), // 3B
+            inputWire(sourceGateId = 0, portId = 7, value = Pin.UNDEFINED), // 4A
+            inputWire(sourceGateId = 0, portId = 8, value = Pin.UNDEFINED), // 4B
+            inputWire(sourceGateId = 0, portId = 9, value = Pin.HIGH), // VCC
+        )
+
         val chip = IC7400(
             id = 1,
-            inputs = mutableListOf(
-                Pin.HIGH, Pin.HIGH, // Gate 1: NAND(1,1)=0
-                Pin.LOW, Pin.HIGH,  // Gate 2: NAND(0,1)=1
-                Pin.LOW, Pin.UNDEFINED, Pin.UNDEFINED, Pin.UNDEFINED, Pin.UNDEFINED, Pin.HIGH
-            ),
+            inputs = mutableListOf(), // will be rebuilt from inputFrom by computeSimulation
             output = mutableListOf(),
-            inputFrom = mutableListOf(),
+            inputFrom = chipInputs,
             outputTo = mutableListOf(outWire1Y, outWire2Y)
         )
 
