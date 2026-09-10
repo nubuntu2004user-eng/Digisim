@@ -1,7 +1,6 @@
 package com.example.digisim.ComponentsDrawing
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -61,7 +60,7 @@ internal fun DrawScope.drawInput(
     // Output port
     drawCircle(color = getPortColor(settings), radius = 6f, center = component.findPortOffset())
 
-    val label = "ID ${component.ID}"
+    val label = if (component.label.equals("")) "IN ${component.ID}" else "${component.label} ${component.ID}"
     val textLayout = textMeasurer.measure(label, style = textStyle)
     if (settings.drawText) {
         drawText(

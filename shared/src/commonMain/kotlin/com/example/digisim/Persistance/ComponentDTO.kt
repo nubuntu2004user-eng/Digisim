@@ -12,6 +12,7 @@ data class ComponentDto(
     val y: Float,
     val inputCount: Int,
     val outputCount: Int,
+    val label: String,
     val customLogic: MutableList<MutableList<SimulationComponent>>?,
     val customName: String?
 )

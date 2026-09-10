@@ -60,7 +60,7 @@ internal fun DrawScope.drawClock(
     // Output port
     drawCircle(color = getPortColor(settings), radius = 6f, center = component.findPortOffset())
 
-    val label = "CLK ${component.ID}"
+    val label = if (component.label.equals("")) "CLK ${component.ID}" else "${component.label} ${component.ID}"
     val textLayout = textMeasurer.measure(label, style = textStyle)
     if (settings.drawText) {
         drawText(

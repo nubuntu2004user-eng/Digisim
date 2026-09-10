@@ -16,12 +16,14 @@ class DFlipFlopAsync(
     id: Int,
     initialX: Float = 0f,
     initialY: Float = 0f,
-    initialInputCount: Int = 4,
+    initialInputCount: Int = 3,
     initialOutputCount: Int = 2,
+    label: String = "",
     override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
     override val customComponentName: String? = null
 ) : Component(id) {
 
+    override var label: String by mutableStateOf(label)
     override var x: Float by mutableStateOf(initialX)
     override var y: Float by mutableStateOf(initialY)
     override var width: Float by mutableStateOf(100f)

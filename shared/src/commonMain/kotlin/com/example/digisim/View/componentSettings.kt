@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,7 +32,6 @@ import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.TranslationViewModel
-import kotlin.math.roundToInt
 
 @Composable
 fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: SimulationViewModel, translationViewModel: TranslationViewModel){
@@ -57,6 +55,26 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
             Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 
             Text( translationViewModel.getString("ID: ") + component?.ID.toString())
+
+            Spacer(modifier = Modifier.fillMaxHeight(0.01f))
+
+            var userLabel by remember(component?.label) { mutableStateOf(component?.label ?: "") }
+            OutlinedTextField(
+                value = userLabel,
+                onValueChange = { userLabel = it },
+                label = { Text(translationViewModel.getString("Component Label")) },
+                shape = RoundedCornerShape(30),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        component?.label = userLabel
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
 
             Spacer(modifier = Modifier.fillMaxHeight(0.01f))
 

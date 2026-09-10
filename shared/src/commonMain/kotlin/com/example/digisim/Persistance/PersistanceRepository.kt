@@ -18,16 +18,16 @@ internal object persistanceRepository {
 
     }
 
-    internal fun defaultDataDir(): File {
-        val userHome = System.getProperty("user.home")
-        val os = System.getProperty("os.name").lowercase()
-        val base = if(os.contains("win")){
-                System.getenv("APPDATA") ?: "$userHome\\AppData\\Roaming"
-        } else {
-            "$userHome/.local/share"
-        }
-        return File(base , "DigiSim").apply { mkdirs() }
-        }
+//    internal fun defaultDataDir(): File {
+//        val userHome = System.getProperty("user.home")
+//        val os = System.getProperty("os.name").lowercase()
+//        val base = if(os.contains("win")){
+//                System.getenv("APPDATA") ?: "$userHome\\AppData\\Roaming"
+//        } else {
+//            "$userHome/.local/share"
+//        }
+//        return File(base , "DigiSim").apply { mkdirs() }
+//        }
     internal suspend fun saveAs(file: PlatformFile, components: MutableList<ComponentDto>, wires: MutableList<Wire>) {
         val circuitData = CircuitData(components, wires)
         val content = json.encodeToString(circuitData)

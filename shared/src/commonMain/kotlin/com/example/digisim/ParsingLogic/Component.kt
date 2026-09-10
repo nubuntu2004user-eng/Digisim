@@ -21,6 +21,7 @@ abstract class Component(val ID : Int) {
     abstract val componentType: ComponentType
 
     open var outputPin: Pin by mutableStateOf(Pin.LOW)
+    open var label: String by mutableStateOf("")
 
     abstract var delay: Float?
 

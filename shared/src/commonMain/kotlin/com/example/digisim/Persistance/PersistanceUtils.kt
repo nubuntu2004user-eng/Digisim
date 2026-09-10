@@ -22,6 +22,7 @@ import com.example.digisim.LogicGates.Nor
 import com.example.digisim.LogicGates.Not
 import com.example.digisim.LogicGates.Or
 import com.example.digisim.LogicGates.XNor
+import com.example.digisim.LogicGates.Xor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.Wiring.Button
@@ -61,6 +62,7 @@ fun Component.toDto(): ComponentDto = ComponentDto(
     y = y,
     inputCount = inputCount,
     outputCount = outputCount,
+    label = label,
     customLogic = abstractedLogic,
     customName = customComponentName
 
@@ -72,7 +74,8 @@ fun ComponentDto.toComponent(): Component = when (type) {
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
 
     ComponentType.AND -> And(
@@ -80,63 +83,72 @@ fun ComponentDto.toComponent(): Component = when (type) {
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.NAND -> Nand(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.NOR -> Nor(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.OR -> Or(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.XNOR -> XNor(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
-    ComponentType.XOR -> XNor(
+    ComponentType.XOR -> Xor(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.NOT -> Not(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.INPUT -> Input(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.OUTPUT -> Output(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.CLOCK -> Clock(
         id = id,
@@ -144,105 +156,120 @@ fun ComponentDto.toComponent(): Component = when (type) {
         initialY = y,
         initialInputCount = inputCount,
         initialOutputCount = outputCount,
-        initialDelay = 999.0f
+        initialDelay = 999.0f,
+        label = label
     )
     ComponentType.RS_FLIP_FLOP -> RSFlipFlop(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.JK_FLIP_FLOP -> JKFlipFlop(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.D_FLIP_FLOP -> DFlipFlop(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.T_FLIP_FLOP -> TFlipFlop(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.JK_FLIP_FLOP_ASYNC -> JKFlipFlopAsync(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.SR_FLIP_FLOP_ASYNC -> SRFlipFlopAsync(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.D_FLIP_FLOP_ASYNC -> DFlipFlopAsync(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.T_FLIP_FLOP_ASYNC -> TFlipFlopAsync(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.IC_7400 -> IC7400(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.IC_7402 -> IC7402(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.IC_7404 -> IC7404(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.IC_7408 -> IC7408(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.IC_7432 -> IC7432(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
     ComponentType.IC_7486 -> IC7486(
         id = id,
         initialX = x,
         initialY = y,
         initialInputCount = inputCount,
-        initialOutputCount = outputCount
+        initialOutputCount = outputCount,
+        label = label
     )
 
     ComponentType.CUSTOM -> CustomComponent(
@@ -252,6 +279,7 @@ fun ComponentDto.toComponent(): Component = when (type) {
         initialInputCount = inputCount,
         initialOutputCount = outputCount,
         abstractedLogic = customLogic,
-        customComponentName = customName
+        customComponentName = customName,
+        label = label
     )
 }

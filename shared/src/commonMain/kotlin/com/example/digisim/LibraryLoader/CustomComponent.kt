@@ -14,6 +14,7 @@ class CustomComponent(
     initialY: Float = 0f,
     initialInputCount: Int,
     initialOutputCount: Int,
+    override var label: String = "",
     override val abstractedLogic: MutableList<MutableList<SimulationComponent>>?,
     override val customComponentName: String?
 ): Component(id) {

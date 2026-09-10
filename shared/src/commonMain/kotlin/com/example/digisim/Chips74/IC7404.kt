@@ -18,10 +18,12 @@ class IC7404(
     initialY: Float = 0f,
     initialInputCount: Int = 8,
     initialOutputCount: Int = 6,
+    label: String = "",
     override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
     override val customComponentName: String? = null
 ) : Component(id) {
 
+    override var label: String by mutableStateOf(label)
     override var x: Float by mutableStateOf(initialX)
     override var y: Float by mutableStateOf(initialY)
     override var width: Float by mutableStateOf(120f)

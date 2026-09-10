@@ -1,7 +1,6 @@
 package com.example.digisim.ComponentsDrawing
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -67,7 +66,7 @@ fun DrawScope.drawNor(
     )
 
     // Label – using Compose's drawText (multiplatform)
-    val label = "ID ${component.ID}"
+    val label = if (component.label.equals("")) "NOR ${component.ID}" else "${component.label} ${component.ID}"
     val textStyle = TextStyle(
         color = getComponentTextColor(component.outputPin, settings),
         fontSize = 20.sp,

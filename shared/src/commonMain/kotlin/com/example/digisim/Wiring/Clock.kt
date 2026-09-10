@@ -12,12 +12,15 @@ class Clock(
     id: Int,
     initialX: Float = 0f,
     initialY: Float = 0f,
-    initialInputCount: Int,
-    initialOutputCount: Int,
-    initialDelay: Float?,
+    initialInputCount: Int = 0,
+    initialOutputCount: Int = 1,
+    initialDelay: Float = 999f,
+    label: String = "",
     override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
     override val customComponentName: String? = null
-    ): Component(id) {
+) : Component(id) {
+
+    override var label: String by mutableStateOf(label)
     override var x: Float by mutableStateOf(initialX)
     override var y: Float by mutableStateOf(initialY)
     override var width: Float by mutableStateOf(80f)

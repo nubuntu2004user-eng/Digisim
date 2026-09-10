@@ -18,6 +18,7 @@ class IC7486(
     initialY: Float = 0f,
     initialInputCount: Int = 10,
     initialOutputCount: Int = 4,
+    override var label: String = "",
     override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
     override val customComponentName: String? = null
 ) : Component(id) {

@@ -48,17 +48,17 @@ fun controlButtons(viewModel: CanvasViewModel , scope : CoroutineScope , transla
               onClick = {viewModel.components.clear() ; viewModel.wires.clear() ; viewModel.nextId = 0;clockManager.tick = 0}
           )
           DropdownMenuItem(
+              text = {Text(translationViewModel.getString("Load") , color = settingsViewModel.textColor)},
+              onClick = { scope.launch{
+                  loadWrapper(viewModel)
+              } }
+          )
+          DropdownMenuItem(
               text = {Text(translationViewModel.getString("Save as") , color = settingsViewModel.textColor)},
               onClick = { scope.launch {
                   saveFileAs(viewModel)
               }
               }
-          )
-          DropdownMenuItem(
-              text = {Text(translationViewModel.getString("Load") , color = settingsViewModel.textColor)},
-              onClick = { scope.launch{
-                  loadWrapper(viewModel)
-              } }
           )
       }
 

@@ -15,10 +15,12 @@ class Button(
     initialY: Float = 0f,
     initialInputCount: Int = 0,
     initialOutputCount: Int = 1,
+    label: String = "",
     override val abstractedLogic: MutableList<MutableList<SimulationComponent>>? = null,
     override val customComponentName: String? = null
 ) : Component(id) {
 
+    override var label: String by mutableStateOf(label)
     override var x: Float by mutableStateOf(initialX)
     override var y: Float by mutableStateOf(initialY)
     override var width: Float by mutableStateOf(80f)

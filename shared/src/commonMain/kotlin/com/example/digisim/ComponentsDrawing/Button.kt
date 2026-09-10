@@ -64,7 +64,7 @@ fun DrawScope.drawButton(
     )
 
     // Label
-    val label = "BTN ${component.ID}"
+    val label = if (component.label.equals("")) "BTN ${component.ID}" else "${component.label} ${component.ID}"
     val textStyle = TextStyle(
         color = getComponentTextColor(component.outputPin, settings),
         fontSize = 16.sp,
