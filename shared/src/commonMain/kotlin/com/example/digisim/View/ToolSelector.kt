@@ -112,7 +112,7 @@ fun ToolSelectorRow(viewModel: CanvasViewModel , simulationViewModel: Simulation
                 positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
                 tooltip = {
                     PlainTooltip {
-                        Text(i.type.name)
+                        Text(translationViewModel.getString(i.type.name , appState.currentLanguage))
                     }
                 },
                 state = rememberTooltipState()

@@ -167,8 +167,8 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                     Text(
                         translationViewModel.getString("Frequency", appState.currentLanguage) +
                                 ": " +
-                                frequencyHz.toString() +
-                                "Hz"
+                                frequencyHz.toInt().toString() +
+                                " " + translationViewModel.getString("Hz", appState.currentLanguage)
                     )
                 } else {
                     Text(
@@ -192,7 +192,7 @@ fun componentSettings(viewModel: CanvasViewModel , simulationViewModel: Simulati
                         val frequencies = listOf(500f, 250f, 125f, 100f, 50f, 25f, 20f, 10f, 5f, 4f, 1f)
                         frequencies.forEach { freq ->
                             DropdownMenuItem(
-                                text = { Text("${freq.toInt()} Hz") },
+                                text = { Text("${freq.toInt()} " + translationViewModel.getString("Hz", appState.currentLanguage)) },
                                 onClick = {
                                     val delayTicks = frequencyHzToToggleDelayTicks(freq)
                                     if (delayTicks != null) {

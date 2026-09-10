@@ -27,22 +27,22 @@ import kotlinx.coroutines.launch
 @Composable
 fun settingsPanel(settingsViewModel: SettingsViewModel, appState: AppState, translationViewModel: TranslationViewModel , scope : CoroutineScope) {
     Column {
-        Text("Settings" , color = settingsViewModel.textColor , modifier = Modifier.padding(8.dp))
+        Text(translationViewModel.getString("Settings", appState.currentLanguage) , color = settingsViewModel.textColor , modifier = Modifier.padding(8.dp))
         Spacer(modifier = Modifier.fillMaxHeight(0.01f))
         Row {
-            Text("Language:" , color = settingsViewModel.textColor , modifier = Modifier.padding(12.dp))
+            Text(translationViewModel.getString("Language:", appState.currentLanguage) , color = settingsViewModel.textColor , modifier = Modifier.padding(12.dp))
 
             TextButton(onClick = {appState.currentLanguage = Language.ENGLISH}){
 
-                Text("EN", color = settingsViewModel.textColor)
+                Text(translationViewModel.getString("EN", appState.currentLanguage), color = settingsViewModel.textColor)
         }
             TextButton(onClick = {appState.currentLanguage = Language.DEUTSCH}){
 
-                Text("DE", color = settingsViewModel.textColor)
+                Text(translationViewModel.getString("DE", appState.currentLanguage), color = settingsViewModel.textColor)
             }
             TextButton(onClick = {appState.currentLanguage = Language.UKRAINIAN}){
 
-                Text("UA" , color = settingsViewModel.textColor)
+                Text(translationViewModel.getString("UA", appState.currentLanguage) , color = settingsViewModel.textColor)
             }
         }
         Spacer(modifier = Modifier.fillMaxHeight(0.01f))
@@ -52,7 +52,7 @@ fun settingsPanel(settingsViewModel: SettingsViewModel, appState: AppState, tran
             saveState(appState )
             }
             }){
-            Text("Save and exit" , color = settingsViewModel.textColor)
+            Text(translationViewModel.getString("Save and exit", appState.currentLanguage) , color = settingsViewModel.textColor)
         }
 
     }

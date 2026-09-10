@@ -87,7 +87,7 @@ fun controlButtons(viewModel: CanvasViewModel, scope : CoroutineScope, translati
         Spacer(modifier = Modifier.fillMaxWidth(0.01f))
 
         TextButton(onClick = {appState.showSettings = !appState.showSettings}){
-            Text("Settings" , color = settingsViewModel.textColor)
+            Text(translationViewModel.getString("Settings" , appState.currentLanguage) , color = settingsViewModel.textColor)
         }
 
       Box{

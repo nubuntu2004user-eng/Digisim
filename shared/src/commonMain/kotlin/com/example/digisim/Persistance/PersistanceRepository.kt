@@ -37,11 +37,18 @@ internal object persistanceRepository {
         defaultDataDir().writeString(content)
     }
     internal suspend fun loadState(): AppStateDto{
-        if (defaultDataDir().exists() ){
-            return defaultDataDir().readString()?.let { json.decodeFromString(it) }!!
+        val file = defaultDataDir()
+        return try {
+            if (file.exists()) {
+                file.readString()?.let { 
+                    json.decodeFromString<AppStateDto>(it) 
+                } ?: AppStateDto(currentLanguage = Language.ENGLISH)
+            } else {
+                AppStateDto(currentLanguage = Language.ENGLISH)
+            }
+        } catch (e: Exception) {
+            AppStateDto(currentLanguage = Language.ENGLISH)
         }
-        else return AppStateDto(currentLanguage = Language.ENGLISH)
-
     }
     internal suspend fun saveAs(file: PlatformFile, components: MutableList<ComponentDto>, wires: MutableList<Wire>) {
         val circuitData = CircuitData(components, wires)

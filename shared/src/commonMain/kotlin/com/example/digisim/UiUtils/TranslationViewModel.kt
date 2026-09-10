@@ -3,7 +3,8 @@ package com.example.digisim.UiUtils
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel import kotlinx.serialization.Serializable
+
 
 class TranslationViewModel : ViewModel() {
 
@@ -103,6 +104,27 @@ class TranslationViewModel : ViewModel() {
         "Pause" to mapOf(Language.ENGLISH to "Pause", Language.DEUTSCH to "Pause", Language.UKRAINIAN to "Пауза"),
         "One step" to mapOf(Language.ENGLISH to "One step", Language.DEUTSCH to "Einzelschritt", Language.UKRAINIAN to "Один крок"),
         "Auto" to mapOf(Language.ENGLISH to "Auto", Language.DEUTSCH to "Auto", Language.UKRAINIAN to "Авто"),
+        "Settings" to mapOf(Language.ENGLISH to "Settings", Language.DEUTSCH to "Einstellungen", Language.UKRAINIAN to "Налаштування"),
+        "Language:" to mapOf(Language.ENGLISH to "Language:", Language.DEUTSCH to "Sprache:", Language.UKRAINIAN to "Мова:"),
+        "EN" to mapOf(Language.ENGLISH to "EN", Language.DEUTSCH to "EN", Language.UKRAINIAN to "EN"),
+        "DE" to mapOf(Language.ENGLISH to "DE", Language.DEUTSCH to "DE", Language.UKRAINIAN to "DE"),
+        "UA" to mapOf(Language.ENGLISH to "UA", Language.DEUTSCH to "UA", Language.UKRAINIAN to "UA"),
+        "Save and exit" to mapOf(Language.ENGLISH to "Save and exit", Language.DEUTSCH to "Speichern und beenden", Language.UKRAINIAN to "Зберегти та вийти"),
+        "Component Label" to mapOf(Language.ENGLISH to "Component Label", Language.DEUTSCH to "Komponentenbeschriftung", Language.UKRAINIAN to "Мітка компонента"),
+        "Not set" to mapOf(Language.ENGLISH to "Not set", Language.DEUTSCH to "Nicht gesetzt", Language.UKRAINIAN to "Не встановлено"),
+        "Delete Component" to mapOf(Language.ENGLISH to "Delete Component", Language.DEUTSCH to "Komponente löschen", Language.UKRAINIAN to "Видалити компонент"),
+        "New Library" to mapOf(Language.ENGLISH to "New Library", Language.DEUTSCH to "Neue Bibliothek", Language.UKRAINIAN to "Нова бібліотека"),
+        "Must be number!" to mapOf(Language.ENGLISH to "Must be number!", Language.DEUTSCH to "Muss eine Nummer sein!", Language.UKRAINIAN to "Має бути числом!"),
+        "INPUT" to mapOf(Language.ENGLISH to "Input", Language.DEUTSCH to "Eingang", Language.UKRAINIAN to "Вхід"),
+        "OUTPUT" to mapOf(Language.ENGLISH to "Output", Language.DEUTSCH to "Ausgang", Language.UKRAINIAN to "Вихід"),
+        "NOT" to mapOf(Language.ENGLISH to "NOT", Language.DEUTSCH to "NICHT", Language.UKRAINIAN to "НЕ"),
+        "AND" to mapOf(Language.ENGLISH to "AND", Language.DEUTSCH to "UND", Language.UKRAINIAN to "І"),
+        "OR" to mapOf(Language.ENGLISH to "OR", Language.DEUTSCH to "ODER", Language.UKRAINIAN to "АБО"),
+        "XOR" to mapOf(Language.ENGLISH to "XOR", Language.DEUTSCH to "XOR", Language.UKRAINIAN to "ВИКЛ-АБО"),
+        "NAND" to mapOf(Language.ENGLISH to "NAND", Language.DEUTSCH to "NAND", Language.UKRAINIAN to "І-НЕ"),
+        "NOR" to mapOf(Language.ENGLISH to "NOR", Language.DEUTSCH to "NOR", Language.UKRAINIAN to "АБО-НЕ"),
+        "XNOR" to mapOf(Language.ENGLISH to "XNOR", Language.DEUTSCH to "XNOR", Language.UKRAINIAN to "ВИКЛ-АБО-НЕ"),
+        "Hz" to mapOf(Language.ENGLISH to "Hz", Language.DEUTSCH to "Hz", Language.UKRAINIAN to "Гц"),
 
         )
 
@@ -111,4 +133,6 @@ class TranslationViewModel : ViewModel() {
     }
 }
 
- enum class Language{ENGLISH ,  DEUTSCH , UKRAINIAN}
+
+@Serializable
+enum class Language{ENGLISH ,  DEUTSCH , UKRAINIAN}
