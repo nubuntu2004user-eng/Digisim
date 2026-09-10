@@ -42,12 +42,12 @@ internal object persistanceRepository {
             if (file.exists()) {
                 file.readString()?.let { 
                     json.decodeFromString<AppStateDto>(it) 
-                } ?: AppStateDto(currentLanguage = Language.ENGLISH)
+                } ?: AppStateDto(currentLanguage = Language.ENGLISH , mutableListOf() )
             } else {
-                AppStateDto(currentLanguage = Language.ENGLISH)
+                AppStateDto(currentLanguage = Language.ENGLISH , mutableListOf())
             }
         } catch (e: Exception) {
-            AppStateDto(currentLanguage = Language.ENGLISH)
+            AppStateDto(currentLanguage = Language.ENGLISH , mutableListOf())
         }
     }
     internal suspend fun saveAs(file: PlatformFile, components: MutableList<ComponentDto>, wires: MutableList<Wire>) {

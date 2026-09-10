@@ -68,7 +68,12 @@ class ComponentLibrariesViewModel: ViewModel() {
 
     fun addCustomComponent(component: LibraryComponent , selectedLibrary : String) {
         val customLibrary = libraries.find { it.name == selectedLibrary }
+        if (customLibrary == null){
+            libraries.add(Libraries(selectedLibrary , mutableStateListOf(component) , true))
+        }
+        else{
         (customLibrary?.components as? MutableList<LibraryComponent>)?.add(component)
+        }
     }
 }
   class Libraries(

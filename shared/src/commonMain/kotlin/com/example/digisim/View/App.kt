@@ -47,6 +47,7 @@ fun App() {
         LaunchedEffect(Unit) {
             val loadedDto = loadState()
             appState.applyDto(loadedDto)
+            appState.loadLibraries(librariesViewModel, scope, appState)
         }
 
         Column(modifier = Modifier

@@ -49,6 +49,7 @@ import com.example.digisim.UiUtils.TranslationViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.example.digisim.LibraryLoader.addCustomComponent
+import com.example.digisim.Persistance.persistanceRepository.saveState
 import com.example.digisim.UiUtils.AppState
 import com.example.digisim.UiUtils.Libraries
 import com.example.digisim.UiUtils.undoOnce
@@ -138,7 +139,8 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
             if (selectedLibrary.isMutable){
                 IconButton(onClick = {
                     scope.launch {
-                        addCustomComponent(libraryViewModel , selectedLibrary.name)
+                        addCustomComponent(libraryViewModel , selectedLibrary.name , appState)
+                        saveState(appState)
                     }
                 }){
                     Icon(
@@ -152,6 +154,9 @@ fun componentLibraries(viewModel : CanvasViewModel , libraryViewModel: Component
                     scope.launch {
                         libraryViewModel.libraries.remove(selectedLibrary)
                         libraryViewModel.previousLib()
+                        val toRemove = appState.libraries.find { it.name == selectedLibrary.name }
+                        appState.libraries.remove(toRemove)
+                        saveState(appState)
                     }
                 }){
                     Icon(
