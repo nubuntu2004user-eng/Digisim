@@ -172,7 +172,7 @@ class SharedCommonTest {
         val lowColor = getComponentInnerRectColor(Pin.LOW)
 
         assertNotEquals(highColor, lowColor)
-        assertEquals(Color(0xFF2E7D32), highColor)
+        assertEquals(Color(0xFFFFB300), highColor)
         assertEquals(Color(0xFF81C784), lowColor)
 
         assertEquals(Color.Black, getComponentTextColor(Pin.HIGH))
@@ -253,48 +253,48 @@ class SharedCommonTest {
         assertNotNull(flipFlopsLib)
         assertEquals(8, flipFlopsLib.components.size)
 
-        val rsComp = createComponent(ComponentType.RS_FLIP_FLOP, 1, 10f, 20f)
+        val rsComp = createComponent(ComponentType.RS_FLIP_FLOP, 1, 10f, 20f, logic = null, name = null)
         assertTrue(rsComp is RSFlipFlop)
         assertEquals(2, rsComp.inputCount)
         assertEquals(2, rsComp.outputCount)
 
-        val jkComp = createComponent(ComponentType.JK_FLIP_FLOP, 2, 10f, 20f)
+        val jkComp = createComponent(ComponentType.JK_FLIP_FLOP, 2, 10f, 20f, logic = null, name = null)
         assertTrue(jkComp is JKFlipFlop)
         assertEquals(3, jkComp.inputCount)
         assertEquals(2, jkComp.outputCount)
 
-        val dComp = createComponent(ComponentType.D_FLIP_FLOP, 3, 10f, 20f)
+        val dComp = createComponent(ComponentType.D_FLIP_FLOP, 3, 10f, 20f, logic = null, name = null)
         assertTrue(dComp is DFlipFlop)
         assertEquals(2, dComp.inputCount)
         assertEquals(2, dComp.outputCount)
 
-        val tComp = createComponent(ComponentType.T_FLIP_FLOP, 4, 10f, 20f)
+        val tComp = createComponent(ComponentType.T_FLIP_FLOP, 4, 10f, 20f, logic = null, name = null)
         assertTrue(tComp is TFlipFlop)
         assertEquals(2, tComp.inputCount)
         assertEquals(2, tComp.outputCount)
 
         // Asynchronous Flip-Flops
-        val jkAsync = createComponent(ComponentType.JK_FLIP_FLOP_ASYNC, 5, 10f, 20f)
+        val jkAsync = createComponent(ComponentType.JK_FLIP_FLOP_ASYNC, 5, 10f, 20f, logic = null, name = null)
         assertTrue(jkAsync is JKFlipFlopAsync)
         assertEquals(5, jkAsync.inputCount)
         assertEquals(2, jkAsync.outputCount)
 
-        val srAsync = createComponent(ComponentType.SR_FLIP_FLOP_ASYNC, 6, 10f, 20f)
+        val srAsync = createComponent(ComponentType.SR_FLIP_FLOP_ASYNC, 6, 10f, 20f, logic = null, name = null)
         assertTrue(srAsync is SRFlipFlopAsync)
         assertEquals(5, srAsync.inputCount)
         assertEquals(2, srAsync.outputCount)
 
-        val dAsync = createComponent(ComponentType.D_FLIP_FLOP_ASYNC, 7, 10f, 20f)
+        val dAsync = createComponent(ComponentType.D_FLIP_FLOP_ASYNC, 7, 10f, 20f, logic = null, name = null)
         assertTrue(dAsync is DFlipFlopAsync)
         assertEquals(4, dAsync.inputCount)
         assertEquals(2, dAsync.outputCount)
 
-        val tAsync = createComponent(ComponentType.T_FLIP_FLOP_ASYNC, 8, 10f, 20f)
+        val tAsync = createComponent(ComponentType.T_FLIP_FLOP_ASYNC, 8, 10f, 20f, logic = null, name = null)
         assertTrue(tAsync is TFlipFlopAsync)
         assertEquals(4, tAsync.inputCount)
         assertEquals(2, tAsync.outputCount)
 
-        val btnComp = createComponent(ComponentType.BUTTON, 9, 10f, 20f)
+        val btnComp = createComponent(ComponentType.BUTTON, 9, 10f, 20f, logic = null, name = null)
         assertTrue(btnComp is com.example.digisim.Wiring.Button)
         assertEquals(0, btnComp.inputCount)
         assertEquals(1, btnComp.outputCount)

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.digisim.DrawingLogic.CanvasViewModel
+import com.example.digisim.LlmClients.OpenAiClient
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.ComponentLibrariesViewModel
@@ -19,14 +20,19 @@ fun leftPanel(viewModel: CanvasViewModel,
               translationViewModel: TranslationViewModel,
               appState: AppState,
               settingsViewModel: SettingsViewModel,
-              scope : CoroutineScope
+              scope : CoroutineScope,
+              llmClient: OpenAiClient
 ){
     Column(modifier = Modifier.fillMaxSize()) {
-        if (!appState.showSettings){
-        componentLibraries(viewModel , librariesViewModel, translationViewModel ,appState)
-        componentSettings(viewModel, simulation, translationViewModel , appState)}
-        else{
+        if (appState.showSettings){
             settingsPanel(settingsViewModel, appState , translationViewModel ,scope)
+        }
+        else if(appState.agenticMode) {
+            agenticUI(llmClient = llmClient , scope = scope)
+        }
+        else{
+                componentLibraries(viewModel , librariesViewModel, translationViewModel ,appState)
+                componentSettings(viewModel, simulation, translationViewModel , appState)
         }
     }
 }

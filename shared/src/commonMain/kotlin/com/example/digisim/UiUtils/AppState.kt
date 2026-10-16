@@ -21,6 +21,8 @@ class AppState: ViewModel(
         var currentLanguage by mutableStateOf(Language.ENGLISH)
         var showSettings by mutableStateOf(false)
 
+        var agenticMode by mutableStateOf(false)
+
         var libraries = mutableListOf<LibrariesDto>()
 
         fun applyDto(dto: AppStateDto) {

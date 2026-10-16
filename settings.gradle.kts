@@ -16,6 +16,9 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
+        versionCatalogs{
+            create("ktorLibs").from("io.ktor:ktor-version-catalog:3.6.0")
+        }
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
@@ -34,3 +37,4 @@ plugins {
 include(":desktopApp")
 include(":shared")
 include(":SimulationEngine")
+include(":mcpServer")

@@ -24,6 +24,7 @@ import com.example.digisim.UiUtils.undoOnce
 import engineLogic.ClockManager
 import kotlinx.coroutines.CoroutineScope
 import androidx.compose.ui.input.key.*
+import com.example.digisim.LlmClients.OpenAiClient
 import com.example.digisim.Persistance.AppStateDto
 import com.example.digisim.Persistance.persistanceRepository.loadState
 import com.example.digisim.SettingsViewModel
@@ -41,6 +42,7 @@ fun App() {
         val librariesViewModel  = remember { ComponentLibrariesViewModel() }
         val clockManager = remember { ClockManager() }
         val translationViewModel = remember<TranslationViewModel> { TranslationViewModel() }
+        val openAiClient = remember {OpenAiClient()}
         
         val appState = remember { AppState() }
         
@@ -69,7 +71,7 @@ fun App() {
             TopRow(simulation , viewModel , scope , clockManager, translationViewModel , appState)
             Row {
                 Column(modifier = Modifier.weight(0.3f)) {
-                    leftPanel(viewModel, simulation , librariesViewModel, translationViewModel , appState , SettingsViewModel.default , scope)
+                    leftPanel(viewModel, simulation , librariesViewModel, translationViewModel , appState , SettingsViewModel.default , scope , llmClient = openAiClient)
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     ToolSelectorRow(viewModel , simulation, translationViewModel ,appState)

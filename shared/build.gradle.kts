@@ -24,6 +24,10 @@ kotlin {
             implementation(project(":SimulationEngine"))
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
             implementation("io.github.vinceglb:filekit-dialogs-compose:0.15.0")
+            implementation("com.aallam.openai:openai-client:4.1.0")
+            implementation("io.ktor:ktor-client-cio:3.6.0")
+            implementation("io.ktor:ktor-client-core:3.6.0")
+
         }
 //        commonTest.dependencies {
 //            implementation(libs.kotlin.test)

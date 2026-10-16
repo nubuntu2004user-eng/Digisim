@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DoubleArrow
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -161,7 +162,12 @@ fun TopRow(simulation : SimulationViewModel, viewModel : CanvasViewModel, scope 
                 Button(onClick = {viewModel.currentWiringColor = i.color}, colors = ButtonColors(i.color , i.color , i.color , i.color)){}
             }
         }
-
+        IconButton(onClick = {appState.agenticMode = !appState.agenticMode}){
+            Icon(
+                imageVector = Icons.Filled.SmartToy,
+                contentDescription = null
+            )
+        }
     }
 }
 private class colorButton(

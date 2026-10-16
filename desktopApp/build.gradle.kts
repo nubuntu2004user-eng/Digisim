@@ -8,6 +8,9 @@ plugins {
 
 dependencies {
     implementation(project(":shared"))
+    implementation(project(":mcpServer"))
+    implementation(ktorLibs.server.core)
+    implementation(ktorLibs.server.netty)
 
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutinesSwing)
