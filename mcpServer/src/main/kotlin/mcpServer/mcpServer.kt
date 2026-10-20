@@ -5,6 +5,7 @@ import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Or
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
+import io.ktor.client.request.request
 import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
 import io.modelcontextprotocol.kotlin.sdk.types.*
@@ -46,6 +47,27 @@ class mcpServer(private val canvasViewModel: CanvasViewModel = CanvasViewModel()
                 }
             },
             required = listOf("x", "y")
+        )
+        val addWireSchema = ToolSchema(
+            properties = buildJsonObject {
+                putJsonObject("source_gate_id"){
+                    put("type" , "integer")
+                    put("description", "Id of the gate from with a cable comes from")
+                }
+                putJsonObject("source_port_index"){
+                    put("type" , "integer")
+                    put("description", "Port on source gate from which the cable comes from")
+                }
+                putJsonObject("target_gate_id"){
+                    put("type" , "integer")
+                    put("description" , "Id of the gate to with a cable is connected")
+                }
+                putJsonObject("target_port_index"){
+                    put("type" , "integer")
+                    put("description" , "Index of the port on the gate to with a cable is connected")
+            }
+            },
+            required = listOf("source_gate_id" ,"source_port_index" , "target_gate_id" , "target_port_index")
         )
         mcpServer.addTool(
             name = "add_and",
@@ -99,6 +121,13 @@ class mcpServer(private val canvasViewModel: CanvasViewModel = CanvasViewModel()
             inputSchema = addComponentSchema
         ) { request ->
             addComponent(request = request , componentType = ComponentType.XNOR, canvasViewModel = canvasViewModel)
+        }
+        mcpServer.addTool(
+            name = "add_wire",
+            description = "Use this to wire components",
+            inputSchema = addWireSchema
+        ){request ->
+            wireComponents(request = request , canvasViewModel = canvasViewModel)
         }
 
         return mcpServer

@@ -16,6 +16,7 @@ kotlin {
 dependencies {
     implementation(project(":shared"))
     implementation(libs.compose.runtime)
+    implementation(libs.compose.ui)
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(ktorLibs.server.core)
     implementation(ktorLibs.server.netty)
