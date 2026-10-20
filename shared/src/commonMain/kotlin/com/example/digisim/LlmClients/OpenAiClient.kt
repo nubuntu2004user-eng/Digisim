@@ -1,9 +1,13 @@
 package com.example.digisim.LlmClients
 
+import androidx.compose.runtime.mutableStateOf
 import com.aallam.openai.api.chat.ChatCompletion
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
+import com.aallam.openai.api.chat.Tool
+import com.aallam.openai.api.chat.ToolChoice
+import com.aallam.openai.api.core.Parameters
 import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.api.response.Response
@@ -11,14 +15,20 @@ import com.aallam.openai.api.response.ResponseInput
 import com.aallam.openai.api.response.ResponseRequest
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIHost
+import com.example.digisim.mcpClient.mcpClient
+import com.aallam.openai.api.chat.ToolCall
+import io.modelcontextprotocol.kotlin.sdk.types.TextContent
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import kotlin.time.Duration.Companion.seconds
 
-class OpenAiClient {
+class OpenAiClient(private val mcpClient: mcpClient) {
    private val openAi = OpenAI(
-       token = "none",
-        timeout = Timeout(socket = 300.seconds),
-       host = OpenAIHost(baseUrl = "http://127.0.0.1:9931")
+       token = "none", //api key
+       timeout = Timeout(socket = 300.seconds),
+       host = OpenAIHost(baseUrl = "http://127.0.0.1:9931") //add ability to pick url and api key as well as model before last version
    )
+    val currentlyAnswering = mutableStateOf(false)
     val messages = mutableListOf(ChatMessage(
         role = ChatRole.System,
         content = "You are a helpful assistant"
@@ -33,10 +43,71 @@ class OpenAiClient {
         return openAi.response(response)
     }
     suspend fun chatCompletion(): ChatCompletion {
+        val json = Json { encodeDefaults = true }
+        val tools = mcpClient.listTools().map { t ->
+            Tool.function(
+                name = t.name,
+                description = t.description,
+                parameters = Parameters.fromJsonString(
+                    json.encodeToString(t.inputSchema)
+                )
+            )
+        }
         val request = ChatCompletionRequest(
             model = model,
-            messages = messages
+            messages = messages,
+            tools = tools,
+            toolChoice = ToolChoice.Auto
         )
-    return openAi.chatCompletion(request)
+        return openAi.chatCompletion(request)
+    }
+
+    suspend fun sendMessage(userText: String): String {
+        messages.add(ChatMessage(role = ChatRole.User, content = userText))
+        val response = chatCompletion()
+        val message = response.choices.firstOrNull()?.message ?: return "No response"
+        messages.add(message)
+
+        val toolCalls = message.toolCalls
+        if (!toolCalls.isNullOrEmpty()) {
+            val toolResults = mutableListOf<String>()
+            for (toolCall in toolCalls) {
+                if (toolCall is ToolCall.Function) {
+                    val name = toolCall.function.name
+                    val argsStr = toolCall.function.arguments
+                    val jsonArgs = try {
+                        Json.parseToJsonElement(argsStr).jsonObject
+                    } catch (e: Exception) {
+                        null
+                    }
+                    val result = mcpClient.callTool(name, jsonArgs)
+                    val resultText = result.content
+                        .filterIsInstance<io.modelcontextprotocol.kotlin.sdk.types.TextContent>()
+                        .joinToString("\n") { it.text }
+
+                    toolResults.add(resultText)
+
+                    messages.add(
+                        ChatMessage(
+                            role = ChatRole.Tool,
+                            toolCallId = toolCall.id,
+                            name = toolCall.function.name,
+                            content = resultText
+                        )
+                    )
+                }
+            }
+
+            // Follow-up request so LLM produces final answer with tool output
+            val followUp = chatCompletion()
+            val followUpMessage = followUp.choices.firstOrNull()?.message
+            if (followUpMessage != null) {
+                messages.add(followUpMessage)
+                return followUpMessage.content ?: toolResults.joinToString("\n")
+            }
+            return toolResults.joinToString("\n")
+        }
+
+        return message.content ?: ""
     }
 }

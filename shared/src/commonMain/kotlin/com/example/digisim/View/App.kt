@@ -30,23 +30,24 @@ import com.example.digisim.Persistance.persistanceRepository.loadState
 import com.example.digisim.SettingsViewModel
 import com.example.digisim.UiUtils.AppState
 import com.example.digisim.UiUtils.Language
+import com.example.digisim.mcpClient.mcpClient
 import kotlinx.coroutines.launch
 
 @Composable
 @Preview
-fun App() {
+fun App(viewModel: CanvasViewModel = remember { CanvasViewModel() }) {
     MaterialTheme {
         val scope: CoroutineScope = rememberCoroutineScope()
-        val viewModel = remember { CanvasViewModel() }
         val simulation = remember { SimulationViewModel() }
         val librariesViewModel  = remember { ComponentLibrariesViewModel() }
         val clockManager = remember { ClockManager() }
         val translationViewModel = remember<TranslationViewModel> { TranslationViewModel() }
-        val openAiClient = remember {OpenAiClient()}
-        
+        val mcpClient = remember { mcpClient() }
+        val openAiClient = remember {OpenAiClient(mcpClient)}
         val appState = remember { AppState() }
         
         LaunchedEffect(Unit) {
+            mcpClient.initializeClient()
             val loadedDto = loadState()
             appState.applyDto(loadedDto)
             appState.loadLibraries(librariesViewModel, scope, appState)

@@ -15,5 +15,5 @@ class ServerTest {
         // verify server root returns 200
         assertEquals(HttpStatusCode.OK, client.get("/").status)
     }
-
 }
+

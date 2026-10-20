@@ -42,20 +42,24 @@ fun agenticUI(llmClient: OpenAiClient , scope: CoroutineScope){
         OutlinedTextField(value = input , onValueChange = {input = it} ,
             trailingIcon = {
                 IconButton(onClick = {
+                    val prompt = input.trim()
+                    if (prompt.isEmpty()) return@IconButton
+                    input = ""
                     scope.launch {
-                        output += "You:\n$input \n"
-                        llmClient.messages.add(
-                            ChatMessage(
-                                role = ChatRole.User,
-                                content = input
-                            )
-                        )
-                        output += "Llm:\n" + llmClient.chatCompletion().choices
-                            .toString()
-                            .substringAfter("content=")
-                            .substringBefore("), name=") + "\n"
+                        llmClient.currentlyAnswering.value = true
+                        output += "You:\n$prompt\n\n"
+                        try {
+                            val reply = llmClient.sendMessage(prompt)
+                            output += "Llm:\n$reply\n\n"
+                        } catch (e: Exception) {
+                            output += "Error: ${e.message}\n\n"
+                        } finally {
+                            llmClient.currentlyAnswering.value = false
+                        }
                     }
-                }){
+                },
+                    enabled = !llmClient.currentlyAnswering.value
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Check,
                         contentDescription = null

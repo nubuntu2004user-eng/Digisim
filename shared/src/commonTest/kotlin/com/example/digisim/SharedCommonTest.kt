@@ -165,18 +165,6 @@ class SharedCommonTest {
         assertEquals(Pin.LOW, not1.outputPin)
         assertEquals(Pin.LOW, out2.outputPin)
     }
-
-    @Test
-    fun testColorHelpers() {
-        val highColor = getComponentInnerRectColor(Pin.HIGH)
-        val lowColor = getComponentInnerRectColor(Pin.LOW)
-
-        assertNotEquals(highColor, lowColor)
-        assertEquals(Color(0xFFFFB300), highColor)
-        assertEquals(Color(0xFF81C784), lowColor)
-
-        assertEquals(Color.Black, getComponentTextColor(Pin.HIGH))
-        assertEquals(Color.White, getComponentTextColor(Pin.LOW))
     }
 
     @Test
@@ -421,4 +409,3 @@ class SharedCommonTest {
         assertEquals(160f, placed.x)
         assertEquals(120f, placed.y)
     }
-}

@@ -14,6 +14,7 @@ dependencies {
 
     implementation(compose.desktop.currentOs)
     implementation(libs.kotlinx.coroutinesSwing)
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
 
     implementation(libs.compose.uiToolingPreview)
 }

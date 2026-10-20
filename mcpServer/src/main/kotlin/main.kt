@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.digisim.DrawingLogic.CanvasViewModel
 import io.ktor.server.application.Application
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
@@ -9,12 +10,15 @@ import io.ktor.server.netty.NettyApplicationEngine
 fun main() {
     startServer(wait = true)
 }
-fun startServer(wait : Boolean): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration >{
+
+fun startServer(
+    canvasViewModel: CanvasViewModel = CanvasViewModel(),
+    wait: Boolean = false
+): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
     return embeddedServer(
-        factory = io.ktor.server.netty.Netty,
+        factory = Netty,
         port = 8080,
         host = "127.0.0.1",
-        module = Application::rootModule
+        module = { rootModule(canvasViewModel) }
     ).start(wait = wait)
-
 }

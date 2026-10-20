@@ -27,6 +27,8 @@ kotlin {
             implementation("com.aallam.openai:openai-client:4.1.0")
             implementation("io.ktor:ktor-client-cio:3.6.0")
             implementation("io.ktor:ktor-client-core:3.6.0")
+            implementation("io.modelcontextprotocol:kotlin-sdk:0.15.0")
+
 
         }
 //        commonTest.dependencies {
