@@ -1,10 +1,12 @@
 # Digital Logic Simulator
 
-A digital logic simulator inspired by [Logisim](https://github.com/logisim-evolution/logisim-evolution) and [Digital](https://github.com/hneemann/Digital).
+World first digital logic simulator with embedded mcp protocol aiming to accelerate development of circuits with usage of large language models inspired by [Logisim](https://github.com/logisim-evolution/logisim-evolution) and [Digital](https://github.com/hneemann/Digital).
 
-> ⚠️ **This is a very early pre-release build.** Expect bugs and missing features — but it's already usable by beginners looking to learn the basics of digital logic.
+> ⚠️ **This is a pre-release build.** Expect bugs and missing features — but it's already usable by beginners looking to learn the basics of digital logic.
 
 ## Features
+
+- Mcp support with OpenAI/OpenAI compatible endpoints
 
 - All basic logic gates and clocks
 

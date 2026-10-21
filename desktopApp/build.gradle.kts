@@ -26,7 +26,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.ivanplisko.digisim"
-            packageVersion = "0.9.1"
+            packageVersion = "0.9.9"
         }
     }
 }
