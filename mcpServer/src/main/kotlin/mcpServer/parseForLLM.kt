@@ -11,8 +11,8 @@ fun parseForLLM(canvasViewModel: CanvasViewModel): String{
     val wires = canvasViewModel.wires
     result += "Placed components and their attributed:\n"
     for (component in components){
-        result += "Component of type ${component.componentType} ID ${component.ID} Coordinates x = ${component.x} y = ${component.y}\nInput count = ${component.inputCount}" +
-                "Output count ${component.outputCount} Custom label ${component.label}\n"
+        result += "Component of type ${component.componentType}, ID ${component.ID},\nCoordinates x = ${component.x} y = ${component.y}\nInput count = ${component.inputCount}," +
+                "Output count ${component.outputCount}, Custom label ${component.label}\n"
                 if (component.componentType == ComponentType.CUSTOM){
                     val abstractedLogic = parseAbstractedLogic(component.abstractedLogic)
                     result += "This component is also custom (user made) o it has some additional attributes:\n" +

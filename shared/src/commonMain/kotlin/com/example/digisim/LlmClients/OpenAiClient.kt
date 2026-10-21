@@ -17,24 +17,41 @@ import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIHost
 import com.example.digisim.mcpClient.mcpClient
 import com.aallam.openai.api.chat.ToolCall
+import com.aallam.openai.api.model.Model
+import com.example.digisim.UiUtils.AppState
 import io.modelcontextprotocol.kotlin.sdk.types.TextContent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlin.time.Duration.Companion.seconds
 
 class OpenAiClient(private val mcpClient: mcpClient) {
-   private val openAi = OpenAI(
-       token = "none", //api key
-       timeout = Timeout(socket = 300.seconds),
-       host = OpenAIHost(baseUrl = "http://127.0.0.1:9931") //add ability to pick url and api key as well as model before last version
-   )
+    private var openAi = OpenAI(
+        token = "",
+        timeout = Timeout(socket = 300.seconds),
+        host = OpenAIHost(baseUrl = "http://127.0.0.1:9931")
+    )
+    private var model = ModelId("")
+
     val currentlyAnswering = mutableStateOf(false)
     val messages = mutableListOf(ChatMessage(
         role = ChatRole.System,
-        content = "You are a helpful assistant"
+        content = "role: act as a senior digital circuit designer and help user to build the circuit he asks for"
     ))
 
-    private val model = ModelId("gemma-4-E2B-it-Q4_K_S.gguf")
+    fun applySettings( appState: AppState) {
+        if (appState.isUsingLocalModel){
+        openAi = OpenAI(
+            token = appState.apiKey.ifBlank { "none" },
+            timeout = Timeout(socket = 300.seconds),
+            host = OpenAIHost(baseUrl = appState.baseUrl)
+        )}else{
+            openAi = OpenAI(
+                token = appState.apiKey.ifBlank { "none" },
+                timeout = Timeout(socket = 300.seconds)
+            )
+        }
+        model = ModelId(appState.currentModel)
+    }
     suspend fun prompt(input: String): Response {
         val response = ResponseRequest(
             model = model,

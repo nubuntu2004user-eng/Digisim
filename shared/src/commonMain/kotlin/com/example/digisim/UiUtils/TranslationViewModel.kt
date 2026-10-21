@@ -126,6 +126,21 @@ class TranslationViewModel : ViewModel() {
         "XNOR" to mapOf(Language.ENGLISH to "XNOR", Language.DEUTSCH to "XNOR", Language.UKRAINIAN to "ВИКЛ-АБО-НЕ"),
         "Hz" to mapOf(Language.ENGLISH to "Hz", Language.DEUTSCH to "Hz", Language.UKRAINIAN to "Гц"),
 
+        // AI / agentic UI
+        "Chat" to mapOf(Language.ENGLISH to "Chat", Language.DEUTSCH to "Chat", Language.UKRAINIAN to "Чат"),
+        "AI provider\nsettings" to mapOf(Language.ENGLISH to "AI provider\nsettings", Language.DEUTSCH to "KI-Anbieter\nEinstellungen", Language.UKRAINIAN to "Провайдер ШІ\nНалаштування"),
+        "You:\n" to mapOf(Language.ENGLISH to "You:\n", Language.DEUTSCH to "Du:\n", Language.UKRAINIAN to "Ви:\n"),
+        "Llm:\n" to mapOf(Language.ENGLISH to "Llm:\n", Language.DEUTSCH to "LLM:\n", Language.UKRAINIAN to "ШІ:\n"),
+        "Error: " to mapOf(Language.ENGLISH to "Error: ", Language.DEUTSCH to "Fehler: ", Language.UKRAINIAN to "Помилка: "),
+        "Save and exit" to mapOf(Language.ENGLISH to "Save and exit", Language.DEUTSCH to "Speichern und schließen", Language.UKRAINIAN to "Зберегти та закрити"),
+
+        // aiSettings
+        "Api key:" to mapOf(Language.ENGLISH to "Api key:", Language.DEUTSCH to "API-Schlüssel:", Language.UKRAINIAN to "API-ключ:"),
+        "Is the model local?" to mapOf(Language.ENGLISH to "Is the model local?", Language.DEUTSCH to "Ist das Modell lokal?", Language.UKRAINIAN to "Модель локальна?"),
+        "Base URL:" to mapOf(Language.ENGLISH to "Base URL:", Language.DEUTSCH to "Basis-URL:", Language.UKRAINIAN to "Базова URL:"),
+        "Available models:" to mapOf(Language.ENGLISH to "Available models:", Language.DEUTSCH to "Verfügbare Modelle:", Language.UKRAINIAN to "Доступні моделі:"),
+        "Current model:" to mapOf(Language.ENGLISH to "Current model:", Language.DEUTSCH to "Aktuelles Modell:", Language.UKRAINIAN to "Поточна модель:"),
+
         )
 
     fun getString(key: String , language: Language): String {

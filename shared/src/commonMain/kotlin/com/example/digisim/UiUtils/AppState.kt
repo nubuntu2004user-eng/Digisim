@@ -25,9 +25,25 @@ class AppState: ViewModel(
 
         var libraries = mutableListOf<LibrariesDto>()
 
+        var apiKey by mutableStateOf("")
+
+        var isUsingLocalModel by mutableStateOf(true)
+
+        var baseUrl by mutableStateOf("http://127.0.0.1:9931")
+
+        var modelList = mutableListOf<String>()
+
+        var currentModel by mutableStateOf("")
+
+        var openAiSettings by mutableStateOf(true)
         fun applyDto(dto: AppStateDto) {
             this.currentLanguage = dto.currentLanguage
             this.libraries = dto.librariesDto
+            this.isUsingLocalModel = dto.isUsingLocalModel
+            this.apiKey = dto.apiKey
+            this.baseUrl = dto.baseUrl
+            this.modelList = dto.modelList
+            this.currentModel = dto.currentModel
         }
         fun loadLibraries(librariesViewModel: ComponentLibrariesViewModel , scope: CoroutineScope , appState: AppState){
                 scope.launch {

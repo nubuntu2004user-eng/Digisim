@@ -50,6 +50,9 @@ fun App(viewModel: CanvasViewModel = remember { CanvasViewModel() }) {
             mcpClient.initializeClient()
             val loadedDto = loadState()
             appState.applyDto(loadedDto)
+            openAiClient.applySettings(
+                appState = appState
+            )
             appState.loadLibraries(librariesViewModel, scope, appState)
         }
 

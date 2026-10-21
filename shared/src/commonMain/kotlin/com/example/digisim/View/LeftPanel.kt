@@ -28,7 +28,7 @@ fun leftPanel(viewModel: CanvasViewModel,
             settingsPanel(settingsViewModel, appState , translationViewModel ,scope)
         }
         else if(appState.agenticMode) {
-            agenticUI(llmClient = llmClient , scope = scope)
+            agenticUI(llmClient = llmClient, scope = scope, appState = appState, translationViewModel = translationViewModel)
         }
         else{
                 componentLibraries(viewModel , librariesViewModel, translationViewModel ,appState)
