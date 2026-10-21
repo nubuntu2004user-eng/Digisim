@@ -6,6 +6,7 @@ import com.example.digisim.LogicGates.Or
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import io.ktor.client.request.request
+import io.ktor.http.content.TextContent
 import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
 import io.modelcontextprotocol.kotlin.sdk.types.*
@@ -69,6 +70,13 @@ class mcpServer(private val canvasViewModel: CanvasViewModel = CanvasViewModel()
             },
             required = listOf("source_gate_id" ,"source_port_index" , "target_gate_id" , "target_port_index")
         )
+        mcpServer.addTool(
+            name = "get_canvas_state",
+            description = "Use this to get information about currently placed components and wires"
+        ){request ->
+            val result = parseForLLM(canvasViewModel = canvasViewModel)
+            CallToolResult(listOf(TextContent(result)))
+        }
         mcpServer.addTool(
             name = "add_and",
             description = "Use this to add an AND component to the simulation canvas ",

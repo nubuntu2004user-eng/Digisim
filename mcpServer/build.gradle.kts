@@ -15,6 +15,7 @@ kotlin {
 }
 dependencies {
     implementation(project(":shared"))
+    implementation(project(":SimulationEngine"))
     implementation(libs.compose.runtime)
     implementation(libs.compose.ui)
     implementation(libs.androidx.lifecycle.viewmodelCompose)
