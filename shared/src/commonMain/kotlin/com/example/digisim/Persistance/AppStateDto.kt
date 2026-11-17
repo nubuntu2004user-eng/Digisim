@@ -13,7 +13,8 @@ data class AppStateDto(
     val apiKey: String = "",
     val baseUrl: String = "http://127.0.0.1:9931",
     val modelList: MutableList<String> = mutableListOf(),
-    val currentModel: String = ""
+    val currentModel: String = "",
+    val isDarkMode: Boolean = false
 )
 
 internal fun AppStateToDto(appState: AppState): AppStateDto {
@@ -24,6 +25,8 @@ internal fun AppStateToDto(appState: AppState): AppStateDto {
         apiKey = appState.apiKey,
         baseUrl = appState.baseUrl,
         modelList = appState.modelList,
-        currentModel = appState.currentModel
+        currentModel = appState.currentModel,
+        isDarkMode = appState.isDarkMode
     )
 }
+

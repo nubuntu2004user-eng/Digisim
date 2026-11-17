@@ -36,7 +36,7 @@ fun DigitalLogicSimulator(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(Color.White)
+                .background(SettingsViewModel.default.canvasBackgroundColor)
                 .clip(RectangleShape)
                 .pointerInput(Unit) {
                     awaitPointerEventScope {
@@ -156,7 +156,24 @@ fun DigitalLogicSimulator(
                 //Draw All
                 viewModel.components.forEach { component ->
                     drawComponent(component , textMeasurer , SettingsViewModel.default)
+                    if (viewModel.selectedGateId == component.ID) {
+                        val pad = 6f
+                        val settings = SettingsViewModel.default
+                        drawRect(
+                            color = settings.accentTaupe,
+                            topLeft = Offset(component.x - pad, component.y - pad),
+                            size = androidx.compose.ui.geometry.Size(component.width + pad * 2f, component.height + pad * 2f),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2f)
+                        )
+                        // Swiss technical corner ticks
+                        val c = 5f
+                        drawRect(color = settings.strongBorderColor, topLeft = Offset(component.x - pad - 2f, component.y - pad - 2f), size = androidx.compose.ui.geometry.Size(c, c))
+                        drawRect(color = settings.strongBorderColor, topLeft = Offset(component.x + component.width + pad - 3f, component.y - pad - 2f), size = androidx.compose.ui.geometry.Size(c, c))
+                        drawRect(color = settings.strongBorderColor, topLeft = Offset(component.x - pad - 2f, component.y + component.height + pad - 3f), size = androidx.compose.ui.geometry.Size(c, c))
+                        drawRect(color = settings.strongBorderColor, topLeft = Offset(component.x + component.width + pad - 3f, component.y + component.height + pad - 3f), size = androidx.compose.ui.geometry.Size(c, c))
+                    }
                 }
+
 
                 // Draw pending component (hovering)
                 viewModel.pendingComponent?.let { pending ->

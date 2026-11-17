@@ -129,18 +129,66 @@ class TranslationViewModel : ViewModel() {
         // AI / agentic UI
         "Chat" to mapOf(Language.ENGLISH to "Chat", Language.DEUTSCH to "Chat", Language.UKRAINIAN to "Чат"),
         "AI provider\nsettings" to mapOf(Language.ENGLISH to "AI provider\nsettings", Language.DEUTSCH to "KI-Anbieter\nEinstellungen", Language.UKRAINIAN to "Провайдер ШІ\nНалаштування"),
+        "AI Provider Settings" to mapOf(Language.ENGLISH to "AI Provider Settings", Language.DEUTSCH to "KI-Anbieter Einstellungen", Language.UKRAINIAN to "Налаштування провайдера ШІ"),
+        "Circuit Assistant" to mapOf(Language.ENGLISH to "Circuit Assistant", Language.DEUTSCH to "Schaltungs-Assistent", Language.UKRAINIAN to "Асистент схем"),
         "You:\n" to mapOf(Language.ENGLISH to "You:\n", Language.DEUTSCH to "Du:\n", Language.UKRAINIAN to "Ви:\n"),
         "Llm:\n" to mapOf(Language.ENGLISH to "Llm:\n", Language.DEUTSCH to "LLM:\n", Language.UKRAINIAN to "ШІ:\n"),
         "Error: " to mapOf(Language.ENGLISH to "Error: ", Language.DEUTSCH to "Fehler: ", Language.UKRAINIAN to "Помилка: "),
         "Save and exit" to mapOf(Language.ENGLISH to "Save and exit", Language.DEUTSCH to "Speichern und schließen", Language.UKRAINIAN to "Зберегти та закрити"),
 
-        // aiSettings
+        // aiSettings & Swiss UI labels
         "Api key:" to mapOf(Language.ENGLISH to "Api key:", Language.DEUTSCH to "API-Schlüssel:", Language.UKRAINIAN to "API-ключ:"),
         "Is the model local?" to mapOf(Language.ENGLISH to "Is the model local?", Language.DEUTSCH to "Ist das Modell lokal?", Language.UKRAINIAN to "Модель локальна?"),
         "Base URL:" to mapOf(Language.ENGLISH to "Base URL:", Language.DEUTSCH to "Basis-URL:", Language.UKRAINIAN to "Базова URL:"),
         "Available models:" to mapOf(Language.ENGLISH to "Available models:", Language.DEUTSCH to "Verfügbare Modelle:", Language.UKRAINIAN to "Доступні моделі:"),
         "Current model:" to mapOf(Language.ENGLISH to "Current model:", Language.DEUTSCH to "Aktuelles Modell:", Language.UKRAINIAN to "Поточна модель:"),
-
+        "Local Endpoint" to mapOf(Language.ENGLISH to "Local Endpoint", Language.DEUTSCH to "Lokaler Endpunkt", Language.UKRAINIAN to "Локальний сервер"),
+        "Cloud API" to mapOf(Language.ENGLISH to "Cloud API", Language.DEUTSCH to "Cloud-API", Language.UKRAINIAN to "Хмарний API"),
+        "01 / COMPONENT LIBRARY" to mapOf(Language.ENGLISH to "01 / COMPONENT LIBRARY", Language.DEUTSCH to "01 / BAUTEIL-BIBLIOTHEK", Language.UKRAINIAN to "01 / БІБЛІОТЕКА КОМПОНЕНТІВ"),
+        "02 / INSPECTOR" to mapOf(Language.ENGLISH to "02 / INSPECTOR", Language.DEUTSCH to "02 / INSPEKTOR", Language.UKRAINIAN to "02 / ІНСПЕКТОР"),
+        "01 / SYSTEM SETTINGS" to mapOf(Language.ENGLISH to "01 / SYSTEM SETTINGS", Language.DEUTSCH to "01 / SYSTEMEINSTELLUNGEN", Language.UKRAINIAN to "01 / СИСТЕМНІ НАЛАШТУВАННЯ"),
+        "01 / CIRCUIT ASSISTANT" to mapOf(Language.ENGLISH to "01 / CIRCUIT ASSISTANT", Language.DEUTSCH to "01 / SCHALTUNGS-ASSISTENT", Language.UKRAINIAN to "01 / АСИСТЕНТ СХЕМ"),
+        "No component selected" to mapOf(Language.ENGLISH to "No component selected", Language.DEUTSCH to "Keine Komponente ausgewählt", Language.UKRAINIAN to "Компонент не вибрано"),
+        "Select the EDIT tool and click any component on the schematic canvas to inspect its ports, label, and clock parameters." to mapOf(
+            Language.ENGLISH to "Select the EDIT tool and click any component on the schematic canvas to inspect its ports, label, and clock parameters.",
+            Language.DEUTSCH to "Wählen Sie das Werkzeug BEARBEITEN und klicken Sie auf ein Bauteil auf der Arbeitsfläche, um Anschlüsse und Parameter zu prüfen.",
+            Language.UKRAINIAN to "Виберіть інструмент РЕДАГУВАТИ та натисніть на компонент на полотні, щоб переглянути його параметри."
+        ),
+        "Switch to Edit Mode" to mapOf(Language.ENGLISH to "Switch to Edit Mode", Language.DEUTSCH to "In Bearbeitungsmodus wechseln", Language.UKRAINIAN to "Перейти в режим редагування"),
+        "No messages yet. Ask the assistant to build, inspect, or debug a digital circuit on the canvas." to mapOf(
+            Language.ENGLISH to "No messages yet. Ask the assistant to build, inspect, or debug a digital circuit on the canvas.",
+            Language.DEUTSCH to "Noch keine Nachrichten. Bitten Sie den Assistenten, eine Schaltung zu erstellen oder zu prüfen.",
+            Language.UKRAINIAN to "Повідомлень ще немає. Попросіть асистента побудувати або перевірити цифрову схему."
+        ),
+        "Processing circuit request..." to mapOf(Language.ENGLISH to "Processing circuit request...", Language.DEUTSCH to "Anfrage wird verarbeitet...", Language.UKRAINIAN to "Обробка запиту..."),
+        "Describe circuit changes or ask a question..." to mapOf(Language.ENGLISH to "Describe circuit changes or ask a question...", Language.DEUTSCH to "Schaltungsänderung beschreiben...", Language.UKRAINIAN to "Опишіть зміни схеми або поставте запитання..."),
+        "Send" to mapOf(Language.ENGLISH to "Send", Language.DEUTSCH to "Senden", Language.UKRAINIAN to "Надіслати"),
+        "Theme:" to mapOf(Language.ENGLISH to "Theme:", Language.DEUTSCH to "Darstellung:", Language.UKRAINIAN to "Тема:"),
+        "Zurich Light" to mapOf(Language.ENGLISH to "Zurich Light", Language.DEUTSCH to "Zürich Hell", Language.UKRAINIAN to "Цюрих Світла"),
+        "Basel Dark" to mapOf(Language.ENGLISH to "Basel Dark", Language.DEUTSCH to "Basel Dunkel", Language.UKRAINIAN to "Базель Темна"),
+        "Component Labels:" to mapOf(Language.ENGLISH to "Component Labels:", Language.DEUTSCH to "Bauteil-Beschriftung:", Language.UKRAINIAN to "Мітки компонентів:"),
+        "Visible" to mapOf(Language.ENGLISH to "Visible", Language.DEUTSCH to "Sichtbar", Language.UKRAINIAN to "Видимі"),
+        "Hidden" to mapOf(Language.ENGLISH to "Hidden", Language.DEUTSCH to "Ausgeblendet", Language.UKRAINIAN to "Приховані"),
+        "Return to Library" to mapOf(Language.ENGLISH to "Return to Library", Language.DEUTSCH to "Zurück zur Bibliothek", Language.UKRAINIAN to "Повернутися до бібліотеки"),
+        "Cancel" to mapOf(Language.ENGLISH to "Cancel", Language.DEUTSCH to "Abbrechen", Language.UKRAINIAN to "Скасувати"),
+        "Apply" to mapOf(Language.ENGLISH to "Apply", Language.DEUTSCH to "Anwenden", Language.UKRAINIAN to "Застосувати"),
+        "MODE" to mapOf(Language.ENGLISH to "MODE", Language.DEUTSCH to "MODUS", Language.UKRAINIAN to "РЕЖИМ"),
+        "QUICK INSERT" to mapOf(Language.ENGLISH to "QUICK INSERT", Language.DEUTSCH to "SCHNELLWAHL", Language.UKRAINIAN to "ШВИДКА ВСТАВКА"),
+        "SIMULATION" to mapOf(Language.ENGLISH to "SIMULATION", Language.DEUTSCH to "SIMULATION", Language.UKRAINIAN to "СИМУЛЯЦІЯ"),
+        "RUNNING" to mapOf(Language.ENGLISH to "RUNNING", Language.DEUTSCH to "AKTIV", Language.UKRAINIAN to "АКТИВНА"),
+        "IDLE" to mapOf(Language.ENGLISH to "IDLE", Language.DEUTSCH to "BEREIT", Language.UKRAINIAN to "ОЧІКУВАННЯ"),
+        "COMPONENTS" to mapOf(Language.ENGLISH to "COMPONENTS", Language.DEUTSCH to "BAUTEILE", Language.UKRAINIAN to "КОМПОНЕНТИ"),
+        "WIRES" to mapOf(Language.ENGLISH to "WIRES", Language.DEUTSCH to "LEITUNGEN", Language.UKRAINIAN to "ДРОТИ"),
+        "TICK" to mapOf(Language.ENGLISH to "TICK", Language.DEUTSCH to "TAKT", Language.UKRAINIAN to "ТАКТ"),
+        "VIEWPORT" to mapOf(Language.ENGLISH to "VIEWPORT", Language.DEUTSCH to "ANSICHT", Language.UKRAINIAN to "ОГЛЯД"),
+        "Reset View" to mapOf(Language.ENGLISH to "Reset View", Language.DEUTSCH to "Ansicht zurücksetzen", Language.UKRAINIAN to "Скинути вигляд"),
+        "Import Component (.json)" to mapOf(Language.ENGLISH to "Import Component (.json)", Language.DEUTSCH to "Bauteil importieren (.json)", Language.UKRAINIAN to "Імпортувати компонент (.json)"),
+        "Delete Library" to mapOf(Language.ENGLISH to "Delete Library", Language.DEUTSCH to "Bibliothek löschen", Language.UKRAINIAN to "Видалити бібліотеку"),
+        "Empty custom library. Import a circuit JSON file to create a reusable sub-component." to mapOf(
+            Language.ENGLISH to "Empty custom library. Import a circuit JSON file to create a reusable sub-component.",
+            Language.DEUTSCH to "Leere Bibliothek. Importieren Sie eine JSON-Schaltung als wiederverwendbares Bauteil.",
+            Language.UKRAINIAN to "Порожня бібліотека. Імпортуйте JSON-файл схеми для створення компонента."
+        ),
         )
 
     fun getString(key: String , language: Language): String {
