@@ -158,110 +158,111 @@ fun componentLibraries(
                             val isPending = viewModel.pendingComponent?.componentType == item.type &&
                                     (item.type != ComponentType.CUSTOM || viewModel.pendingComponent?.customComponentName == item.name)
 
-                            TooltipBox(
-                                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
-                                tooltip = {
-                                    PlainTooltip {
-                                        Text(translationViewModel.getString(item.description, lang))
-                                    }
-                                },
-                                state = rememberTooltipState(),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Surface(
-                                    onClick = {
-                                        if (item.type == ComponentType.CUSTOM) {
-                                            viewModel.addComponent(
-                                                item.type,
-                                                item.abstractedLogic,
-                                                item.name,
-                                                item.inputCount,
-                                                item.outputCount
-                                            )
-                                        } else {
-                                            viewModel.addComponent(item.type)
+                            Box(modifier = Modifier.weight(1f)) {
+                                TooltipBox(
+                                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
+                                    tooltip = {
+                                        PlainTooltip {
+                                            Text(translationViewModel.getString(item.description, lang))
                                         }
                                     },
-                                    shape = RoundedCornerShape(2.dp),
-                                    color = if (isPending) settings.primaryControlFill else settings.elevatedSurfaceColor,
-                                    border = BorderStroke(
-                                        width = 1.dp,
-                                        color = if (isPending) settings.accentTaupe else settings.borderColor
-                                    ),
-                                    modifier = Modifier.fillMaxWidth()
+                                    state = rememberTooltipState()
                                 ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 8.dp, vertical = 8.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        // Miniature schematic symbol preview box
-                                        Box(
-                                            modifier = Modifier
-                                                .size(40.dp, 30.dp)
-                                                .background(
-                                                    settings.canvasBackgroundColor,
-                                                    RoundedCornerShape(2.dp)
-                                                )
-                                                .border(
-                                                    1.dp,
-                                                    settings.borderColor,
-                                                    RoundedCornerShape(2.dp)
-                                                ),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            if (item.icon != null) {
-                                                Icon(
-                                                    imageVector = item.icon,
-                                                    contentDescription = item.name,
-                                                    tint = settings.textColor
+                                    Surface(
+                                        onClick = {
+                                            if (item.type == ComponentType.CUSTOM) {
+                                                viewModel.addComponent(
+                                                    item.type,
+                                                    item.abstractedLogic,
+                                                    item.name,
+                                                    item.inputCount,
+                                                    item.outputCount
                                                 )
                                             } else {
-                                                val preview = previewComponents[item.name]
-                                                if (preview != null) {
-                                                    Canvas(modifier = Modifier.size(34.dp, 24.dp)) {
-                                                        val totalW = preview.width + 16f
-                                                        val totalH = preview.height + 16f
-                                                        val scale = minOf(
-                                                            size.width / totalW,
-                                                            size.height / totalH
-                                                        )
-                                                        val offsetX =
-                                                            (size.width - preview.width * scale) / 2f
-                                                        val offsetY =
-                                                            (size.height - preview.height * scale) / 2f
-
-                                                        val previewSettings = SettingsViewModel(drawText = false).also {
-                                                            it.applyTheme(settings.isDarkMode)
-                                                        }
-
-                                                        withTransform({
-                                                            translate(left = offsetX, top = offsetY)
-                                                            scale(scale, scale, pivot = Offset.Zero)
-                                                        }) {
-                                                            drawComponent(
-                                                                preview,
-                                                                textMeasurer,
-                                                                settings = previewSettings
+                                                viewModel.addComponent(item.type)
+                                            }
+                                        },
+                                        shape = RoundedCornerShape(2.dp),
+                                        color = if (isPending) settings.primaryControlFill else settings.elevatedSurfaceColor,
+                                        border = BorderStroke(
+                                            width = 1.dp,
+                                            color = if (isPending) settings.accentTaupe else settings.borderColor
+                                        ),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 8.dp, vertical = 8.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            // Miniature schematic symbol preview box
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(40.dp, 30.dp)
+                                                    .background(
+                                                        settings.canvasBackgroundColor,
+                                                        RoundedCornerShape(2.dp)
+                                                    )
+                                                    .border(
+                                                        1.dp,
+                                                        settings.borderColor,
+                                                        RoundedCornerShape(2.dp)
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                if (item.icon != null) {
+                                                    Icon(
+                                                        imageVector = item.icon,
+                                                        contentDescription = item.name,
+                                                        tint = settings.textColor
+                                                    )
+                                                } else {
+                                                    val preview = previewComponents[item.name]
+                                                    if (preview != null) {
+                                                        Canvas(modifier = Modifier.size(34.dp, 24.dp)) {
+                                                            val totalW = preview.width + 16f
+                                                            val totalH = preview.height + 16f
+                                                            val scale = minOf(
+                                                                size.width / totalW,
+                                                                size.height / totalH
                                                             )
+                                                            val offsetX =
+                                                                (size.width - preview.width * scale) / 2f
+                                                            val offsetY =
+                                                                (size.height - preview.height * scale) / 2f
+
+                                                            val previewSettings = SettingsViewModel(drawText = false).also {
+                                                                it.applyTheme(settings.isDarkMode)
+                                                            }
+
+                                                            withTransform({
+                                                                translate(left = offsetX, top = offsetY)
+                                                                scale(scale, scale, pivot = Offset.Zero)
+                                                            }) {
+                                                                drawComponent(
+                                                                    preview,
+                                                                    textMeasurer,
+                                                                    settings = previewSettings
+                                                                )
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
-                                        }
 
-                                        Text(
-                                            text = translationViewModel.getString(item.name, lang),
-                                            color = if (isPending) settings.primaryControlText else settings.textColor,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                            lineHeight = 13.sp,
-                                            modifier = Modifier.weight(1f)
-                                        )
+                                            Text(
+                                                text = translationViewModel.getString(item.name, lang),
+                                                color = if (isPending) settings.primaryControlText else settings.textColor,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis,
+                                                lineHeight = 13.sp,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
                                     }
                                 }
                             }

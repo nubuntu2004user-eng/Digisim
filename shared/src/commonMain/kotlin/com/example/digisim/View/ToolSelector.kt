@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -140,6 +141,7 @@ fun ToolSelectorRow(
                     isActive = isSelected,
                     compact = true,
                     settings = settings,
+                    modifier = Modifier.testTag("mode_${tool.mode.name}"),
                     leadingContent = {
                         Icon(
                             imageVector = tool.icon,
@@ -167,57 +169,50 @@ fun ToolSelectorRow(
             for (compBtn in componentButtonList) {
                 val preview = previewComponents[compBtn.type]
                 val isPending = viewModel.pendingComponent?.componentType == compBtn.type
-                val label = translationViewModel.getString(compBtn.type.name, lang)
 
-                TooltipBox(
-                    positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
-                    tooltip = { PlainTooltip { Text(label) } },
-                    state = rememberTooltipState()
+                Surface(
+                    onClick = compBtn.onClick,
+                    enabled = !simulationViewModel.isRunning,
+                    shape = RoundedCornerShape(2.dp),
+                    color = if (isPending) settings.primaryControlFill else settings.elevatedSurfaceColor,
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = if (isPending) settings.accentTaupe else settings.borderColor
+                    ),
+                    modifier = Modifier.height(30.dp).testTag("quick_insert_${compBtn.type.name}")
                 ) {
-                    Surface(
-                        onClick = compBtn.onClick,
-                        enabled = !simulationViewModel.isRunning,
-                        shape = RoundedCornerShape(2.dp),
-                        color = if (isPending) settings.primaryControlFill else settings.elevatedSurfaceColor,
-                        border = BorderStroke(
-                            width = 1.dp,
-                            color = if (isPending) settings.accentTaupe else settings.borderColor
-                        ),
-                        modifier = Modifier.height(32.dp)
+                    Row(
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            if (preview != null) {
-                                Canvas(modifier = Modifier.size(28.dp, 20.dp)) {
-                                    val totalW = preview.width + 16f
-                                    val totalH = preview.height + 16f
-                                    val scale = minOf(size.width / totalW, size.height / totalH)
-                                    val offsetX = (size.width - preview.width * scale) / 2f
-                                    val offsetY = (size.height - preview.height * scale) / 2f
+                        if (preview != null) {
+                            Canvas(modifier = Modifier.size(22.dp, 18.dp)) {
+                                val totalW = preview.width + 16f
+                                val totalH = preview.height + 16f
+                                val scale = minOf(size.width / totalW, size.height / totalH)
+                                val offsetX = (size.width - preview.width * scale) / 2f
+                                val offsetY = (size.height - preview.height * scale) / 2f
 
-                                    val previewSettings = SettingsViewModel(drawText = false).also {
-                                        it.applyTheme(settings.isDarkMode)
-                                    }
+                                val previewSettings = SettingsViewModel(drawText = false).also {
+                                    it.applyTheme(settings.isDarkMode)
+                                }
 
-                                    withTransform({
-                                        translate(left = offsetX, top = offsetY)
-                                        scale(scale, scale, pivot = Offset.Zero)
-                                    }) {
-                                        drawComponent(preview, textMeasurer, settings = previewSettings)
-                                    }
+                                withTransform({
+                                    translate(left = offsetX, top = offsetY)
+                                    scale(scale, scale, pivot = Offset.Zero)
+                                }) {
+                                    drawComponent(preview, textMeasurer, settings = previewSettings)
                                 }
                             }
-                            Text(
-                                text = compBtn.type.name,
-                                color = if (isPending) settings.primaryControlText else settings.textColor,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                fontFamily = FontFamily.Monospace
-                            )
                         }
+                        Text(
+                            text = compBtn.type.name,
+                            color = if (isPending) settings.primaryControlText else settings.textColor,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = FontFamily.Monospace
+                        )
                     }
                 }
             }

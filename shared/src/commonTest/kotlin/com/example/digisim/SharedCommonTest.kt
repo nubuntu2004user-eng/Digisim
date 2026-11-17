@@ -165,7 +165,6 @@ class SharedCommonTest {
         assertEquals(Pin.LOW, not1.outputPin)
         assertEquals(Pin.LOW, out2.outputPin)
     }
-    }
 
     @Test
     fun testSettingsViewModelColorCustomization() {
@@ -409,3 +408,5 @@ class SharedCommonTest {
         assertEquals(160f, placed.x)
         assertEquals(120f, placed.y)
     }
+}
+

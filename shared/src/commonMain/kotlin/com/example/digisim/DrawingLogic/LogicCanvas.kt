@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.rememberTextMeasurer
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
@@ -38,6 +39,7 @@ fun DigitalLogicSimulator(
                 .fillMaxHeight()
                 .background(SettingsViewModel.default.canvasBackgroundColor)
                 .clip(RectangleShape)
+                .testTag("logic_canvas")
                 .pointerInput(Unit) {
                     awaitPointerEventScope {
                         var isPanning = false
@@ -103,10 +105,7 @@ fun DigitalLogicSimulator(
                                     }
                                 }
                                 PointerEventType.Exit -> {
-                                    if (viewModel.pendingComponent != null) {
-                                        viewModel.pendingComponent?.x = -1000f
-                                        viewModel.pendingComponent?.y = -1000f
-                                    }
+                                    // Keep pendingComponent off-screen until next Move/Press on canvas
                                 }
                                 PointerEventType.Release -> {
                                     isPanning = false

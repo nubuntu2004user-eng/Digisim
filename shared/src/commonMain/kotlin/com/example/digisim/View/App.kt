@@ -31,15 +31,17 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 @Preview
-fun App(viewModel: CanvasViewModel = remember { CanvasViewModel() }) {
+fun App(
+    viewModel: CanvasViewModel = remember { CanvasViewModel() },
+    simulation: SimulationViewModel = remember { SimulationViewModel() },
+    librariesViewModel: ComponentLibrariesViewModel = remember { ComponentLibrariesViewModel() },
+    clockManager: ClockManager = remember { ClockManager() },
+    translationViewModel: TranslationViewModel = remember { TranslationViewModel() },
+    appState: AppState = remember { AppState() }
+) {
     val scope: CoroutineScope = rememberCoroutineScope()
-    val simulation = remember { SimulationViewModel() }
-    val librariesViewModel = remember { ComponentLibrariesViewModel() }
-    val clockManager = remember { ClockManager() }
-    val translationViewModel = remember { TranslationViewModel() }
     val mcpClient = remember { mcpClient() }
     val openAiClient = remember { OpenAiClient(mcpClient) }
-    val appState = remember { AppState() }
     val settings = SettingsViewModel.default
 
     val swissColorScheme = if (settings.isDarkMode) {
@@ -67,7 +69,11 @@ fun App(viewModel: CanvasViewModel = remember { CanvasViewModel() }) {
     }
 
     LaunchedEffect(Unit) {
-        mcpClient.initializeClient()
+        try {
+            mcpClient.initializeClient()
+        } catch (_: Exception) {
+            // MCP server may not be running in headless UI tests or standalone preview
+        }
         val loadedDto = loadState()
         appState.applyDto(loadedDto)
         openAiClient.applySettings(appState = appState)
