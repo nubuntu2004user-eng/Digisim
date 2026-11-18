@@ -2,6 +2,7 @@ package com.example.mcpServer
 
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.ParsingLogic.ComponentType
+import com.example.digisim.StandardComponents.DipSwitch4BitComp
 import io.modelcontextprotocol.kotlin.sdk.types.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.types.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.types.TextContent
@@ -18,7 +19,9 @@ private val multiInputGateTypes = setOf(
     ComponentType.NAND,
     ComponentType.NOR,
     ComponentType.XOR,
-    ComponentType.XNOR
+    ComponentType.XNOR,
+    ComponentType.ODD_PARITY,
+    ComponentType.EVEN_PARITY
 )
 
 suspend fun updateComponent(
@@ -89,13 +92,27 @@ suspend fun updateComponent(
     val highArg = args["high"]?.jsonPrimitive?.let {
         it.booleanOrNull ?: it.contentOrNull?.toBooleanStrictOrNull()
     }
+    val switchIndexArg = args["switchIndex"]?.jsonPrimitive?.contentOrNull?.toIntOrNull()
     if (highArg != null) {
         if (component.componentType == ComponentType.INPUT || component.componentType == ComponentType.BUTTON) {
             component.outputPin = if (highArg) Pin.HIGH else Pin.LOW
             changes.add("outputPin=${component.outputPin}")
+        } else if (component is DipSwitch4BitComp && switchIndexArg != null && switchIndexArg in 0..3) {
+            component.setSwitch(switchIndexArg, highArg)
+            changes.add("SW$switchIndexArg=${if (highArg) "HIGH" else "LOW"}")
         } else {
-            changes.add("high ignored (only applicable to INPUT or BUTTON)")
+            changes.add("high ignored (only applicable to INPUT, BUTTON, or DIP_SWITCH_4BIT with switchIndex 0..3)")
         }
+    }
+
+    val memAddr = args["memoryAddress"]?.jsonPrimitive?.contentOrNull?.toIntOrNull()
+    val memVal = args["memoryValue"]?.jsonPrimitive?.contentOrNull?.toIntOrNull()
+    if (memVal != null) {
+        val targetIdx = (memAddr ?: 0).coerceIn(0, 15)
+        while (component.memoryData.size <= targetIdx) component.memoryData.add(0)
+        component.memoryData[targetIdx] = memVal and 0xF
+        if (component is DipSwitch4BitComp) component.syncOutputsFromMask()
+        changes.add("memory[$targetIdx]=${memVal and 0xF}")
     }
 
     val report = if (changes.isEmpty()) {

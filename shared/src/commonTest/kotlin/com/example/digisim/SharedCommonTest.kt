@@ -464,5 +464,68 @@ class SharedCommonTest {
             assertEquals(1, simComp.size)
         }
     }
+
+    @Test
+    fun testLogisimLibrariesTunnelAndCounterMultiTickPersistence() = runTest {
+        val libVm = ComponentLibrariesViewModel()
+        val expectedLibNames = listOf("Gates", "Wiring", "Plexers", "Arithmetic", "Flip-Flops", "Memory", "I/O", "74**")
+        assertEquals(expectedLibNames, libVm.libraries.map { it.name })
+
+        // Verify every component in every library converts cleanly for simulation and round-trips through DTO
+        val clockManager = ClockManager()
+        for (lib in libVm.libraries) {
+            for (item in lib.components) {
+                val comp = createComponent(item.type, id = 1, x = 20f, y = 40f, logic = null, name = "TEST")
+                assertEquals(item.type, comp.componentType)
+                val dto = comp.toDto()
+                val restored = dto.toComponent()
+                assertEquals(item.type, restored.componentType)
+                assertNotNull(com.example.digisim.SimulationHandling.convertForSimulation(comp, clockManager))
+            }
+        }
+
+        // Test Wireless TUNNEL + 4-Bit Counter + Hex Digit Display across multiple clock ticks
+        val viewModel = CanvasViewModel()
+        val simulation = SimulationViewModel()
+
+        val clkIn = Input(1, 0f, 0f, 0, 1)
+        val tunnelTx = createComponent(ComponentType.TUNNEL, id = 2, x = 100f, y = 0f, logic = null, name = "CLK_BUS")
+        val tunnelRx = createComponent(ComponentType.TUNNEL, id = 3, x = 200f, y = 0f, logic = null, name = "CLK_BUS")
+        val counter = createComponent(ComponentType.COUNTER_4BIT, id = 4, x = 300f, y = 0f, logic = null, name = null)
+        val hexDisp = createComponent(ComponentType.HEX_DIGIT_DISPLAY, id = 5, x = 460f, y = 0f, logic = null, name = null)
+
+        viewModel.components.addAll(listOf(clkIn, tunnelTx, tunnelRx, counter, hexDisp))
+        // Wire clkIn -> tunnelTx (input 0), and tunnelRx (output 0) -> counter CLK (input 0), plus counter Q0..Q3 -> hexDisp D0..D3
+        viewModel.wires.addAll(
+            listOf(
+                Wire(10, 1, 0, 2, 0),
+                Wire(11, 3, 0, 4, 0),
+                Wire(12, 4, 0, 5, 0),
+                Wire(13, 4, 1, 5, 1),
+                Wire(14, 4, 2, 5, 2),
+                Wire(15, 4, 3, 5, 3)
+            )
+        )
+
+        // Tick 1: clkIn = LOW -> Counter = 0
+        simulation.runSimulation(viewModel, clockManager = clockManager)
+        assertEquals(0, counter.memoryData.first())
+
+        // Tick 2: clkIn = HIGH (rising edge travels wirelessly across TUNNEL "CLK_BUS") -> Counter = 1
+        clkIn.outputPin = Pin.HIGH
+        simulation.runSimulation(viewModel, clockManager = clockManager)
+        assertEquals(1, counter.memoryData.first())
+        assertEquals(Pin.HIGH, hexDisp.inputPins[0])
+        assertEquals(Pin.LOW, hexDisp.inputPins[1])
+
+        // Tick 3 & 4: clkIn = LOW then HIGH -> Counter = 2
+        clkIn.outputPin = Pin.LOW
+        simulation.runSimulation(viewModel, clockManager = clockManager)
+        clkIn.outputPin = Pin.HIGH
+        simulation.runSimulation(viewModel, clockManager = clockManager)
+        assertEquals(2, counter.memoryData.first())
+        assertEquals(Pin.LOW, hexDisp.inputPins[0])
+        assertEquals(Pin.HIGH, hexDisp.inputPins[1])
+    }
 }
 

@@ -31,6 +31,7 @@ import com.example.digisim.Chips74.IC74151
 import com.example.digisim.Chips74.IC74157
 import com.example.digisim.Chips74.IC74266
 import com.example.digisim.Chips74.IC74283
+import com.example.digisim.StandardComponents.*
 import com.example.digisim.LibraryLoader.CustomComponent
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
@@ -425,6 +426,37 @@ fun ComponentDto.toComponent(): Component = when (type) {
         initialOutputCount = outputCount,
         label = label
     )
+    ComponentType.BUFFER -> BufferGate(id, x, y, inputCount, outputCount, label)
+    ComponentType.CONTROLLED_BUFFER -> ControlledBufferGate(id, x, y, inputCount, outputCount, label)
+    ComponentType.CONTROLLED_INVERTER -> ControlledInverterGate(id, x, y, inputCount, outputCount, label)
+    ComponentType.ODD_PARITY -> OddParityGate(id, x, y, inputCount, outputCount, label)
+    ComponentType.EVEN_PARITY -> EvenParityGate(id, x, y, inputCount, outputCount, label)
+    ComponentType.CONSTANT_HIGH -> ConstantHighPin(id, x, y, inputCount, outputCount, label)
+    ComponentType.CONSTANT_LOW -> ConstantLowPin(id, x, y, inputCount, outputCount, label)
+    ComponentType.PROBE -> ProbePin(id, x, y, inputCount, outputCount, label)
+    ComponentType.TUNNEL -> TunnelPin(id, x, y, inputCount, outputCount, label)
+    ComponentType.MULTIPLEXER_2_TO_1 -> Multiplexer2To1Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.MULTIPLEXER_4_TO_1 -> Multiplexer4To1Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.DEMULTIPLEXER_1_TO_2 -> Demultiplexer1To2Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.DEMULTIPLEXER_1_TO_4 -> Demultiplexer1To4Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.DECODER_2_TO_4 -> Decoder2To4Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.DECODER_3_TO_8 -> Decoder3To8Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.PRIORITY_ENCODER_4_TO_2 -> PriorityEncoder4To2Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.HALF_ADDER -> HalfAdderComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.FULL_ADDER -> FullAdderComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.ADDER_4BIT -> Adder4BitComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.SUBTRACTOR_4BIT -> Subtractor4BitComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.COMPARATOR_4BIT -> Comparator4BitComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.NEGATOR_4BIT -> Negator4BitComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.REGISTER_4BIT -> Register4BitComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.COUNTER_4BIT -> Counter4BitComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.SHIFT_REGISTER_4BIT -> ShiftRegister4BitComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.RAM_16X4 -> Ram16x4Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.ROM_16X4 -> Rom16x4Comp(id, x, y, inputCount, outputCount, label)
+    ComponentType.LED -> LedComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.SEVEN_SEGMENT_DISPLAY -> SevenSegmentDisplayComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.HEX_DIGIT_DISPLAY -> HexDigitDisplayComp(id, x, y, inputCount, outputCount, label)
+    ComponentType.DIP_SWITCH_4BIT -> DipSwitch4BitComp(id, x, y, inputCount, outputCount, label)
 
     ComponentType.CUSTOM -> CustomComponent(
         id = id,

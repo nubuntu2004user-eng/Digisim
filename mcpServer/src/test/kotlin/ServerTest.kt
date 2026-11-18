@@ -60,7 +60,7 @@ class ServerTest {
     }
 
     @Test
-    fun `test mcp client lists all 47 registered tools with descriptions and schemas`() = runBlocking {
+    fun `test mcp client lists all 78 registered tools with descriptions and schemas`() = runBlocking {
         withLiveMcpSession { client, _ ->
             val tools = client.listTools()
             val toolNames = tools.map { it.name }.toSet()
@@ -75,10 +75,32 @@ class ServerTest {
                 "add_nor",
                 "add_xor",
                 "add_xnor",
+                "add_buffer",
+                "add_controlled_buffer",
+                "add_controlled_inverter",
+                "add_odd_parity",
+                "add_even_parity",
                 "add_input",
                 "add_output",
                 "add_button",
                 "add_clock",
+                "add_constant_high",
+                "add_constant_low",
+                "add_probe",
+                "add_tunnel",
+                "add_multiplexer_2_to_1",
+                "add_multiplexer_4_to_1",
+                "add_demultiplexer_1_to_2",
+                "add_demultiplexer_1_to_4",
+                "add_decoder_2_to_4",
+                "add_decoder_3_to_8",
+                "add_priority_encoder_4_to_2",
+                "add_half_adder",
+                "add_full_adder",
+                "add_adder_4bit",
+                "add_subtractor_4bit",
+                "add_comparator_4bit",
+                "add_negator_4bit",
                 "add_rs_flip_flop",
                 "add_jk_flip_flop",
                 "add_d_flip_flop",
@@ -87,6 +109,15 @@ class ServerTest {
                 "add_sr_flip_flop_async",
                 "add_d_flip_flop_async",
                 "add_t_flip_flop_async",
+                "add_register_4bit",
+                "add_counter_4bit",
+                "add_shift_register_4bit",
+                "add_ram_16x4",
+                "add_rom_16x4",
+                "add_led",
+                "add_seven_segment_display",
+                "add_hex_digit_display",
+                "add_dip_switch_4bit",
                 "add_ic_7400",
                 "add_ic_7402",
                 "add_ic_7404",
@@ -115,7 +146,7 @@ class ServerTest {
                 "delete_wire"
             )
 
-            assertEquals(expectedTools, toolNames, "MCP Server must expose all 47 expected tools")
+            assertEquals(expectedTools, toolNames, "MCP Server must expose all 78 expected tools")
             tools.forEach { tool ->
                 assertFalse(tool.description.isNullOrBlank(), "Tool ${tool.name} must have a non-blank description")
                 assertNotNull(tool.inputSchema, "Tool ${tool.name} must define an inputSchema")
@@ -124,7 +155,7 @@ class ServerTest {
     }
 
     @Test
-    fun `test all 42 component creation tools over live mcp client protocol`() = runBlocking {
+    fun `test all 73 component creation tools over live mcp client protocol`() = runBlocking {
         withLiveMcpSession { client, viewModel ->
             data class ToolSpec(
                 val toolName: String,
@@ -143,10 +174,32 @@ class ServerTest {
                 ToolSpec("add_nor", ComponentType.NOR, 2, 1),
                 ToolSpec("add_xor", ComponentType.XOR, 2, 1),
                 ToolSpec("add_xnor", ComponentType.XNOR, 2, 1),
+                ToolSpec("add_buffer", ComponentType.BUFFER, 1, 1),
+                ToolSpec("add_controlled_buffer", ComponentType.CONTROLLED_BUFFER, 2, 1),
+                ToolSpec("add_controlled_inverter", ComponentType.CONTROLLED_INVERTER, 2, 1),
+                ToolSpec("add_odd_parity", ComponentType.ODD_PARITY, 3, 1, buildJsonObject { put("inputCount", 3) }),
+                ToolSpec("add_even_parity", ComponentType.EVEN_PARITY, 3, 1, buildJsonObject { put("inputCount", 3) }),
                 ToolSpec("add_input", ComponentType.INPUT, 0, 1, buildJsonObject { put("high", true) }),
                 ToolSpec("add_output", ComponentType.OUTPUT, 1, 0),
                 ToolSpec("add_button", ComponentType.BUTTON, 0, 1, buildJsonObject { put("high", true) }),
                 ToolSpec("add_clock", ComponentType.CLOCK, 0, 1, buildJsonObject { put("frequencyHz", 50) }),
+                ToolSpec("add_constant_high", ComponentType.CONSTANT_HIGH, 0, 1),
+                ToolSpec("add_constant_low", ComponentType.CONSTANT_LOW, 0, 1),
+                ToolSpec("add_probe", ComponentType.PROBE, 1, 0),
+                ToolSpec("add_tunnel", ComponentType.TUNNEL, 1, 1),
+                ToolSpec("add_multiplexer_2_to_1", ComponentType.MULTIPLEXER_2_TO_1, 3, 1),
+                ToolSpec("add_multiplexer_4_to_1", ComponentType.MULTIPLEXER_4_TO_1, 6, 1),
+                ToolSpec("add_demultiplexer_1_to_2", ComponentType.DEMULTIPLEXER_1_TO_2, 2, 2),
+                ToolSpec("add_demultiplexer_1_to_4", ComponentType.DEMULTIPLEXER_1_TO_4, 3, 4),
+                ToolSpec("add_decoder_2_to_4", ComponentType.DECODER_2_TO_4, 3, 4),
+                ToolSpec("add_decoder_3_to_8", ComponentType.DECODER_3_TO_8, 4, 8),
+                ToolSpec("add_priority_encoder_4_to_2", ComponentType.PRIORITY_ENCODER_4_TO_2, 4, 3),
+                ToolSpec("add_half_adder", ComponentType.HALF_ADDER, 2, 2),
+                ToolSpec("add_full_adder", ComponentType.FULL_ADDER, 3, 2),
+                ToolSpec("add_adder_4bit", ComponentType.ADDER_4BIT, 9, 5),
+                ToolSpec("add_subtractor_4bit", ComponentType.SUBTRACTOR_4BIT, 9, 5),
+                ToolSpec("add_comparator_4bit", ComponentType.COMPARATOR_4BIT, 8, 3),
+                ToolSpec("add_negator_4bit", ComponentType.NEGATOR_4BIT, 4, 4),
                 ToolSpec("add_rs_flip_flop", ComponentType.RS_FLIP_FLOP, 2, 2),
                 ToolSpec("add_jk_flip_flop", ComponentType.JK_FLIP_FLOP, 3, 2),
                 ToolSpec("add_d_flip_flop", ComponentType.D_FLIP_FLOP, 2, 2),
@@ -155,6 +208,15 @@ class ServerTest {
                 ToolSpec("add_sr_flip_flop_async", ComponentType.SR_FLIP_FLOP_ASYNC, 5, 2),
                 ToolSpec("add_d_flip_flop_async", ComponentType.D_FLIP_FLOP_ASYNC, 4, 2),
                 ToolSpec("add_t_flip_flop_async", ComponentType.T_FLIP_FLOP_ASYNC, 4, 2),
+                ToolSpec("add_register_4bit", ComponentType.REGISTER_4BIT, 7, 4),
+                ToolSpec("add_counter_4bit", ComponentType.COUNTER_4BIT, 9, 5),
+                ToolSpec("add_shift_register_4bit", ComponentType.SHIFT_REGISTER_4BIT, 8, 4),
+                ToolSpec("add_ram_16x4", ComponentType.RAM_16X4, 10, 4),
+                ToolSpec("add_rom_16x4", ComponentType.ROM_16X4, 4, 4),
+                ToolSpec("add_led", ComponentType.LED, 1, 0),
+                ToolSpec("add_seven_segment_display", ComponentType.SEVEN_SEGMENT_DISPLAY, 8, 0),
+                ToolSpec("add_hex_digit_display", ComponentType.HEX_DIGIT_DISPLAY, 5, 0),
+                ToolSpec("add_dip_switch_4bit", ComponentType.DIP_SWITCH_4BIT, 0, 4),
                 ToolSpec("add_ic_7400", ComponentType.IC_7400, 10, 4),
                 ToolSpec("add_ic_7402", ComponentType.IC_7402, 10, 4),
                 ToolSpec("add_ic_7404", ComponentType.IC_7404, 8, 6),

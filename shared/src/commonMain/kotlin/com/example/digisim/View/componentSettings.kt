@@ -182,7 +182,9 @@ fun componentSettings(
                     ComponentType.NAND,
                     ComponentType.NOR,
                     ComponentType.XOR,
-                    ComponentType.XNOR
+                    ComponentType.XNOR,
+                    ComponentType.ODD_PARITY,
+                    ComponentType.EVEN_PARITY
                 )
                 if (isMultiInputGate) {
                     var userInputCount by remember(selectedComponent.ID, selectedComponent.inputCount) {

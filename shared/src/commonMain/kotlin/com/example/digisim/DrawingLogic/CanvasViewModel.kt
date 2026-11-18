@@ -37,6 +37,7 @@ import com.example.digisim.Chips74.IC74151
 import com.example.digisim.Chips74.IC74157
 import com.example.digisim.Chips74.IC74266
 import com.example.digisim.Chips74.IC74283
+import com.example.digisim.StandardComponents.*
 import com.example.digisim.LibraryLoader.CustomComponent
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
@@ -91,12 +92,20 @@ class CanvasViewModel: ViewModel() {
 
     fun findPortAt(position: Offset): PortHit? {
         for (component in components) {
-            if (component.componentType == ComponentType.INPUT || component.componentType == ComponentType.CLOCK || component.componentType == ComponentType.BUTTON) {
+            if (component.componentType == ComponentType.INPUT ||
+                component.componentType == ComponentType.CLOCK ||
+                component.componentType == ComponentType.BUTTON ||
+                component.componentType == ComponentType.CONSTANT_HIGH ||
+                component.componentType == ComponentType.CONSTANT_LOW
+            ) {
                 if (distance(position, component.findPortOffset()) < 12f) {
                     return PortHit(component.ID, 0, false, component.findPortOffset())
                 }
             }
-            if (component.componentType == ComponentType.OUTPUT) {
+            if (component.componentType == ComponentType.OUTPUT ||
+                component.componentType == ComponentType.PROBE ||
+                component.componentType == ComponentType.LED
+            ) {
                 if (distance(position, component.findPortOffset()) < 12f) {
                     return PortHit(component.ID, 0, true, component.findPortOffset())
                 }
@@ -171,6 +180,37 @@ fun createComponent(
         ComponentType.IC_74157 -> IC74157(id, x, y, 12, 4)
         ComponentType.IC_74266 -> IC74266(id, x, y, 10, 4)
         ComponentType.IC_74283 -> IC74283(id, x, y, 11, 5)
+        ComponentType.BUFFER -> BufferGate(id, x, y, 1, 1)
+        ComponentType.CONTROLLED_BUFFER -> ControlledBufferGate(id, x, y, 2, 1)
+        ComponentType.CONTROLLED_INVERTER -> ControlledInverterGate(id, x, y, 2, 1)
+        ComponentType.ODD_PARITY -> OddParityGate(id, x, y, inputCount, 1)
+        ComponentType.EVEN_PARITY -> EvenParityGate(id, x, y, inputCount, 1)
+        ComponentType.CONSTANT_HIGH -> ConstantHighPin(id, x, y, 0, 1)
+        ComponentType.CONSTANT_LOW -> ConstantLowPin(id, x, y, 0, 1)
+        ComponentType.PROBE -> ProbePin(id, x, y, 1, 0)
+        ComponentType.TUNNEL -> TunnelPin(id, x, y, 1, 1, name ?: "NET")
+        ComponentType.MULTIPLEXER_2_TO_1 -> Multiplexer2To1Comp(id, x, y, 3, 1)
+        ComponentType.MULTIPLEXER_4_TO_1 -> Multiplexer4To1Comp(id, x, y, 6, 1)
+        ComponentType.DEMULTIPLEXER_1_TO_2 -> Demultiplexer1To2Comp(id, x, y, 2, 2)
+        ComponentType.DEMULTIPLEXER_1_TO_4 -> Demultiplexer1To4Comp(id, x, y, 3, 4)
+        ComponentType.DECODER_2_TO_4 -> Decoder2To4Comp(id, x, y, 3, 4)
+        ComponentType.DECODER_3_TO_8 -> Decoder3To8Comp(id, x, y, 4, 8)
+        ComponentType.PRIORITY_ENCODER_4_TO_2 -> PriorityEncoder4To2Comp(id, x, y, 4, 3)
+        ComponentType.HALF_ADDER -> HalfAdderComp(id, x, y, 2, 2)
+        ComponentType.FULL_ADDER -> FullAdderComp(id, x, y, 3, 2)
+        ComponentType.ADDER_4BIT -> Adder4BitComp(id, x, y, 9, 5)
+        ComponentType.SUBTRACTOR_4BIT -> Subtractor4BitComp(id, x, y, 9, 5)
+        ComponentType.COMPARATOR_4BIT -> Comparator4BitComp(id, x, y, 8, 3)
+        ComponentType.NEGATOR_4BIT -> Negator4BitComp(id, x, y, 4, 4)
+        ComponentType.REGISTER_4BIT -> Register4BitComp(id, x, y, 7, 4)
+        ComponentType.COUNTER_4BIT -> Counter4BitComp(id, x, y, 9, 5)
+        ComponentType.SHIFT_REGISTER_4BIT -> ShiftRegister4BitComp(id, x, y, 8, 4)
+        ComponentType.RAM_16X4 -> Ram16x4Comp(id, x, y, 10, 4)
+        ComponentType.ROM_16X4 -> Rom16x4Comp(id, x, y, 4, 4)
+        ComponentType.LED -> LedComp(id, x, y, 1, 0)
+        ComponentType.SEVEN_SEGMENT_DISPLAY -> SevenSegmentDisplayComp(id, x, y, 8, 0)
+        ComponentType.HEX_DIGIT_DISPLAY -> HexDigitDisplayComp(id, x, y, 5, 0)
+        ComponentType.DIP_SWITCH_4BIT -> DipSwitch4BitComp(id, x, y, 0, 4)
         ComponentType.CUSTOM -> CustomComponent(id , x, y , inputCount , outputCount , abstractedLogic = logic , customComponentName = name )
     }
 }

@@ -22,6 +22,7 @@ import com.example.digisim.Chips74.IC74151
 import com.example.digisim.Chips74.IC74157
 import com.example.digisim.Chips74.IC74266
 import com.example.digisim.Chips74.IC74283
+import com.example.digisim.StandardComponents.*
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.FlipFlops.DFlipFlop
 import com.example.digisim.FlipFlops.DFlipFlopAsync
@@ -428,6 +429,37 @@ suspend fun addComponent(
             initialOutputCount = 5,
             label = label
         )
+        ComponentType.BUFFER -> BufferGate(canvasViewModel.nextId++, x, y, 1, 1, label)
+        ComponentType.CONTROLLED_BUFFER -> ControlledBufferGate(canvasViewModel.nextId++, x, y, 2, 1, label)
+        ComponentType.CONTROLLED_INVERTER -> ControlledInverterGate(canvasViewModel.nextId++, x, y, 2, 1, label)
+        ComponentType.ODD_PARITY -> OddParityGate(canvasViewModel.nextId++, x, y, gateInputCount, 1, label)
+        ComponentType.EVEN_PARITY -> EvenParityGate(canvasViewModel.nextId++, x, y, gateInputCount, 1, label)
+        ComponentType.CONSTANT_HIGH -> ConstantHighPin(canvasViewModel.nextId++, x, y, 0, 1, label)
+        ComponentType.CONSTANT_LOW -> ConstantLowPin(canvasViewModel.nextId++, x, y, 0, 1, label)
+        ComponentType.PROBE -> ProbePin(canvasViewModel.nextId++, x, y, 1, 0, label)
+        ComponentType.TUNNEL -> TunnelPin(canvasViewModel.nextId++, x, y, 1, 1, label.ifBlank { "NET" })
+        ComponentType.MULTIPLEXER_2_TO_1 -> Multiplexer2To1Comp(canvasViewModel.nextId++, x, y, 3, 1, label)
+        ComponentType.MULTIPLEXER_4_TO_1 -> Multiplexer4To1Comp(canvasViewModel.nextId++, x, y, 6, 1, label)
+        ComponentType.DEMULTIPLEXER_1_TO_2 -> Demultiplexer1To2Comp(canvasViewModel.nextId++, x, y, 2, 2, label)
+        ComponentType.DEMULTIPLEXER_1_TO_4 -> Demultiplexer1To4Comp(canvasViewModel.nextId++, x, y, 3, 4, label)
+        ComponentType.DECODER_2_TO_4 -> Decoder2To4Comp(canvasViewModel.nextId++, x, y, 3, 4, label)
+        ComponentType.DECODER_3_TO_8 -> Decoder3To8Comp(canvasViewModel.nextId++, x, y, 4, 8, label)
+        ComponentType.PRIORITY_ENCODER_4_TO_2 -> PriorityEncoder4To2Comp(canvasViewModel.nextId++, x, y, 4, 3, label)
+        ComponentType.HALF_ADDER -> HalfAdderComp(canvasViewModel.nextId++, x, y, 2, 2, label)
+        ComponentType.FULL_ADDER -> FullAdderComp(canvasViewModel.nextId++, x, y, 3, 2, label)
+        ComponentType.ADDER_4BIT -> Adder4BitComp(canvasViewModel.nextId++, x, y, 9, 5, label)
+        ComponentType.SUBTRACTOR_4BIT -> Subtractor4BitComp(canvasViewModel.nextId++, x, y, 9, 5, label)
+        ComponentType.COMPARATOR_4BIT -> Comparator4BitComp(canvasViewModel.nextId++, x, y, 8, 3, label)
+        ComponentType.NEGATOR_4BIT -> Negator4BitComp(canvasViewModel.nextId++, x, y, 4, 4, label)
+        ComponentType.REGISTER_4BIT -> Register4BitComp(canvasViewModel.nextId++, x, y, 7, 4, label)
+        ComponentType.COUNTER_4BIT -> Counter4BitComp(canvasViewModel.nextId++, x, y, 9, 5, label)
+        ComponentType.SHIFT_REGISTER_4BIT -> ShiftRegister4BitComp(canvasViewModel.nextId++, x, y, 8, 4, label)
+        ComponentType.RAM_16X4 -> Ram16x4Comp(canvasViewModel.nextId++, x, y, 10, 4, label)
+        ComponentType.ROM_16X4 -> Rom16x4Comp(canvasViewModel.nextId++, x, y, 4, 4, label)
+        ComponentType.LED -> LedComp(canvasViewModel.nextId++, x, y, 1, 0, label)
+        ComponentType.SEVEN_SEGMENT_DISPLAY -> SevenSegmentDisplayComp(canvasViewModel.nextId++, x, y, 8, 0, label)
+        ComponentType.HEX_DIGIT_DISPLAY -> HexDigitDisplayComp(canvasViewModel.nextId++, x, y, 5, 0, label)
+        ComponentType.DIP_SWITCH_4BIT -> DipSwitch4BitComp(canvasViewModel.nextId++, x, y, 0, 4, label)
         ComponentType.CUSTOM -> null
     }
 

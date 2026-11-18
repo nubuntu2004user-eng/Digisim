@@ -19,6 +19,8 @@ abstract class SimulationComponent(val id : Int) {
     abstract var delayTicks: Float?
     abstract var highDuration : Int?
     abstract var lowDuration : Int?
+    open var statefulClockPin: Pin = Pin.LOW
+    open var statefulMemory: MutableList<Int> = mutableListOf()
     abstract suspend fun evaluate(): MutableList<Pin>
 
     override fun equals(other: Any?): Boolean {
@@ -40,9 +42,16 @@ enum class Pin { HIGH, LOW , UNDEFINED , ERROR}
 
 enum class ComponentType {
     NAND, AND, OR, NOR, XOR, XNOR, NOT,
+    BUFFER, CONTROLLED_BUFFER, CONTROLLED_INVERTER, ODD_PARITY, EVEN_PARITY,
     INPUT, OUTPUT, CLOCK, BUTTON,
+    CONSTANT_HIGH, CONSTANT_LOW, PROBE, TUNNEL,
+    MULTIPLEXER_2_TO_1, MULTIPLEXER_4_TO_1, DEMULTIPLEXER_1_TO_2, DEMULTIPLEXER_1_TO_4,
+    DECODER_2_TO_4, DECODER_3_TO_8, PRIORITY_ENCODER_4_TO_2,
+    HALF_ADDER, FULL_ADDER, ADDER_4BIT, SUBTRACTOR_4BIT, COMPARATOR_4BIT, NEGATOR_4BIT,
     RS_FLIP_FLOP, JK_FLIP_FLOP, D_FLIP_FLOP, T_FLIP_FLOP,
     JK_FLIP_FLOP_ASYNC, SR_FLIP_FLOP_ASYNC, D_FLIP_FLOP_ASYNC, T_FLIP_FLOP_ASYNC,
+    REGISTER_4BIT, COUNTER_4BIT, SHIFT_REGISTER_4BIT, RAM_16X4, ROM_16X4,
+    LED, SEVEN_SEGMENT_DISPLAY, HEX_DIGIT_DISPLAY, DIP_SWITCH_4BIT,
     CUSTOM,
     IC_7400, IC_7402, IC_7404, IC_7407, IC_7408,
     IC_7410, IC_7411, IC_7420, IC_7421, IC_7427, IC_7430,

@@ -183,7 +183,19 @@ class mcpServer(private val canvasViewModel: CanvasViewModel = CanvasViewModel()
                 }
                 putJsonObject("high") {
                     put("type", "boolean")
-                    put("description", "Set signal state to HIGH (true) or LOW (false) (for INPUT or BUTTON components)")
+                    put("description", "Set signal state to HIGH (true) or LOW (false) (for INPUT, BUTTON, or DIP_SWITCH_4BIT)")
+                }
+                putJsonObject("switchIndex") {
+                    put("type", "integer")
+                    put("description", "Switch index (0..3) when toggling a DIP_SWITCH_4BIT with 'high'")
+                }
+                putJsonObject("memoryAddress") {
+                    put("type", "integer")
+                    put("description", "Memory word index (0..15) for ROM_16X4 or RAM_16X4")
+                }
+                putJsonObject("memoryValue") {
+                    put("type", "integer")
+                    put("description", "4-bit value (0..15) to store at memoryAddress (or initial state for REGISTER_4BIT/COUNTER_4BIT/DIP_SWITCH_4BIT)")
                 }
             },
             required = listOf("id")
@@ -546,6 +558,255 @@ class mcpServer(private val canvasViewModel: CanvasViewModel = CanvasViewModel()
             inputSchema = fixedPortComponentSchema
         ) { request ->
             addComponent(request = request, componentType = ComponentType.IC_74283, canvasViewModel = canvasViewModel)
+        }
+
+        // 5b. Additional Gates, Wiring, Plexers, Arithmetic, Memory, and I/O Components
+        mcpServer.addTool(
+            name = "add_buffer",
+            description = "Add a 1-bit non-inverting BUFFER gate to the canvas. Input: 0, Output: 0.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.BUFFER, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_controlled_buffer",
+            description = "Add a Tri-State CONTROLLED_BUFFER to the canvas. Inputs: [0: DATA, 1: EN], Output: 0.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.CONTROLLED_BUFFER, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_controlled_inverter",
+            description = "Add a Tri-State CONTROLLED_INVERTER to the canvas. Inputs: [0: DATA, 1: EN], Output: 0.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.CONTROLLED_INVERTER, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_odd_parity",
+            description = "Add an ODD_PARITY checker gate to the canvas. Inputs: 0..(inputCount-1), Output: 0 (HIGH when odd number of inputs are HIGH).",
+            inputSchema = multiInputGateSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.ODD_PARITY, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_even_parity",
+            description = "Add an EVEN_PARITY checker gate to the canvas. Inputs: 0..(inputCount-1), Output: 0 (HIGH when even number of inputs are HIGH).",
+            inputSchema = multiInputGateSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.EVEN_PARITY, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_constant_high",
+            description = "Add a permanent HIGH (1 / VCC) constant source to the canvas. Inputs: none, Output: 0.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.CONSTANT_HIGH, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_constant_low",
+            description = "Add a permanent LOW (0 / GND) constant source to the canvas. Inputs: none, Output: 0.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.CONSTANT_LOW, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_probe",
+            description = "Add a PROBE signal monitor to the canvas. Input: 0, Outputs: none.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.PROBE, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_tunnel",
+            description = "Add a wireless net TUNNEL to the canvas (connects with all other tunnels sharing the same label/name). Input: 0, Output: 0.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.TUNNEL, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_multiplexer_2_to_1",
+            description = "Add a 2-to-1 Multiplexer to the canvas. Inputs (3): [0: D0, 1: D1, 2: SEL], Output (1): [0: Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.MULTIPLEXER_2_TO_1, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_multiplexer_4_to_1",
+            description = "Add a 4-to-1 Multiplexer to the canvas. Inputs (6): [0..3: D0..D3, 4: SEL0, 5: SEL1], Output (1): [0: Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.MULTIPLEXER_4_TO_1, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_demultiplexer_1_to_2",
+            description = "Add a 1-to-2 Demultiplexer to the canvas. Inputs (2): [0: D, 1: SEL], Outputs (2): [0: Y0, 1: Y1].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.DEMULTIPLEXER_1_TO_2, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_demultiplexer_1_to_4",
+            description = "Add a 1-to-4 Demultiplexer to the canvas. Inputs (3): [0: D, 1: SEL0, 2: SEL1], Outputs (4): [0..3: Y0..Y3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.DEMULTIPLEXER_1_TO_4, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_decoder_2_to_4",
+            description = "Add a 2-to-4 active-HIGH Line Decoder to the canvas. Inputs (3): [0: A0, 1: A1, 2: EN], Outputs (4): [0..3: Y0..Y3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.DECODER_2_TO_4, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_decoder_3_to_8",
+            description = "Add a 3-to-8 active-HIGH Line Decoder to the canvas. Inputs (4): [0: A0, 1: A1, 2: A2, 3: EN], Outputs (8): [0..7: Y0..Y7].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.DECODER_3_TO_8, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_priority_encoder_4_to_2",
+            description = "Add a 4-to-2 Priority Encoder to the canvas. Inputs (4): [0..3: D0..D3], Outputs (3): [0: A0, 1: A1, 2: VALID].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.PRIORITY_ENCODER_4_TO_2, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_half_adder",
+            description = "Add a 1-bit Half Adder to the canvas. Inputs (2): [0: A, 1: B], Outputs (2): [0: SUM, 1: CARRY].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.HALF_ADDER, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_full_adder",
+            description = "Add a 1-bit Full Adder to the canvas. Inputs (3): [0: A, 1: B, 2: CIN], Outputs (2): [0: SUM, 1: COUT].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.FULL_ADDER, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_adder_4bit",
+            description = "Add a 4-bit Binary Full Adder to the canvas. Inputs (9): [0..3: A0..A3, 4..7: B0..B3, 8: CIN], Outputs (5): [0..3: S0..S3, 4: COUT].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.ADDER_4BIT, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_subtractor_4bit",
+            description = "Add a 4-bit Binary Subtractor to the canvas. Inputs (9): [0..3: A0..A3, 4..7: B0..B3, 8: BIN], Outputs (5): [0..3: D0..D3, 4: BOUT].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.SUBTRACTOR_4BIT, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_comparator_4bit",
+            description = "Add a 4-bit Magnitude Comparator to the canvas. Inputs (8): [0..3: A0..A3, 4..7: B0..B3], Outputs (3): [0: A_GT_B, 1: A_EQ_B, 2: A_LT_B].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.COMPARATOR_4BIT, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_negator_4bit",
+            description = "Add a 4-bit Two's Complement Negator (-A mod 16) to the canvas. Inputs (4): [0..3: A0..A3], Outputs (4): [0..3: Y0..Y3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.NEGATOR_4BIT, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_register_4bit",
+            description = "Add a 4-bit D Register to the canvas. Inputs (7): [0..3: D0..D3, 4: CLK, 5: EN, 6: CLR], Outputs (4): [0..3: Q0..Q3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.REGISTER_4BIT, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_counter_4bit",
+            description = "Add a 4-bit Up/Down Binary Counter to the canvas. Inputs (9): [0: CLK, 1: EN, 2: UP_DOWN, 3: CLR, 4: LOAD, 5..8: D0..D3], Outputs (5): [0..3: Q0..Q3, 4: RCO].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.COUNTER_4BIT, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_shift_register_4bit",
+            description = "Add a 4-bit Shift Register to the canvas. Inputs (8): [0: SER_IN, 1: CLK, 2: LOAD, 3: CLR, 4..7: D0..D3], Outputs (4): [0..3: Q0..Q3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.SHIFT_REGISTER_4BIT, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ram_16x4",
+            description = "Add a 16x4-bit Static RAM to the canvas. Inputs (10): [0..3: ADDR0..ADDR3, 4..7: DIN0..DIN3, 8: WE, 9: CLK], Outputs (4): [0..3: DOUT0..DOUT3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.RAM_16X4, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_rom_16x4",
+            description = "Add a 16x4-bit Read-Only Memory to the canvas. Inputs (4): [0..3: ADDR0..ADDR3], Outputs (4): [0..3: DOUT0..DOUT3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.ROM_16X4, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_led",
+            description = "Add a visual LED lamp indicator to the canvas. Input: 0, Outputs: none.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.LED, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_seven_segment_display",
+            description = "Add a 7-Segment Display to the canvas. Inputs (8): [0..6: segments a..g, 7: dp], Outputs: none.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.SEVEN_SEGMENT_DISPLAY, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_hex_digit_display",
+            description = "Add a 4-bit Hexadecimal Digit Display to the canvas. Inputs (5): [0..3: D0..D3 (0..F), 4: dp], Outputs: none.",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.HEX_DIGIT_DISPLAY, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_dip_switch_4bit",
+            description = "Add a 4-bit interactive DIP Switch bank to the canvas. Inputs: none, Outputs (4): [0..3: SW0..SW3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.DIP_SWITCH_4BIT, canvasViewModel = canvasViewModel)
         }
 
         // 6. Wiring, Component Modification, and Deletion

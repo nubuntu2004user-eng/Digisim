@@ -31,6 +31,7 @@ import com.example.digisim.Chips74.IC74151
 import com.example.digisim.Chips74.IC74157
 import com.example.digisim.Chips74.IC74266
 import com.example.digisim.Chips74.IC74283
+import com.example.digisim.StandardComponents.*
 import com.example.digisim.LogicGates.And
 import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Input
@@ -102,13 +103,13 @@ fun convertForSimulation(input : Component , clockManager : ClockManager): List<
             )
         )
         is RSFlipFlop -> return listOf(flipFlops.RSFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
-        is JKFlipFlop -> return listOf(flipFlops.JKFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
-        is DFlipFlop -> return listOf(flipFlops.DFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
-        is TFlipFlop -> return listOf(flipFlops.TFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
-        is JKFlipFlopAsync -> return listOf(flipFlops.JKFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
-        is SRFlipFlopAsync -> return listOf(flipFlops.SRFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
-        is DFlipFlopAsync -> return listOf(flipFlops.DFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
-        is TFlipFlopAsync -> return listOf(flipFlops.TFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin))
+        is JKFlipFlop -> return listOf(flipFlops.JKFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin, prevClock = input.prevClockPin))
+        is DFlipFlop -> return listOf(flipFlops.DFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin, prevClock = input.prevClockPin))
+        is TFlipFlop -> return listOf(flipFlops.TFlipFlop(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin, prevClock = input.prevClockPin))
+        is JKFlipFlopAsync -> return listOf(flipFlops.JKFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin, prevClock = input.prevClockPin))
+        is SRFlipFlopAsync -> return listOf(flipFlops.SRFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin, prevClock = input.prevClockPin))
+        is DFlipFlopAsync -> return listOf(flipFlops.DFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin, prevClock = input.prevClockPin))
+        is TFlipFlopAsync -> return listOf(flipFlops.TFlipFlopAsync(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf(), currentQ = input.outputPin, prevClock = input.prevClockPin))
         is IC7400 -> return listOf(chips74.IC7400(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC7402 -> return listOf(chips74.IC7402(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC7404 -> return listOf(chips74.IC7404(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
@@ -131,6 +132,53 @@ fun convertForSimulation(input : Component , clockManager : ClockManager): List<
         is IC74157 -> return listOf(chips74.IC74157(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC74266 -> return listOf(chips74.IC74266(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC74283 -> return listOf(chips74.IC74283(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is BufferGate -> return listOf(logicGates.Buffer(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf()))
+        is ControlledBufferGate -> return listOf(logicGates.ControlledBuffer(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf()))
+        is ControlledInverterGate -> return listOf(logicGates.ControlledInverter(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf()))
+        is OddParityGate -> return listOf(logicGates.OddParity(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf()))
+        is EvenParityGate -> return listOf(logicGates.EvenParity(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf()))
+        is ConstantHighPin -> return listOf(wiring.ConstantHigh(input.ID))
+        is ConstantLowPin -> return listOf(wiring.ConstantLow(input.ID))
+        is ProbePin -> return listOf(wiring.Probe(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf()))
+        is TunnelPin -> return listOf(wiring.Tunnel(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf()))
+        is Multiplexer2To1Comp -> return listOf(plexers.Multiplexer2To1(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Multiplexer4To1Comp -> return listOf(plexers.Multiplexer4To1(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Demultiplexer1To2Comp -> return listOf(plexers.Demultiplexer1To2(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Demultiplexer1To4Comp -> return listOf(plexers.Demultiplexer1To4(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Decoder2To4Comp -> return listOf(plexers.Decoder2To4(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Decoder3To8Comp -> return listOf(plexers.Decoder3To8(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is PriorityEncoder4To2Comp -> return listOf(plexers.PriorityEncoder4To2(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is HalfAdderComp -> return listOf(arithmetic.HalfAdder(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is FullAdderComp -> return listOf(arithmetic.FullAdder(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Adder4BitComp -> return listOf(arithmetic.Adder4Bit(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Subtractor4BitComp -> return listOf(arithmetic.Subtractor4Bit(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Comparator4BitComp -> return listOf(arithmetic.Comparator4Bit(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Negator4BitComp -> return listOf(arithmetic.Negator4Bit(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is Register4BitComp -> return listOf(memory.Register4Bit(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()).apply {
+            statefulClockPin = input.prevClockPin
+            statefulMemory = input.memoryData.toMutableList()
+        })
+        is Counter4BitComp -> return listOf(memory.Counter4Bit(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()).apply {
+            statefulClockPin = input.prevClockPin
+            statefulMemory = input.memoryData.toMutableList()
+        })
+        is ShiftRegister4BitComp -> return listOf(memory.ShiftRegister4Bit(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()).apply {
+            statefulClockPin = input.prevClockPin
+            statefulMemory = input.memoryData.toMutableList()
+        })
+        is Ram16x4Comp -> return listOf(memory.Ram16x4(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()).apply {
+            statefulClockPin = input.prevClockPin
+            statefulMemory = input.memoryData.toMutableList()
+        })
+        is Rom16x4Comp -> return listOf(memory.Rom16x4(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()).apply {
+            statefulMemory = input.memoryData.toMutableList()
+        })
+        is LedComp -> return listOf(wiring.Led(input.ID, mutableListOf(), mutableListOf(input.outputPin), input.inputCount, mutableListOf(), mutableListOf()))
+        is SevenSegmentDisplayComp -> return listOf(wiring.SevenSegmentDisplay(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is HexDigitDisplayComp -> return listOf(wiring.HexDigitDisplay(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is DipSwitch4BitComp -> return listOf(wiring.DipSwitch4Bit(input.ID, mutableListOf(), input.outputPins.toMutableList(), input.inputCount, mutableListOf(), mutableListOf()).apply {
+            statefulMemory = input.memoryData.toMutableList()
+        })
         else -> return null
     }
 }

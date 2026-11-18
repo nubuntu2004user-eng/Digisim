@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Input
+import com.example.digisim.StandardComponents.DipSwitch4BitComp
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.DragState
 import com.example.digisim.ParsingLogic.PortHit
@@ -50,6 +51,23 @@ internal fun pokeComponent(
         }
     } else if (hitGate is Button) {
         hitGate.press()
+        if (simulation != null && simulation.isRunning) {
+            if (scope != null) {
+                scope.launch {
+                    simulation.runSimulation(viewModel, scope, clockManager)
+                }
+            } else {
+                kotlinx.coroutines.runBlocking {
+                    simulation.runSimulation(viewModel, null, clockManager)
+                }
+            }
+        }
+    } else if (hitGate is DipSwitch4BitComp) {
+        val outPositions = hitGate.outputPortPositions()
+        val closestIndex = outPositions.indices.minByOrNull { idx ->
+            kotlin.math.abs(worldPosition.y - outPositions[idx].y)
+        } ?: 0
+        hitGate.toggleSwitch(closestIndex)
         if (simulation != null && simulation.isRunning) {
             if (scope != null) {
                 scope.launch {

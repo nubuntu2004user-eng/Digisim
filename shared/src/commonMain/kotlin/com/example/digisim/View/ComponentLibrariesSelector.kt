@@ -94,15 +94,14 @@ fun componentLibraries(
             }
         )
 
-        // Category Tabs Bar
-        Row(
+        // Category Tabs Bar (FlowRow so all library tabs remain visible without horizontal clipping)
+        FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(settings.panelBackgroundColor)
-                .horizontalScroll(rememberScrollState())
                 .padding(horizontal = 10.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             libraryViewModel.libraries.forEachIndexed { idx, lib ->
                 val isSelected = idx == safeIndex
@@ -118,11 +117,15 @@ fun componentLibraries(
         SwissHorizontalDivider(settings)
 
         // Component Grid List
+        val gridScrollState = rememberScrollState()
+        LaunchedEffect(safeIndex) {
+            gridScrollState.scrollTo(0)
+        }
         Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(gridScrollState)
                 .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

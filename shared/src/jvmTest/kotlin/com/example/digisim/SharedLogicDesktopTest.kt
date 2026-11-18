@@ -54,25 +54,54 @@ class SharedLogicDesktopTest {
 
         // 1. Check "Gates" library (default tab)
         val expectedGates = listOf(
-            "NOT Gate", "AND Gate", "OR Gate", "NAND Gate", "NOR Gate", "XOR Gate", "XNOR Gate"
+            "NOT Gate", "Buffer", "AND Gate", "OR Gate", "NAND Gate", "NOR Gate",
+            "XOR Gate", "XNOR Gate", "Tri-State Buffer", "Tri-State Inverter", "Odd Parity", "Even Parity"
         )
         for (gateName in expectedGates) {
-            val node = onNodeWithText(gateName).assertExists().assertIsDisplayed()
+            val node = onNodeWithText(gateName).assertExists().performScrollTo().assertIsDisplayed()
             val bounds = node.fetchSemanticsNode().boundsInRoot
             assertTrue(bounds.width > 10f, "Expected $gateName to have visible width, got ${bounds.width}")
             assertTrue(bounds.right <= 330f, "Expected $gateName to fit inside sidebar, got right=${bounds.right}")
         }
 
-        // 2. Click "Wiring" tab and verify all 4 components are visible
+        // 2. Click "Wiring" tab and verify all 8 components are visible
         onNodeWithText("Wiring").performClick()
         waitForIdle()
 
-        val expectedWiring = listOf("Input pin", "Button", "Output pin", "Clock")
+        val expectedWiring = listOf(
+            "Input pin", "Button", "Output pin", "Clock",
+            "Constant 1 (VCC)", "Constant 0 (GND)", "Probe", "Tunnel"
+        )
         for (itemName in expectedWiring) {
-            val node = onNodeWithText(itemName).assertExists().assertIsDisplayed()
+            val node = onNodeWithText(itemName).assertExists().performScrollTo().assertIsDisplayed()
             val bounds = node.fetchSemanticsNode().boundsInRoot
             assertTrue(bounds.width > 10f, "Expected $itemName to have visible width, got ${bounds.width}")
             assertTrue(bounds.right <= 330f, "Expected $itemName to fit inside sidebar, got right=${bounds.right}")
+        }
+
+        // 2b. Click "Plexers", "Arithmetic", "Memory", and "I/O" tabs and verify components
+        onNodeWithText("Plexers").performClick()
+        waitForIdle()
+        for (itemName in listOf("MUX 2:1", "MUX 4:1", "DEMUX 1:2", "Decoder 2:4", "Priority Encoder")) {
+            onNodeWithText(itemName).assertExists().performScrollTo().assertIsDisplayed()
+        }
+
+        onNodeWithText("Arithmetic").performClick()
+        waitForIdle()
+        for (itemName in listOf("Half Adder", "Full Adder", "4-Bit Adder", "4-Bit Subtractor", "4-Bit Comparator", "4-Bit Negator")) {
+            onNodeWithText(itemName).assertExists().performScrollTo().assertIsDisplayed()
+        }
+
+        onNodeWithText("Memory").performClick()
+        waitForIdle()
+        for (itemName in listOf("4-Bit Register", "4-Bit Counter", "4-Bit Shift Reg", "RAM 16x4", "ROM 16x4")) {
+            onNodeWithText(itemName).assertExists().performScrollTo().assertIsDisplayed()
+        }
+
+        onNodeWithText("I/O").performClick()
+        waitForIdle()
+        for (itemName in listOf("LED", "7-Segment", "Hex Display", "4-Bit DIP Switch")) {
+            onNodeWithText(itemName).assertExists().performScrollTo().assertIsDisplayed()
         }
 
         // 3. Click "Flip-Flops" tab and verify flip-flop items exist
@@ -424,5 +453,473 @@ class SharedLogicDesktopTest {
         assertEquals(Pin.HIGH, setIn.outputPin)
         assertEquals(Pin.HIGH, dAsync.outputPin)
         assertEquals(Pin.HIGH, qOut.outputPin)
+    }
+
+    /**
+     * Playwright-style Test 5:
+     * Combines Memory ("4-Bit Counter"), I/O ("Hex Display" + "LED"), and Wiring ("Input pin")
+     * via UI clicks, wires the 4-bit counter outputs to the Hex Display and LED, and pokes the clock
+     * input across multiple ticks to verify the counter advances (0 -> 1 -> 2 -> 3) in the UI.
+     */
+    @Test
+    fun testBuildAndSimulate4BitCounterWithHexDisplayAndLedViaUiClicks() = runComposeUiTest {
+        val viewModel = CanvasViewModel()
+        val simulation = SimulationViewModel()
+        val librariesVm = ComponentLibrariesViewModel()
+        val clockManager = ClockManager()
+        val translationVm = TranslationViewModel()
+        val appState = AppState()
+
+        setContent {
+            Box(modifier = Modifier.size(1280.dp, 820.dp)) {
+                App(
+                    viewModel = viewModel,
+                    simulation = simulation,
+                    librariesViewModel = librariesVm,
+                    clockManager = clockManager,
+                    translationViewModel = translationVm,
+                    appState = appState
+                )
+            }
+        }
+        waitForIdle()
+
+        val canvasNode = onNodeWithTag("logic_canvas").assertExists()
+
+        // 1. Place Input pin (Clock pulse source) at (100, 140)
+        onNodeWithText("Wiring").performClick()
+        waitForIdle()
+        onNodeWithText("Input pin").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(100f, 140f)) }
+        waitForIdle()
+
+        // 2. Place 4-Bit Counter from "Memory" tab at (280, 160)
+        onNodeWithText("Memory").performClick()
+        waitForIdle()
+        onNodeWithText("4-Bit Counter").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(280f, 160f)) }
+        waitForIdle()
+
+        // 3. Place Hex Display at (480, 140) and LED at (480, 320) from "I/O" tab
+        onNodeWithText("I/O").performClick()
+        waitForIdle()
+        onNodeWithText("Hex Display").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(480f, 140f)) }
+        waitForIdle()
+
+        onNodeWithText("LED").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(480f, 320f)) }
+        waitForIdle()
+
+        assertEquals(4, viewModel.components.size)
+        val clkPin = viewModel.components[0]
+        val counter = viewModel.components[1]
+        val hexDisplay = viewModel.components[2]
+        val led = viewModel.components[3]
+
+        assertEquals(ComponentType.COUNTER_4BIT, counter.componentType)
+        assertEquals(ComponentType.HEX_DIGIT_DISPLAY, hexDisplay.componentType)
+        assertEquals(ComponentType.LED, led.componentType)
+
+        // 4. Switch to Wire mode and wire Clock -> Counter[0], Counter Q0..Q3 -> Hex Display D0..D3, Counter Q0 -> LED
+        onNodeWithText("Wire").performClick()
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(clkPin.findPortOffset()) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(counter.inputPortPositions()[0]) }
+        waitForIdle()
+
+        for (bit in 0..3) {
+            canvasNode.performMouseInput { click(counter.outputPortPositions()[bit]) }
+            waitForIdle()
+            canvasNode.performMouseInput { click(hexDisplay.inputPortPositions()[bit]) }
+            waitForIdle()
+        }
+
+        canvasNode.performMouseInput { click(counter.outputPortPositions()[0]) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(led.findPortOffset()) }
+        waitForIdle()
+
+        assertEquals(6, viewModel.wires.size)
+
+        // 5. Start simulation and poke clkPin to generate rising edges
+        onNodeWithText("Start").performClick()
+        waitForIdle()
+        assertEquals(0, counter.memoryData.first())
+        assertEquals(Pin.LOW, led.outputPin)
+
+        val clkCenter = Offset(clkPin.x + clkPin.width / 2f, clkPin.y + clkPin.height / 2f)
+
+        // Rising edge 1 -> Count = 1 (Q0=HIGH, Q1=LOW), LED=HIGH
+        canvasNode.performMouseInput { click(clkCenter) }
+        waitForIdle()
+        assertEquals(1, counter.memoryData.first())
+        assertEquals(Pin.HIGH, led.outputPin)
+        assertEquals(Pin.HIGH, hexDisplay.inputPins[0])
+        assertEquals(Pin.LOW, hexDisplay.inputPins[1])
+
+        // Falling edge -> Count holds at 1
+        canvasNode.performMouseInput { click(clkCenter) }
+        waitForIdle()
+        assertEquals(1, counter.memoryData.first())
+
+        // Rising edge 2 -> Count = 2 (Q0=LOW, Q1=HIGH), LED=LOW
+        canvasNode.performMouseInput { click(clkCenter) }
+        waitForIdle()
+        assertEquals(2, counter.memoryData.first())
+        assertEquals(Pin.LOW, led.outputPin)
+        assertEquals(Pin.LOW, hexDisplay.inputPins[0])
+        assertEquals(Pin.HIGH, hexDisplay.inputPins[1])
+    }
+
+    /**
+     * Playwright-style Test 6:
+     * Combines Plexers ("MUX 2:1") with Wiring ("Constant 0 (GND)", "Constant 1 (VCC)", "Input pin", "Probe")
+     * via UI clicks and verifies the Probe toggles from 0 to 1 when the MUX select pin is poked.
+     */
+    @Test
+    fun testBuildAndSimulateMux2To1WithConstantPinsAndProbeViaUiClicks() = runComposeUiTest {
+        val viewModel = CanvasViewModel()
+        val simulation = SimulationViewModel()
+        val librariesVm = ComponentLibrariesViewModel()
+        val clockManager = ClockManager()
+        val translationVm = TranslationViewModel()
+        val appState = AppState()
+
+        setContent {
+            Box(modifier = Modifier.size(1280.dp, 820.dp)) {
+                App(
+                    viewModel = viewModel,
+                    simulation = simulation,
+                    librariesViewModel = librariesVm,
+                    clockManager = clockManager,
+                    translationViewModel = translationVm,
+                    appState = appState
+                )
+            }
+        }
+        waitForIdle()
+
+        val canvasNode = onNodeWithTag("logic_canvas").assertExists()
+
+        // 1. Place Constant 0 (GND), Constant 1 (VCC), Input pin (SEL), and Probe from "Wiring" tab
+        onNodeWithText("Wiring").performClick()
+        waitForIdle()
+
+        onNodeWithText("Constant 0 (GND)").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(100f, 80f)) }
+        waitForIdle()
+
+        onNodeWithText("Constant 1 (VCC)").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(100f, 180f)) }
+        waitForIdle()
+
+        onNodeWithText("Input pin").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(100f, 280f)) }
+        waitForIdle()
+
+        onNodeWithText("Probe").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(460f, 160f)) }
+        waitForIdle()
+
+        // 2. Place MUX 2:1 from "Plexers" tab at (280, 160)
+        onNodeWithText("Plexers").performClick()
+        waitForIdle()
+        onNodeWithText("MUX 2:1").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(280f, 160f)) }
+        waitForIdle()
+
+        assertEquals(5, viewModel.components.size)
+        val gnd = viewModel.components[0]
+        val vcc = viewModel.components[1]
+        val selPin = viewModel.components[2]
+        val probe = viewModel.components[3]
+        val mux = viewModel.components[4]
+
+        // 3. Wire GND -> MUX D0 (0), VCC -> MUX D1 (1), SEL -> MUX S (2), MUX Y (0) -> Probe
+        onNodeWithText("Wire").performClick()
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(gnd.findPortOffset()) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(mux.inputPortPositions()[0]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(vcc.findPortOffset()) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(mux.inputPortPositions()[1]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(selPin.findPortOffset()) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(mux.inputPortPositions()[2]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(mux.outputPortPositions()[0]) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(probe.findPortOffset()) }
+        waitForIdle()
+
+        assertEquals(4, viewModel.wires.size)
+
+        // 4. Start simulation: SEL=LOW selects D0 (GND=LOW) -> Probe=LOW
+        onNodeWithText("Start").performClick()
+        waitForIdle()
+        assertEquals(Pin.LOW, probe.outputPin)
+
+        // 5. Poke SEL Input pin -> SEL=HIGH selects D1 (VCC=HIGH) -> Probe=HIGH
+        val selCenter = Offset(selPin.x + selPin.width / 2f, selPin.y + selPin.height / 2f)
+        canvasNode.performMouseInput { click(selCenter) }
+        waitForIdle()
+        assertEquals(Pin.HIGH, selPin.outputPin)
+        assertEquals(Pin.HIGH, mux.outputPin)
+        assertEquals(Pin.HIGH, probe.outputPin)
+    }
+
+    /**
+     * Playwright-style Test 7:
+     * Combines I/O ("4-Bit DIP Switch") with Arithmetic ("Half Adder") and Wiring ("Output pin")
+     * via UI clicks, and pokes individual switches on the 4-Bit DIP Switch bank on the canvas
+     * to verify the Half Adder SUM and CARRY outputs update in real time.
+     */
+    @Test
+    fun testBuildAndSimulateDipSwitchAndHalfAdderViaUiClicks() = runComposeUiTest {
+        val viewModel = CanvasViewModel()
+        val simulation = SimulationViewModel()
+        val librariesVm = ComponentLibrariesViewModel()
+        val clockManager = ClockManager()
+        val translationVm = TranslationViewModel()
+        val appState = AppState()
+
+        setContent {
+            Box(modifier = Modifier.size(1280.dp, 820.dp)) {
+                App(
+                    viewModel = viewModel,
+                    simulation = simulation,
+                    librariesViewModel = librariesVm,
+                    clockManager = clockManager,
+                    translationViewModel = translationVm,
+                    appState = appState
+                )
+            }
+        }
+        waitForIdle()
+
+        val canvasNode = onNodeWithTag("logic_canvas").assertExists()
+
+        // 1. Place 4-Bit DIP Switch from "I/O" tab at (100, 140)
+        onNodeWithText("I/O").performClick()
+        waitForIdle()
+        onNodeWithText("4-Bit DIP Switch").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(100f, 140f)) }
+        waitForIdle()
+
+        // 2. Place Half Adder from "Arithmetic" tab at (280, 140)
+        onNodeWithText("Arithmetic").performClick()
+        waitForIdle()
+        onNodeWithText("Half Adder").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(280f, 140f)) }
+        waitForIdle()
+
+        // 3. Place two Output pins (SUM and CARRY) at (460, 100) and (460, 220)
+        onNodeWithText("Wiring").performClick()
+        waitForIdle()
+        onNodeWithText("Output pin").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(460f, 100f)) }
+        waitForIdle()
+
+        onNodeWithText("Output pin").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(460f, 220f)) }
+        waitForIdle()
+
+        assertEquals(4, viewModel.components.size)
+        val dipSwitch = viewModel.components[0]
+        val halfAdder = viewModel.components[1]
+        val sumOut = viewModel.components[2]
+        val carryOut = viewModel.components[3]
+
+        // 4. Wire DIP SW0 -> HalfAdder A (0), DIP SW1 -> HalfAdder B (1), HalfAdder S (0) -> sumOut, HalfAdder C (1) -> carryOut
+        onNodeWithText("Wire").performClick()
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(dipSwitch.outputPortPositions()[0]) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(halfAdder.inputPortPositions()[0]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(dipSwitch.outputPortPositions()[1]) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(halfAdder.inputPortPositions()[1]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(halfAdder.outputPortPositions()[0]) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(sumOut.findPortOffset()) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(halfAdder.outputPortPositions()[1]) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(carryOut.findPortOffset()) }
+        waitForIdle()
+
+        assertEquals(4, viewModel.wires.size)
+
+        // 5. Start simulation: initially SW0=0, SW1=0 -> SUM=LOW, CARRY=LOW
+        onNodeWithText("Start").performClick()
+        waitForIdle()
+        assertEquals(Pin.LOW, sumOut.outputPin)
+        assertEquals(Pin.LOW, carryOut.outputPin)
+
+        // 6. Poke SW0 row on the DIP Switch -> SW0=1, SW1=0 -> SUM=HIGH, CARRY=LOW
+        val sw0Pos = Offset(dipSwitch.x + dipSwitch.width / 2f, dipSwitch.outputPortPositions()[0].y)
+        val sw1Pos = Offset(dipSwitch.x + dipSwitch.width / 2f, dipSwitch.outputPortPositions()[1].y)
+
+        canvasNode.performMouseInput { click(sw0Pos) }
+        waitForIdle()
+        assertEquals(Pin.HIGH, sumOut.outputPin)
+        assertEquals(Pin.LOW, carryOut.outputPin)
+
+        // 7. Poke SW1 row on the DIP Switch -> SW0=1, SW1=1 -> SUM=LOW, CARRY=HIGH
+        canvasNode.performMouseInput { click(sw1Pos) }
+        waitForIdle()
+        assertEquals(Pin.LOW, sumOut.outputPin)
+        assertEquals(Pin.HIGH, carryOut.outputPin)
+    }
+
+    /**
+     * Playwright-style Test 8:
+     * Combines 74** TTL ("7404" Hex Inverter IC) with Gates ("Buffer") and Wiring ("Constant 0 (GND)",
+     * "Constant 1 (VCC)", "Input pin", "Output pin") via UI clicks and verifies the chain simulation.
+     */
+    @Test
+    fun testBuildAndSimulate7404WithBufferAndPowerRailsViaUiClicks() = runComposeUiTest {
+        val viewModel = CanvasViewModel()
+        val simulation = SimulationViewModel()
+        val librariesVm = ComponentLibrariesViewModel()
+        val clockManager = ClockManager()
+        val translationVm = TranslationViewModel()
+        val appState = AppState()
+
+        setContent {
+            Box(modifier = Modifier.size(1280.dp, 820.dp)) {
+                App(
+                    viewModel = viewModel,
+                    simulation = simulation,
+                    librariesViewModel = librariesVm,
+                    clockManager = clockManager,
+                    translationViewModel = translationVm,
+                    appState = appState
+                )
+            }
+        }
+        waitForIdle()
+
+        val canvasNode = onNodeWithTag("logic_canvas").assertExists()
+
+        // 1. Place Input pin, GND, VCC, and Output pin from "Wiring" tab
+        onNodeWithText("Wiring").performClick()
+        waitForIdle()
+
+        onNodeWithText("Input pin").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(80f, 80f)) }
+        waitForIdle()
+
+        onNodeWithText("Constant 0 (GND)").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(80f, 220f)) }
+        waitForIdle()
+
+        onNodeWithText("Constant 1 (VCC)").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(80f, 320f)) }
+        waitForIdle()
+
+        onNodeWithText("Output pin").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(620f, 120f)) }
+        waitForIdle()
+
+        // 2. Place 7404 Hex Inverter IC from "74**" tab at (260, 140)
+        onNodeWithText("74**").performClick()
+        waitForIdle()
+        onNodeWithText("7404").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(260f, 140f)) }
+        waitForIdle()
+
+        // 3. Place Buffer from "Gates" tab at (460, 120)
+        onNodeWithText("Gates").performClick()
+        waitForIdle()
+        onNodeWithText("Buffer").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(460f, 120f)) }
+        waitForIdle()
+
+        assertEquals(6, viewModel.components.size)
+        val inPin = viewModel.components[0]
+        val gnd = viewModel.components[1]
+        val vcc = viewModel.components[2]
+        val outPin = viewModel.components[3]
+        val ic7404 = viewModel.components[4]
+        val buffer = viewModel.components[5]
+
+        // 4. Wire inPin -> 7404 1A (0), GND -> 7404 GND (3), VCC -> 7404 VCC (7), 7404 1Y (0) -> Buffer (0), Buffer (0) -> outPin
+        onNodeWithText("Wire").performClick()
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(inPin.findPortOffset()) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(ic7404.inputPortPositions()[0]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(gnd.findPortOffset()) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(ic7404.inputPortPositions()[3]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(vcc.findPortOffset()) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(ic7404.inputPortPositions()[7]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(ic7404.outputPortPositions()[0]) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(buffer.inputPortPositions()[0]) }
+        waitForIdle()
+
+        canvasNode.performMouseInput { click(buffer.outputPortPositions()[0]) }
+        waitForIdle()
+        canvasNode.performMouseInput { click(outPin.findPortOffset()) }
+        waitForIdle()
+
+        assertEquals(5, viewModel.wires.size)
+
+        // 5. Start simulation: inPin=LOW -> 7404 1Y=HIGH -> Buffer=HIGH -> outPin=HIGH
+        onNodeWithText("Start").performClick()
+        waitForIdle()
+        assertEquals(Pin.HIGH, outPin.outputPin)
+
+        // 6. Poke inPin -> inPin=HIGH -> 7404 1Y=LOW -> Buffer=LOW -> outPin=LOW
+        val inCenter = Offset(inPin.x + inPin.width / 2f, inPin.y + inPin.height / 2f)
+        canvasNode.performMouseInput { click(inCenter) }
+        waitForIdle()
+        assertEquals(Pin.HIGH, inPin.outputPin)
+        assertEquals(Pin.LOW, outPin.outputPin)
     }
 }

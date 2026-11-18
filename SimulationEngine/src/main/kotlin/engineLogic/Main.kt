@@ -8,18 +8,24 @@ suspend fun computeSimulation ( input : MutableList<MutableList<SimulationCompon
     val result = input.reversed().toMutableList()
     for (stage in result){
         for (element in stage){
-            if (element.componentType == ComponentType.INPUT || element.componentType == ComponentType.BUTTON) {
+            if (element.componentType == ComponentType.INPUT ||
+                element.componentType == ComponentType.BUTTON ||
+                element.componentType == ComponentType.CONSTANT_HIGH ||
+                element.componentType == ComponentType.CONSTANT_LOW ||
+                element.componentType == ComponentType.DIP_SWITCH_4BIT
+            ) {
                 val evalList = element.evaluate()
                 val outVal = evalList.firstOrNull() ?: Pin.LOW
-                if (element.componentType == ComponentType.INPUT) {
-                    element.output = mutableListOf(outVal)
+                if (element.componentType != ComponentType.BUTTON) {
+                    element.output = evalList
                 }
                 for (i in element.outputTo) {
-                    i.value = outVal
+                    val portVal = evalList.getOrElse(i.sourcePortId) { outVal }
+                    i.value = portVal
                     for (downstreamStage in result) {
                         for (downstreamElem in downstreamStage) {
                             if (downstreamElem.id == i.targetGateId) {
-                                downstreamElem.inputFrom.filter { it.sourceGateId == element.id && it.portId == i.portId }.forEach { it.value = outVal }
+                                downstreamElem.inputFrom.filter { it.sourceGateId == element.id && it.portId == i.portId }.forEach { it.value = portVal }
                             }
                         }
                     }

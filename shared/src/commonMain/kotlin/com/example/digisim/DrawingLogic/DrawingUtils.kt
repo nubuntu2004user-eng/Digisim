@@ -48,6 +48,15 @@ import com.example.digisim.ComponentsDrawing.drawIC74151
 import com.example.digisim.ComponentsDrawing.drawIC74157
 import com.example.digisim.ComponentsDrawing.drawIC74266
 import com.example.digisim.ComponentsDrawing.drawIC74283
+import com.example.digisim.ComponentsDrawing.drawBufferGate
+import com.example.digisim.ComponentsDrawing.drawConstantPin
+import com.example.digisim.ComponentsDrawing.drawDipSwitch4Bit
+import com.example.digisim.ComponentsDrawing.drawLedComponent
+import com.example.digisim.ComponentsDrawing.drawParityGate
+import com.example.digisim.ComponentsDrawing.drawProbeComponent
+import com.example.digisim.ComponentsDrawing.drawSevenSegmentComponent
+import com.example.digisim.ComponentsDrawing.drawStandardBlock
+import com.example.digisim.ComponentsDrawing.drawTunnelComponent
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
@@ -110,16 +119,24 @@ internal fun DrawScope.drawWire(
     color: Color,
 ) {
 
-    val sourcePos = if (sourceComponent.componentType == ComponentType.INPUT || sourceComponent.componentType == ComponentType.CLOCK || sourceComponent.componentType == ComponentType.BUTTON) {
+    val sourcePos = if (sourceComponent.componentType == ComponentType.INPUT ||
+        sourceComponent.componentType == ComponentType.CLOCK ||
+        sourceComponent.componentType == ComponentType.BUTTON ||
+        sourceComponent.componentType == ComponentType.CONSTANT_HIGH ||
+        sourceComponent.componentType == ComponentType.CONSTANT_LOW
+    ) {
         sourceComponent.findPortOffset()
     } else {
-        sourceComponent.outputPortPositions()[sourcePortIndex]
+        sourceComponent.outputPortPositions().getOrElse(sourcePortIndex) { sourceComponent.findPortOffset() }
     }
 
-    val targetPos = if (targetComponent.componentType == ComponentType.OUTPUT) {
+    val targetPos = if (targetComponent.componentType == ComponentType.OUTPUT ||
+        targetComponent.componentType == ComponentType.PROBE ||
+        targetComponent.componentType == ComponentType.LED
+    ) {
         targetComponent.findPortOffset()
     } else {
-        targetComponent.inputPortPositions()[targetPortIndex]
+        targetComponent.inputPortPositions().getOrElse(targetPortIndex) { targetComponent.findPortOffset() }
     }
 
     val midX = (sourcePos.x + targetPos.x) / 2f
@@ -184,6 +201,73 @@ fun DrawScope.drawComponent(
         ComponentType.IC_74157 -> { drawIC74157(component, textMeasurer, settings) }
         ComponentType.IC_74266 -> { drawIC74266(component, textMeasurer, settings) }
         ComponentType.IC_74283 -> { drawIC74283(component, textMeasurer, settings) }
+        ComponentType.BUFFER -> { drawBufferGate(component, textMeasurer, settings, inverting = false, controlled = false) }
+        ComponentType.CONTROLLED_BUFFER -> { drawBufferGate(component, textMeasurer, settings, inverting = false, controlled = true) }
+        ComponentType.CONTROLLED_INVERTER -> { drawBufferGate(component, textMeasurer, settings, inverting = true, controlled = true) }
+        ComponentType.ODD_PARITY -> { drawParityGate(component, textMeasurer, settings, isOdd = true) }
+        ComponentType.EVEN_PARITY -> { drawParityGate(component, textMeasurer, settings, isOdd = false) }
+        ComponentType.CONSTANT_HIGH -> { drawConstantPin(component, textMeasurer, settings, isHigh = true) }
+        ComponentType.CONSTANT_LOW -> { drawConstantPin(component, textMeasurer, settings, isHigh = false) }
+        ComponentType.PROBE -> { drawProbeComponent(component, textMeasurer, settings) }
+        ComponentType.TUNNEL -> { drawTunnelComponent(component, textMeasurer, settings) }
+        ComponentType.MULTIPLEXER_2_TO_1 -> {
+            drawStandardBlock(component, textMeasurer, settings, "MUX", "2:1", listOf("D0", "D1", "S"), listOf("Y"))
+        }
+        ComponentType.MULTIPLEXER_4_TO_1 -> {
+            drawStandardBlock(component, textMeasurer, settings, "MUX", "4:1", listOf("D0", "D1", "D2", "D3", "S0", "S1"), listOf("Y"))
+        }
+        ComponentType.DEMULTIPLEXER_1_TO_2 -> {
+            drawStandardBlock(component, textMeasurer, settings, "DEMUX", "1:2", listOf("D", "S"), listOf("Y0", "Y1"))
+        }
+        ComponentType.DEMULTIPLEXER_1_TO_4 -> {
+            drawStandardBlock(component, textMeasurer, settings, "DEMUX", "1:4", listOf("D", "S0", "S1"), listOf("Y0", "Y1", "Y2", "Y3"))
+        }
+        ComponentType.DECODER_2_TO_4 -> {
+            drawStandardBlock(component, textMeasurer, settings, "DECOD", "2:4", listOf("A0", "A1", "EN"), listOf("Y0", "Y1", "Y2", "Y3"))
+        }
+        ComponentType.DECODER_3_TO_8 -> {
+            drawStandardBlock(component, textMeasurer, settings, "DECOD", "3:8", listOf("A0", "A1", "A2", "EN"), listOf("Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"))
+        }
+        ComponentType.PRIORITY_ENCODER_4_TO_2 -> {
+            drawStandardBlock(component, textMeasurer, settings, "P-ENC", "4:2", listOf("D0", "D1", "D2", "D3"), listOf("A0", "A1", "V"))
+        }
+        ComponentType.HALF_ADDER -> {
+            drawStandardBlock(component, textMeasurer, settings, "H-ADD", "1-BIT", listOf("A", "B"), listOf("S", "C"))
+        }
+        ComponentType.FULL_ADDER -> {
+            drawStandardBlock(component, textMeasurer, settings, "F-ADD", "1-BIT", listOf("A", "B", "CI"), listOf("S", "CO"))
+        }
+        ComponentType.ADDER_4BIT -> {
+            drawStandardBlock(component, textMeasurer, settings, "ADDER", "4-BIT", listOf("A0", "A1", "A2", "A3", "B0", "B1", "B2", "B3", "CI"), listOf("S0", "S1", "S2", "S3", "CO"))
+        }
+        ComponentType.SUBTRACTOR_4BIT -> {
+            drawStandardBlock(component, textMeasurer, settings, "SUB", "4-BIT", listOf("A0", "A1", "A2", "A3", "B0", "B1", "B2", "B3", "BI"), listOf("D0", "D1", "D2", "D3", "BO"))
+        }
+        ComponentType.COMPARATOR_4BIT -> {
+            drawStandardBlock(component, textMeasurer, settings, "COMP", "4-BIT", listOf("A0", "A1", "A2", "A3", "B0", "B1", "B2", "B3"), listOf(">", "=", "<"))
+        }
+        ComponentType.NEGATOR_4BIT -> {
+            drawStandardBlock(component, textMeasurer, settings, "-A", "4-BIT", listOf("A0", "A1", "A2", "A3"), listOf("Y0", "Y1", "Y2", "Y3"))
+        }
+        ComponentType.REGISTER_4BIT -> {
+            drawStandardBlock(component, textMeasurer, settings, "REG", "4-BIT", listOf("D0", "D1", "D2", "D3", "CK", "EN", "CL"), listOf("Q0", "Q1", "Q2", "Q3"))
+        }
+        ComponentType.COUNTER_4BIT -> {
+            drawStandardBlock(component, textMeasurer, settings, "CNT", "4-BIT", listOf("CK", "EN", "U/D", "CL", "LD", "D0", "D1", "D2", "D3"), listOf("Q0", "Q1", "Q2", "Q3", "RC"))
+        }
+        ComponentType.SHIFT_REGISTER_4BIT -> {
+            drawStandardBlock(component, textMeasurer, settings, "SH-REG", "4-BIT", listOf("SI", "CK", "LD", "CL", "D0", "D1", "D2", "D3"), listOf("Q0", "Q1", "Q2", "Q3"))
+        }
+        ComponentType.RAM_16X4 -> {
+            drawStandardBlock(component, textMeasurer, settings, "RAM", "16x4", listOf("A0", "A1", "A2", "A3", "D0", "D1", "D2", "D3", "WE", "CK"), listOf("Q0", "Q1", "Q2", "Q3"))
+        }
+        ComponentType.ROM_16X4 -> {
+            drawStandardBlock(component, textMeasurer, settings, "ROM", "16x4", listOf("A0", "A1", "A2", "A3"), listOf("Q0", "Q1", "Q2", "Q3"))
+        }
+        ComponentType.LED -> { drawLedComponent(component, textMeasurer, settings) }
+        ComponentType.SEVEN_SEGMENT_DISPLAY -> { drawSevenSegmentComponent(component, textMeasurer, settings, isHexDecoded = false) }
+        ComponentType.HEX_DIGIT_DISPLAY -> { drawSevenSegmentComponent(component, textMeasurer, settings, isHexDecoded = true) }
+        ComponentType.DIP_SWITCH_4BIT -> { drawDipSwitch4Bit(component, textMeasurer, settings) }
         ComponentType.CUSTOM -> { drawCustomComponent(component, textMeasurer, settings) }
     }
 }

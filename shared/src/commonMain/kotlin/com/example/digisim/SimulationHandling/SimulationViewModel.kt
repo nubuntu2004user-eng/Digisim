@@ -49,10 +49,11 @@ class SimulationViewModel : ViewModel() {
     }
     suspend fun runSimulation(viewModel: CanvasViewModel, scope: CoroutineScope? = null , clockManager: ClockManager) {
         val action: suspend () -> Unit = {
-            val tmp = splitToStages(viewModel)
+            val allWires = effectiveWires(viewModel)
+            val tmp = splitToStages(viewModel, allWires)
             if (tmp.isNotEmpty() && tmp.any { it.isNotEmpty() }) {
-                val splitToStages = convertCircuit(tmp, viewModel.wires, clockManager)
-                val mappedToWires = mapWires(splitToStages, viewModel)
+                val splitToStages = convertCircuit(tmp, allWires, clockManager)
+                val mappedToWires = mapWires(splitToStages, allWires)
                 val result = computeSimulation(mappedToWires)
                 clockManager.tick += 1
                 componentsState.clear()
@@ -63,6 +64,24 @@ class SimulationViewModel : ViewModel() {
                         if (comp != null) {
                             val pin = elem.output.firstOrNull() ?: (if (elem.componentType == logicGates.ComponentType.OUTPUT) elem.inputs.firstOrNull() ?: Pin.LOW else Pin.LOW)
                             comp.outputPin = pin
+                            comp.inputPins.clear()
+                            comp.inputPins.addAll(elem.inputs)
+                            comp.outputPins.clear()
+                            comp.outputPins.addAll(elem.output)
+                            if (elem.statefulMemory.isNotEmpty()) {
+                                comp.memoryData.clear()
+                                comp.memoryData.addAll(elem.statefulMemory)
+                            }
+                            comp.prevClockPin = when (elem) {
+                                is flipFlops.JKFlipFlop -> elem.prevClock
+                                is flipFlops.DFlipFlop -> elem.prevClock
+                                is flipFlops.TFlipFlop -> elem.prevClock
+                                is flipFlops.JKFlipFlopAsync -> elem.prevClock
+                                is flipFlops.SRFlipFlopAsync -> elem.prevClock
+                                is flipFlops.DFlipFlopAsync -> elem.prevClock
+                                is flipFlops.TFlipFlopAsync -> elem.prevClock
+                                else -> elem.statefulClockPin
+                            }
                         }
                     }
                 }
@@ -83,16 +102,56 @@ class SimulationViewModel : ViewModel() {
         }
     }
 
-    private fun splitToStages(viewModel: CanvasViewModel): MutableList<MutableList<Component>> {
+    private fun effectiveWires(viewModel: CanvasViewModel): List<Wire> {
+        val baseWires = viewModel.wires.toMutableList()
+        val tunnels = viewModel.components.filter { it.componentType == ComponentType.TUNNEL && it.label.isNotBlank() }
+        if (tunnels.size >= 2) {
+            val drivers = tunnels.filter { tx -> baseWires.any { it.targetGateId == tx.ID } }
+            for (tx in drivers) {
+                val receivers = tunnels.filter { rx ->
+                    rx.ID != tx.ID && rx.label == tx.label && baseWires.none { it.targetGateId == rx.ID }
+                }
+                for (rx in receivers) {
+                    baseWires.add(
+                        Wire(
+                            id = -1,
+                            sourceGateId = tx.ID,
+                            sourcePortIndex = 0,
+                            targetGateId = rx.ID,
+                            targetPortIndex = 0
+                        )
+                    )
+                }
+            }
+        }
+        return baseWires
+    }
+
+    private fun splitToStages(viewModel: CanvasViewModel, wires: List<Wire> = effectiveWires(viewModel)): MutableList<MutableList<Component>> {
         val result = mutableListOf<MutableList<Component>>()
-        val wires = viewModel.wires
         val components = viewModel.components
 
         if (components.isEmpty()) return result
 
+        val sourceTypes = setOf(
+            ComponentType.INPUT,
+            ComponentType.BUTTON,
+            ComponentType.CLOCK,
+            ComponentType.CONSTANT_HIGH,
+            ComponentType.CONSTANT_LOW,
+            ComponentType.DIP_SWITCH_4BIT
+        )
+        val sinkTypes = setOf(
+            ComponentType.OUTPUT,
+            ComponentType.PROBE,
+            ComponentType.LED,
+            ComponentType.SEVEN_SEGMENT_DISPLAY,
+            ComponentType.HEX_DIGIT_DISPLAY
+        )
+
         val initialOutputs = components.filter { comp ->
-            comp.componentType == ComponentType.OUTPUT ||
-                    (wires.none { it.sourceGateId == comp.ID } && comp.componentType != ComponentType.INPUT && comp.componentType != ComponentType.BUTTON && comp.componentType != ComponentType.CLOCK)
+            comp.componentType in sinkTypes ||
+                    (wires.none { it.sourceGateId == comp.ID } && comp.componentType !in sourceTypes)
         }.toMutableList()
 
         val startStage = if (initialOutputs.isNotEmpty()) initialOutputs else components.toMutableList()
@@ -114,11 +173,11 @@ class SimulationViewModel : ViewModel() {
             if (checkIfLast(result)) done = true
         }
 
-        val allInputs = components.filter { it.componentType == ComponentType.INPUT || it.componentType == ComponentType.CLOCK || it.componentType == ComponentType.BUTTON }
-        val inputsInStages = result.flatten().filter { it.componentType == ComponentType.INPUT || it.componentType == ComponentType.CLOCK || it.componentType == ComponentType.BUTTON }.map { it.ID }.toSet()
+        val allInputs = components.filter { it.componentType in sourceTypes }
+        val inputsInStages = result.flatten().filter { it.componentType in sourceTypes }.map { it.ID }.toSet()
         val missingInputs = allInputs.filter { it.ID !in inputsInStages }.toMutableList()
         if (missingInputs.isNotEmpty()) {
-            if (result.isNotEmpty() && result.last().all { it.componentType == ComponentType.INPUT || it.componentType == ComponentType.CLOCK || it.componentType == ComponentType.BUTTON }) {
+            if (result.isNotEmpty() && result.last().all { it.componentType in sourceTypes }) {
                 result.last().addAll(missingInputs)
             } else {
                 result.add(missingInputs)
@@ -143,17 +202,24 @@ class SimulationViewModel : ViewModel() {
 
     private fun checkIfLast(input: MutableList<MutableList<Component>>): Boolean {
         if (input.isEmpty() || input.last().isEmpty()) return true
+        val sourceTypes = setOf(
+            ComponentType.INPUT,
+            ComponentType.CLOCK,
+            ComponentType.BUTTON,
+            ComponentType.CONSTANT_HIGH,
+            ComponentType.CONSTANT_LOW,
+            ComponentType.DIP_SWITCH_4BIT
+        )
         for (i in input.last()) {
-            if (i.componentType != ComponentType.INPUT && i.componentType != ComponentType.CLOCK && i.componentType != ComponentType.BUTTON) {
+            if (i.componentType !in sourceTypes) {
                 return false
             }
         }
         return true
     }
 
-    private fun mapWires(input: MutableList<MutableList<SimulationComponent>>, viewModel: CanvasViewModel): MutableList<MutableList<SimulationComponent>> {
+    private fun mapWires(input: MutableList<MutableList<SimulationComponent>>, wires: List<Wire>): MutableList<MutableList<SimulationComponent>> {
         val result = input
-        val wires = viewModel.wires
         for (stage in result) {
             for (i in stage) {
                 i.inputFrom.clear()
