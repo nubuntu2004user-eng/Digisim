@@ -43,8 +43,36 @@ internal fun evalXor(a: Pin, b: Pin): Pin = when {
     else -> Pin.LOW
 }
 
+internal fun evalXnor(a: Pin, b: Pin): Pin = when {
+    a == Pin.ERROR || b == Pin.ERROR -> Pin.ERROR
+    a == Pin.UNDEFINED || b == Pin.UNDEFINED -> Pin.ERROR
+    a == b -> Pin.HIGH
+    else -> Pin.LOW
+}
+
 internal fun evalNot(a: Pin): Pin = when (a) {
     Pin.HIGH -> Pin.LOW
     Pin.LOW -> Pin.HIGH
     else -> Pin.ERROR
+}
+
+internal fun evalBuffer(a: Pin): Pin = when (a) {
+    Pin.HIGH -> Pin.HIGH
+    Pin.LOW -> Pin.LOW
+    else -> Pin.ERROR
+}
+
+internal fun evalMultiAnd(vararg pins: Pin): Pin {
+    if (pins.any { it == Pin.ERROR || it == Pin.UNDEFINED }) return Pin.ERROR
+    return if (pins.all { it == Pin.HIGH }) Pin.HIGH else Pin.LOW
+}
+
+internal fun evalMultiNand(vararg pins: Pin): Pin {
+    if (pins.any { it == Pin.ERROR || it == Pin.UNDEFINED }) return Pin.ERROR
+    return if (pins.all { it == Pin.HIGH }) Pin.LOW else Pin.HIGH
+}
+
+internal fun evalMultiNor(vararg pins: Pin): Pin {
+    if (pins.any { it == Pin.ERROR || it == Pin.UNDEFINED }) return Pin.ERROR
+    return if (pins.all { it == Pin.LOW }) Pin.HIGH else Pin.LOW
 }

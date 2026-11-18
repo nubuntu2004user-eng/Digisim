@@ -29,9 +29,25 @@ import com.example.digisim.ComponentsDrawing.drawTFlipFlopAsync
 import com.example.digisim.ComponentsDrawing.drawIC7400
 import com.example.digisim.ComponentsDrawing.drawIC7402
 import com.example.digisim.ComponentsDrawing.drawIC7404
+import com.example.digisim.ComponentsDrawing.drawIC7407
 import com.example.digisim.ComponentsDrawing.drawIC7408
+import com.example.digisim.ComponentsDrawing.drawIC7410
+import com.example.digisim.ComponentsDrawing.drawIC7411
+import com.example.digisim.ComponentsDrawing.drawIC7420
+import com.example.digisim.ComponentsDrawing.drawIC7421
+import com.example.digisim.ComponentsDrawing.drawIC7427
+import com.example.digisim.ComponentsDrawing.drawIC7430
 import com.example.digisim.ComponentsDrawing.drawIC7432
+import com.example.digisim.ComponentsDrawing.drawIC7473
+import com.example.digisim.ComponentsDrawing.drawIC7474
+import com.example.digisim.ComponentsDrawing.drawIC7476
 import com.example.digisim.ComponentsDrawing.drawIC7486
+import com.example.digisim.ComponentsDrawing.drawIC74138
+import com.example.digisim.ComponentsDrawing.drawIC74139
+import com.example.digisim.ComponentsDrawing.drawIC74151
+import com.example.digisim.ComponentsDrawing.drawIC74157
+import com.example.digisim.ComponentsDrawing.drawIC74266
+import com.example.digisim.ComponentsDrawing.drawIC74283
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.SettingsViewModel
@@ -149,9 +165,25 @@ fun DrawScope.drawComponent(
         ComponentType.IC_7400 -> { drawIC7400(component, textMeasurer, settings) }
         ComponentType.IC_7402 -> { drawIC7402(component, textMeasurer, settings) }
         ComponentType.IC_7404 -> { drawIC7404(component, textMeasurer, settings) }
+        ComponentType.IC_7407 -> { drawIC7407(component, textMeasurer, settings) }
         ComponentType.IC_7408 -> { drawIC7408(component, textMeasurer, settings) }
+        ComponentType.IC_7410 -> { drawIC7410(component, textMeasurer, settings) }
+        ComponentType.IC_7411 -> { drawIC7411(component, textMeasurer, settings) }
+        ComponentType.IC_7420 -> { drawIC7420(component, textMeasurer, settings) }
+        ComponentType.IC_7421 -> { drawIC7421(component, textMeasurer, settings) }
+        ComponentType.IC_7427 -> { drawIC7427(component, textMeasurer, settings) }
+        ComponentType.IC_7430 -> { drawIC7430(component, textMeasurer, settings) }
         ComponentType.IC_7432 -> { drawIC7432(component, textMeasurer, settings) }
+        ComponentType.IC_7473 -> { drawIC7473(component, textMeasurer, settings) }
+        ComponentType.IC_7474 -> { drawIC7474(component, textMeasurer, settings) }
+        ComponentType.IC_7476 -> { drawIC7476(component, textMeasurer, settings) }
         ComponentType.IC_7486 -> { drawIC7486(component, textMeasurer, settings) }
+        ComponentType.IC_74138 -> { drawIC74138(component, textMeasurer, settings) }
+        ComponentType.IC_74139 -> { drawIC74139(component, textMeasurer, settings) }
+        ComponentType.IC_74151 -> { drawIC74151(component, textMeasurer, settings) }
+        ComponentType.IC_74157 -> { drawIC74157(component, textMeasurer, settings) }
+        ComponentType.IC_74266 -> { drawIC74266(component, textMeasurer, settings) }
+        ComponentType.IC_74283 -> { drawIC74283(component, textMeasurer, settings) }
         ComponentType.CUSTOM -> { drawCustomComponent(component, textMeasurer, settings) }
     }
 }

@@ -24,6 +24,8 @@ import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Not
 import com.example.digisim.ParsingLogic.ComponentType
 import com.example.digisim.ParsingLogic.Wire
+import com.example.digisim.Persistance.toComponent
+import com.example.digisim.Persistance.toDto
 import com.example.digisim.SimulationHandling.SimulationViewModel
 import com.example.digisim.UiUtils.ComponentLibrariesViewModel
 import com.example.digisim.Wiring.Input
@@ -407,6 +409,60 @@ class SharedCommonTest {
         assertEquals(ComponentType.AND, placed.componentType)
         assertEquals(160f, placed.x)
         assertEquals(120f, placed.y)
+    }
+
+    @Test
+    fun testAll22Chips74CreationPortsAndPersistence() {
+        val libVm = ComponentLibrariesViewModel()
+        val chips74Lib = libVm.libraries.find { it.name == "74**" }
+        assertNotNull(chips74Lib)
+        assertEquals(22, chips74Lib.components.size)
+
+        val expectedSpecs = listOf(
+            Triple(ComponentType.IC_7400, 10, 4),
+            Triple(ComponentType.IC_7402, 10, 4),
+            Triple(ComponentType.IC_7404, 8, 6),
+            Triple(ComponentType.IC_7407, 8, 6),
+            Triple(ComponentType.IC_7408, 10, 4),
+            Triple(ComponentType.IC_7410, 11, 3),
+            Triple(ComponentType.IC_7411, 11, 3),
+            Triple(ComponentType.IC_7420, 10, 2),
+            Triple(ComponentType.IC_7421, 10, 2),
+            Triple(ComponentType.IC_7427, 11, 3),
+            Triple(ComponentType.IC_7430, 10, 1),
+            Triple(ComponentType.IC_7432, 10, 4),
+            Triple(ComponentType.IC_7473, 10, 4),
+            Triple(ComponentType.IC_7474, 10, 4),
+            Triple(ComponentType.IC_7476, 12, 4),
+            Triple(ComponentType.IC_7486, 10, 4),
+            Triple(ComponentType.IC_74138, 8, 8),
+            Triple(ComponentType.IC_74139, 8, 8),
+            Triple(ComponentType.IC_74151, 14, 2),
+            Triple(ComponentType.IC_74157, 12, 4),
+            Triple(ComponentType.IC_74266, 10, 4),
+            Triple(ComponentType.IC_74283, 11, 5)
+        )
+
+        val clockManager = ClockManager()
+        expectedSpecs.forEachIndexed { index, (type, expectedIn, expectedOut) ->
+            assertTrue(chips74Lib.components.any { it.type == type }, "Missing $type in 74** library")
+            val comp = createComponent(type, id = index + 100, x = 40f, y = 60f, logic = null, name = null)
+            assertEquals(type, comp.componentType)
+            assertEquals(expectedIn, comp.inputCount, "Input count mismatch for $type")
+            assertEquals(expectedOut, comp.outputCount, "Output count mismatch for $type")
+            assertEquals(expectedIn, comp.inputPortPositions().size, "Input port positions mismatch for $type")
+            assertEquals(expectedOut, comp.outputPortPositions().size, "Output port positions mismatch for $type")
+
+            val dto = comp.toDto()
+            val restored = dto.toComponent()
+            assertEquals(type, restored.componentType)
+            assertEquals(expectedIn, restored.inputCount)
+            assertEquals(expectedOut, restored.outputCount)
+
+            val simComp = com.example.digisim.SimulationHandling.convertForSimulation(comp, clockManager)
+            assertNotNull(simComp, "Simulation conversion failed for $type")
+            assertEquals(1, simComp.size)
+        }
     }
 }
 

@@ -420,6 +420,134 @@ class mcpServer(private val canvasViewModel: CanvasViewModel = CanvasViewModel()
             addComponent(request = request, componentType = ComponentType.IC_7486, canvasViewModel = canvasViewModel)
         }
 
+        mcpServer.addTool(
+            name = "add_ic_7407",
+            description = "Add a 7407 Hex Buffer IC to the canvas. Inputs (8): [0: 1A, 1: 2A, 2: 3A, 3: GND, 4: 4A, 5: 5A, 6: 6A, 7: VCC], Outputs (6): [0: 1Y, 1: 2Y, 2: 3Y, 3: 4Y, 4: 5Y, 5: 6Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7407, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7410",
+            description = "Add a 7410 Triple 3-Input NAND Gate IC to the canvas. Inputs (11): [0: 1A, 1: 1B, 2: 2A, 3: 2B, 4: 2C, 5: GND, 6: 3A, 7: 3B, 8: 3C, 9: 1C, 10: VCC], Outputs (3): [0: 1Y, 1: 2Y, 2: 3Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7410, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7411",
+            description = "Add a 7411 Triple 3-Input AND Gate IC to the canvas. Inputs (11): [0: 1A, 1: 1B, 2: 2A, 3: 2B, 4: 2C, 5: GND, 6: 3A, 7: 3B, 8: 3C, 9: 1C, 10: VCC], Outputs (3): [0: 1Y, 1: 2Y, 2: 3Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7411, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7420",
+            description = "Add a 7420 Dual 4-Input NAND Gate IC to the canvas. Inputs (10): [0: 1A, 1: 1B, 2: 1C, 3: 1D, 4: GND, 5: 2A, 6: 2B, 7: 2C, 8: 2D, 9: VCC], Outputs (2): [0: 1Y, 1: 2Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7420, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7421",
+            description = "Add a 7421 Dual 4-Input AND Gate IC to the canvas. Inputs (10): [0: 1A, 1: 1B, 2: 1C, 3: 1D, 4: GND, 5: 2A, 6: 2B, 7: 2C, 8: 2D, 9: VCC], Outputs (2): [0: 1Y, 1: 2Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7421, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7427",
+            description = "Add a 7427 Triple 3-Input NOR Gate IC to the canvas. Inputs (11): [0: 1A, 1: 1B, 2: 2A, 3: 2B, 4: 2C, 5: GND, 6: 3A, 7: 3B, 8: 3C, 9: 1C, 10: VCC], Outputs (3): [0: 1Y, 1: 2Y, 2: 3Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7427, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7430",
+            description = "Add a 7430 Single 8-Input NAND Gate IC to the canvas. Inputs (10): [0: A, 1: B, 2: C, 3: D, 4: E, 5: F, 6: GND, 7: G, 8: H, 9: VCC], Outputs (1): [0: Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7430, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7473",
+            description = "Add a 7473 Dual JK Flip-Flop with Clear IC to the canvas. Inputs (10): [0: 1CLR, 1: 1J, 2: 1CLK, 3: 1K, 4: GND, 5: 2CLR, 6: 2J, 7: 2CLK, 8: 2K, 9: VCC], Outputs (4): [0: 1Q, 1: 1~Q, 2: 2Q, 3: 2~Q].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7473, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7474",
+            description = "Add a 7474 Dual D Flip-Flop with Preset and Clear IC to the canvas. Inputs (10): [0: 1CLR, 1: 1D, 2: 1CLK, 3: 1PRE, 4: GND, 5: 2CLR, 6: 2D, 7: 2CLK, 8: 2PRE, 9: VCC], Outputs (4): [0: 1Q, 1: 1~Q, 2: 2Q, 3: 2~Q].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7474, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_7476",
+            description = "Add a 7476 Dual JK Flip-Flop with Preset and Clear IC to the canvas. Inputs (12): [0: 1PRE, 1: 1CLR, 2: 1J, 3: 1CLK, 4: 1K, 5: GND, 6: 2PRE, 7: 2CLR, 8: 2J, 9: 2CLK, 10: 2K, 11: VCC], Outputs (4): [0: 1Q, 1: 1~Q, 2: 2Q, 3: 2~Q].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_7476, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_74138",
+            description = "Add a 74138 3-to-8 Line Decoder/Demultiplexer IC to the canvas. Inputs (8): [0: A, 1: B, 2: C, 3: ~G2A, 4: ~G2B, 5: G1, 6: GND, 7: VCC], Outputs (8, active-LOW): [0..7: ~Y0..~Y7].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_74138, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_74139",
+            description = "Add a 74139 Dual 2-to-4 Line Decoder IC to the canvas. Inputs (8): [0: ~1G, 1: 1A, 2: 1B, 3: GND, 4: ~2G, 5: 2A, 6: 2B, 7: VCC], Outputs (8, active-LOW): [0..3: 1Y0..1Y3, 4..7: 2Y0..2Y3].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_74139, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_74151",
+            description = "Add a 74151 8-to-1 Data Selector/Multiplexer IC to the canvas. Inputs (14): [0..7: D0..D7, 8: A, 9: B, 10: C, 11: ~G, 12: GND, 13: VCC], Outputs (2): [0: Y, 1: W (~Y)].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_74151, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_74157",
+            description = "Add a 74157 Quad 2-to-1 Data Selector/Multiplexer IC to the canvas. Inputs (12): [0: SEL, 1: 1A, 2: 1B, 3: 2A, 4: 2B, 5: GND, 6: 3A, 7: 3B, 8: 4A, 9: 4B, 10: ~G, 11: VCC], Outputs (4): [0: 1Y, 1: 2Y, 2: 3Y, 3: 4Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_74157, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_74266",
+            description = "Add a 74266 Quad 2-Input XNOR Gate IC to the canvas. Inputs (10): [0: 1A, 1: 1B, 2: 2A, 3: 2B, 4: GND, 5: 3A, 6: 3B, 7: 4A, 8: 4B, 9: VCC], Outputs (4): [0: 1Y, 1: 2Y, 2: 3Y, 3: 4Y].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_74266, canvasViewModel = canvasViewModel)
+        }
+
+        mcpServer.addTool(
+            name = "add_ic_74283",
+            description = "Add a 74283 4-Bit Binary Full Adder IC to the canvas. Inputs (11): [0: A1, 1: B1, 2: A2, 3: B2, 4: A3, 5: B3, 6: A4, 7: B4, 8: C0, 9: GND, 10: VCC], Outputs (5): [0: S1, 1: S2, 2: S3, 3: S4, 4: C4].",
+            inputSchema = fixedPortComponentSchema
+        ) { request ->
+            addComponent(request = request, componentType = ComponentType.IC_74283, canvasViewModel = canvasViewModel)
+        }
+
         // 6. Wiring, Component Modification, and Deletion
         mcpServer.addTool(
             name = "add_wire",

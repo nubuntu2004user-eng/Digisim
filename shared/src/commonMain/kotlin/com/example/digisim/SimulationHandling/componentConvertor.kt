@@ -11,10 +11,26 @@ import com.example.digisim.FlipFlops.TFlipFlopAsync
 import com.example.digisim.Chips74.IC7400
 import com.example.digisim.Chips74.IC7402
 import com.example.digisim.Chips74.IC7404
+import com.example.digisim.Chips74.IC7407
 import com.example.digisim.Chips74.IC7408
+import com.example.digisim.Chips74.IC7410
+import com.example.digisim.Chips74.IC7411
+import com.example.digisim.Chips74.IC7420
+import com.example.digisim.Chips74.IC7421
+import com.example.digisim.Chips74.IC7427
+import com.example.digisim.Chips74.IC7430
 import com.example.digisim.Chips74.IC7432
+import com.example.digisim.Chips74.IC7473
+import com.example.digisim.Chips74.IC7474
+import com.example.digisim.Chips74.IC7476
 import com.example.digisim.LibraryLoader.CustomComponent
 import com.example.digisim.Chips74.IC7486
+import com.example.digisim.Chips74.IC74138
+import com.example.digisim.Chips74.IC74139
+import com.example.digisim.Chips74.IC74151
+import com.example.digisim.Chips74.IC74157
+import com.example.digisim.Chips74.IC74266
+import com.example.digisim.Chips74.IC74283
 import com.example.digisim.LogicGates.And
 import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Input
@@ -96,9 +112,25 @@ fun convertForSimulation(input : Component , clockManager : ClockManager): List<
         is IC7400 -> return listOf(chips74.IC7400(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC7402 -> return listOf(chips74.IC7402(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC7404 -> return listOf(chips74.IC7404(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7407 -> return listOf(chips74.IC7407(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC7408 -> return listOf(chips74.IC7408(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7410 -> return listOf(chips74.IC7410(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7411 -> return listOf(chips74.IC7411(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7420 -> return listOf(chips74.IC7420(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7421 -> return listOf(chips74.IC7421(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7427 -> return listOf(chips74.IC7427(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7430 -> return listOf(chips74.IC7430(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC7432 -> return listOf(chips74.IC7432(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7473 -> return listOf(chips74.IC7473(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7474 -> return listOf(chips74.IC7474(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC7476 -> return listOf(chips74.IC7476(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         is IC7486 -> return listOf(chips74.IC7486(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC74138 -> return listOf(chips74.IC74138(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC74139 -> return listOf(chips74.IC74139(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC74151 -> return listOf(chips74.IC74151(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC74157 -> return listOf(chips74.IC74157(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC74266 -> return listOf(chips74.IC74266(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
+        is IC74283 -> return listOf(chips74.IC74283(input.ID, mutableListOf(), mutableListOf(), input.inputCount, mutableListOf(), mutableListOf()))
         else -> return null
     }
 }

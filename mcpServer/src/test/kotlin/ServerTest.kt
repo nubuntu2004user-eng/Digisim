@@ -60,7 +60,7 @@ class ServerTest {
     }
 
     @Test
-    fun `test mcp client lists all 31 registered tools with descriptions and schemas`() = runBlocking {
+    fun `test mcp client lists all 47 registered tools with descriptions and schemas`() = runBlocking {
         withLiveMcpSession { client, _ ->
             val tools = client.listTools()
             val toolNames = tools.map { it.name }.toSet()
@@ -90,16 +90,32 @@ class ServerTest {
                 "add_ic_7400",
                 "add_ic_7402",
                 "add_ic_7404",
+                "add_ic_7407",
                 "add_ic_7408",
+                "add_ic_7410",
+                "add_ic_7411",
+                "add_ic_7420",
+                "add_ic_7421",
+                "add_ic_7427",
+                "add_ic_7430",
                 "add_ic_7432",
+                "add_ic_7473",
+                "add_ic_7474",
+                "add_ic_7476",
                 "add_ic_7486",
+                "add_ic_74138",
+                "add_ic_74139",
+                "add_ic_74151",
+                "add_ic_74157",
+                "add_ic_74266",
+                "add_ic_74283",
                 "add_wire",
                 "update_component",
                 "delete_component",
                 "delete_wire"
             )
 
-            assertEquals(expectedTools, toolNames, "MCP Server must expose all 31 expected tools")
+            assertEquals(expectedTools, toolNames, "MCP Server must expose all 47 expected tools")
             tools.forEach { tool ->
                 assertFalse(tool.description.isNullOrBlank(), "Tool ${tool.name} must have a non-blank description")
                 assertNotNull(tool.inputSchema, "Tool ${tool.name} must define an inputSchema")
@@ -108,7 +124,7 @@ class ServerTest {
     }
 
     @Test
-    fun `test all 26 component creation tools over live mcp client protocol`() = runBlocking {
+    fun `test all 42 component creation tools over live mcp client protocol`() = runBlocking {
         withLiveMcpSession { client, viewModel ->
             data class ToolSpec(
                 val toolName: String,
@@ -142,9 +158,25 @@ class ServerTest {
                 ToolSpec("add_ic_7400", ComponentType.IC_7400, 10, 4),
                 ToolSpec("add_ic_7402", ComponentType.IC_7402, 10, 4),
                 ToolSpec("add_ic_7404", ComponentType.IC_7404, 8, 6),
+                ToolSpec("add_ic_7407", ComponentType.IC_7407, 8, 6),
                 ToolSpec("add_ic_7408", ComponentType.IC_7408, 10, 4),
+                ToolSpec("add_ic_7410", ComponentType.IC_7410, 11, 3),
+                ToolSpec("add_ic_7411", ComponentType.IC_7411, 11, 3),
+                ToolSpec("add_ic_7420", ComponentType.IC_7420, 10, 2),
+                ToolSpec("add_ic_7421", ComponentType.IC_7421, 10, 2),
+                ToolSpec("add_ic_7427", ComponentType.IC_7427, 11, 3),
+                ToolSpec("add_ic_7430", ComponentType.IC_7430, 10, 1),
                 ToolSpec("add_ic_7432", ComponentType.IC_7432, 10, 4),
-                ToolSpec("add_ic_7486", ComponentType.IC_7486, 10, 4)
+                ToolSpec("add_ic_7473", ComponentType.IC_7473, 10, 4),
+                ToolSpec("add_ic_7474", ComponentType.IC_7474, 10, 4),
+                ToolSpec("add_ic_7476", ComponentType.IC_7476, 12, 4),
+                ToolSpec("add_ic_7486", ComponentType.IC_7486, 10, 4),
+                ToolSpec("add_ic_74138", ComponentType.IC_74138, 8, 8),
+                ToolSpec("add_ic_74139", ComponentType.IC_74139, 8, 8),
+                ToolSpec("add_ic_74151", ComponentType.IC_74151, 14, 2),
+                ToolSpec("add_ic_74157", ComponentType.IC_74157, 12, 4),
+                ToolSpec("add_ic_74266", ComponentType.IC_74266, 10, 4),
+                ToolSpec("add_ic_74283", ComponentType.IC_74283, 11, 5)
             )
 
             specs.forEachIndexed { idx, spec ->
@@ -499,6 +531,69 @@ class ServerTest {
             client.callTool("update_component", buildJsonObject { put("id", in1A.ID); put("high", false) })
             simulation.runSimulation(viewModel, null, clockManager)
             assertEquals(Pin.HIGH, out1Y.outputPin)
+        }
+    }
+
+    @Test
+    fun `test end to end 74138 decoder circuit built and simulated via mcp client`() = runBlocking {
+        withLiveMcpSession { client, viewModel ->
+            val simulation = SimulationViewModel()
+            val clockManager = ClockManager()
+
+            // Place inputs A=1, B=1, C=0 (selects output ~Y3), ~G2A=0, ~G2B=0, G1=1, GND=0, VCC=1
+            client.callTool("add_input", buildJsonObject { put("x", 20); put("y", 20); put("label", "A"); put("high", true) })
+            client.callTool("add_input", buildJsonObject { put("x", 20); put("y", 40); put("label", "B"); put("high", true) })
+            client.callTool("add_input", buildJsonObject { put("x", 20); put("y", 60); put("label", "C"); put("high", false) })
+            client.callTool("add_input", buildJsonObject { put("x", 20); put("y", 80); put("label", "LOW_SRC"); put("high", false) })
+            client.callTool("add_input", buildJsonObject { put("x", 20); put("y", 100); put("label", "HIGH_SRC"); put("high", true) })
+            client.callTool("add_ic_74138", buildJsonObject { put("x", 180); put("y", 20); put("label", "DEC_138") })
+            client.callTool("add_output", buildJsonObject { put("x", 360); put("y", 40); put("label", "OUT_Y0") })
+            client.callTool("add_output", buildJsonObject { put("x", 360); put("y", 100); put("label", "OUT_Y3") })
+
+            val inA = viewModel.components.first { it.label == "A" }
+            val inB = viewModel.components.first { it.label == "B" }
+            val inC = viewModel.components.first { it.label == "C" }
+            val lowSrc = viewModel.components.first { it.label == "LOW_SRC" }
+            val highSrc = viewModel.components.first { it.label == "HIGH_SRC" }
+            val dec = viewModel.components.first { it.label == "DEC_138" }
+            val outY0 = viewModel.components.first { it.label == "OUT_Y0" }
+            val outY3 = viewModel.components.first { it.label == "OUT_Y3" }
+
+            // IC_74138 inputs: [0: A, 1: B, 2: C, 3: ~G2A, 4: ~G2B, 5: G1, 6: GND, 7: VCC]
+            val inputLinks = listOf(
+                inA.ID to 0,
+                inB.ID to 1,
+                inC.ID to 2,
+                lowSrc.ID to 3,
+                lowSrc.ID to 4,
+                highSrc.ID to 5,
+                lowSrc.ID to 6,
+                highSrc.ID to 7
+            )
+            inputLinks.forEach { (srcId, targetPort) ->
+                client.callTool(
+                    "add_wire",
+                    buildJsonObject {
+                        put("source_gate_id", srcId)
+                        put("source_port_index", 0)
+                        put("target_gate_id", dec.ID)
+                        put("target_port_index", targetPort)
+                    }
+                )
+            }
+            // Wire output 0 (~Y0) -> outY0 and output 3 (~Y3) -> outY3
+            client.callTool("add_wire", buildJsonObject {
+                put("source_gate_id", dec.ID); put("source_port_index", 0)
+                put("target_gate_id", outY0.ID); put("target_port_index", 0)
+            })
+            client.callTool("add_wire", buildJsonObject {
+                put("source_gate_id", dec.ID); put("source_port_index", 3)
+                put("target_gate_id", outY3.ID); put("target_port_index", 0)
+            })
+
+            simulation.runSimulation(viewModel, null, clockManager)
+            assertEquals(Pin.HIGH, outY0.outputPin, "~Y0 should be inactive (HIGH) when address is 3")
+            assertEquals(Pin.LOW, outY3.outputPin, "~Y3 should be active (LOW) when address is 3")
         }
     }
 }

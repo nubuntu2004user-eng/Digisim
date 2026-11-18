@@ -89,13 +89,17 @@ class SharedLogicDesktopTest {
             assertTrue(bounds.right <= 330f, "Expected $ffName to fit inside sidebar, got right=${bounds.right}")
         }
 
-        // 4. Click "74**" tab and verify all 6 74-series ICs are visible
+        // 4. Click "74**" tab and verify all 22 74-series ICs are visible (scrolling through the 2-column list)
         onNodeWithText("74**").performClick()
         waitForIdle()
 
-        val expectedChips = listOf("7400", "7402", "7404", "7408", "7432", "7486")
+        val expectedChips = listOf(
+            "7400", "7402", "7404", "7407", "7408", "7410", "7411", "7420",
+            "7421", "7427", "7430", "7432", "7473", "7474", "7476", "7486",
+            "74138", "74139", "74151", "74157", "74266", "74283"
+        )
         for (chipName in expectedChips) {
-            val node = onNodeWithText(chipName).assertExists().assertIsDisplayed()
+            val node = onNodeWithText(chipName).assertExists().performScrollTo().assertIsDisplayed()
             val bounds = node.fetchSemanticsNode().boundsInRoot
             assertTrue(bounds.width > 10f, "Expected $chipName to have visible width, got ${bounds.width}")
             assertTrue(bounds.right <= 330f, "Expected $chipName to fit inside sidebar, got right=${bounds.right}")

@@ -12,9 +12,25 @@ import com.example.digisim.FlipFlops.TFlipFlopAsync
 import com.example.digisim.Chips74.IC7400
 import com.example.digisim.Chips74.IC7402
 import com.example.digisim.Chips74.IC7404
+import com.example.digisim.Chips74.IC7407
 import com.example.digisim.Chips74.IC7408
+import com.example.digisim.Chips74.IC7410
+import com.example.digisim.Chips74.IC7411
+import com.example.digisim.Chips74.IC7420
+import com.example.digisim.Chips74.IC7421
+import com.example.digisim.Chips74.IC7427
+import com.example.digisim.Chips74.IC7430
 import com.example.digisim.Chips74.IC7432
+import com.example.digisim.Chips74.IC7473
+import com.example.digisim.Chips74.IC7474
+import com.example.digisim.Chips74.IC7476
 import com.example.digisim.Chips74.IC7486
+import com.example.digisim.Chips74.IC74138
+import com.example.digisim.Chips74.IC74139
+import com.example.digisim.Chips74.IC74151
+import com.example.digisim.Chips74.IC74157
+import com.example.digisim.Chips74.IC74266
+import com.example.digisim.Chips74.IC74283
 import com.example.digisim.LibraryLoader.CustomComponent
 import com.example.digisim.LogicGates.And
 import com.example.digisim.LogicGates.Nand
@@ -274,6 +290,134 @@ fun ComponentDto.toComponent(): Component = when (type) {
         label = label
     )
     ComponentType.IC_7486 -> IC7486(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7407 -> IC7407(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7410 -> IC7410(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7411 -> IC7411(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7420 -> IC7420(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7421 -> IC7421(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7427 -> IC7427(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7430 -> IC7430(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7473 -> IC7473(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7474 -> IC7474(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_7476 -> IC7476(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_74138 -> IC74138(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_74139 -> IC74139(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_74151 -> IC74151(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_74157 -> IC74157(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_74266 -> IC74266(
+        id = id,
+        initialX = x,
+        initialY = y,
+        initialInputCount = inputCount,
+        initialOutputCount = outputCount,
+        label = label
+    )
+    ComponentType.IC_74283 -> IC74283(
         id = id,
         initialX = x,
         initialY = y,

@@ -3,9 +3,25 @@ package com.example.mcpServer
 import com.example.digisim.Chips74.IC7400
 import com.example.digisim.Chips74.IC7402
 import com.example.digisim.Chips74.IC7404
+import com.example.digisim.Chips74.IC7407
 import com.example.digisim.Chips74.IC7408
+import com.example.digisim.Chips74.IC7410
+import com.example.digisim.Chips74.IC7411
+import com.example.digisim.Chips74.IC7420
+import com.example.digisim.Chips74.IC7421
+import com.example.digisim.Chips74.IC7427
+import com.example.digisim.Chips74.IC7430
 import com.example.digisim.Chips74.IC7432
+import com.example.digisim.Chips74.IC7473
+import com.example.digisim.Chips74.IC7474
+import com.example.digisim.Chips74.IC7476
 import com.example.digisim.Chips74.IC7486
+import com.example.digisim.Chips74.IC74138
+import com.example.digisim.Chips74.IC74139
+import com.example.digisim.Chips74.IC74151
+import com.example.digisim.Chips74.IC74157
+import com.example.digisim.Chips74.IC74266
+import com.example.digisim.Chips74.IC74283
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.FlipFlops.DFlipFlop
 import com.example.digisim.FlipFlops.DFlipFlopAsync
@@ -282,6 +298,134 @@ suspend fun addComponent(
             initialY = y,
             initialInputCount = 10,
             initialOutputCount = 4,
+            label = label
+        )
+        ComponentType.IC_7407 -> IC7407(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 8,
+            initialOutputCount = 6,
+            label = label
+        )
+        ComponentType.IC_7410 -> IC7410(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 11,
+            initialOutputCount = 3,
+            label = label
+        )
+        ComponentType.IC_7411 -> IC7411(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 11,
+            initialOutputCount = 3,
+            label = label
+        )
+        ComponentType.IC_7420 -> IC7420(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 10,
+            initialOutputCount = 2,
+            label = label
+        )
+        ComponentType.IC_7421 -> IC7421(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 10,
+            initialOutputCount = 2,
+            label = label
+        )
+        ComponentType.IC_7427 -> IC7427(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 11,
+            initialOutputCount = 3,
+            label = label
+        )
+        ComponentType.IC_7430 -> IC7430(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 10,
+            initialOutputCount = 1,
+            label = label
+        )
+        ComponentType.IC_7473 -> IC7473(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 10,
+            initialOutputCount = 4,
+            label = label
+        )
+        ComponentType.IC_7474 -> IC7474(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 10,
+            initialOutputCount = 4,
+            label = label
+        )
+        ComponentType.IC_7476 -> IC7476(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 12,
+            initialOutputCount = 4,
+            label = label
+        )
+        ComponentType.IC_74138 -> IC74138(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 8,
+            initialOutputCount = 8,
+            label = label
+        )
+        ComponentType.IC_74139 -> IC74139(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 8,
+            initialOutputCount = 8,
+            label = label
+        )
+        ComponentType.IC_74151 -> IC74151(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 14,
+            initialOutputCount = 2,
+            label = label
+        )
+        ComponentType.IC_74157 -> IC74157(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 12,
+            initialOutputCount = 4,
+            label = label
+        )
+        ComponentType.IC_74266 -> IC74266(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 10,
+            initialOutputCount = 4,
+            label = label
+        )
+        ComponentType.IC_74283 -> IC74283(
+            id = canvasViewModel.nextId++,
+            initialX = x,
+            initialY = y,
+            initialInputCount = 11,
+            initialOutputCount = 5,
             label = label
         )
         ComponentType.CUSTOM -> null
