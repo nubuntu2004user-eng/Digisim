@@ -7,8 +7,7 @@ import io.modelcontextprotocol.kotlin.sdk.client.StreamableHttpClientTransport
 import io.modelcontextprotocol.kotlin.sdk.types.*
 import kotlinx.serialization.json.JsonObject
 
-class mcpClient {
-    val url = "http://127.0.0.1:8080/mcp"
+class mcpClient(val url: String = "http://127.0.0.1:8080/mcp") {
     val httpClient = HttpClient {
         install(SSE)
     }

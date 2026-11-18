@@ -81,13 +81,17 @@ class OpenAiClient(private val mcpClient: mcpClient) {
 
     suspend fun sendMessage(userText: String): String {
         messages.add(ChatMessage(role = ChatRole.User, content = userText))
-        val response = chatCompletion()
-        val message = response.choices.firstOrNull()?.message ?: return "No response"
-        messages.add(message)
+        var response = chatCompletion()
+        var currentMessage = response.choices.firstOrNull()?.message ?: return "No response"
+        messages.add(currentMessage)
 
-        val toolCalls = message.toolCalls
-        if (!toolCalls.isNullOrEmpty()) {
-            val toolResults = mutableListOf<String>()
+        val allToolResults = mutableListOf<String>()
+        var round = 0
+        val maxToolRounds = 10
+
+        while (!currentMessage.toolCalls.isNullOrEmpty() && round < maxToolRounds) {
+            round++
+            val toolCalls = currentMessage.toolCalls.orEmpty()
             for (toolCall in toolCalls) {
                 if (toolCall is ToolCall.Function) {
                     val name = toolCall.function.name
@@ -102,7 +106,7 @@ class OpenAiClient(private val mcpClient: mcpClient) {
                         .filterIsInstance<io.modelcontextprotocol.kotlin.sdk.types.TextContent>()
                         .joinToString("\n") { it.text }
 
-                    toolResults.add(resultText)
+                    allToolResults.add(resultText)
 
                     messages.add(
                         ChatMessage(
@@ -115,16 +119,12 @@ class OpenAiClient(private val mcpClient: mcpClient) {
                 }
             }
 
-            // Follow-up request so LLM produces final answer with tool output
-            val followUp = chatCompletion()
-            val followUpMessage = followUp.choices.firstOrNull()?.message
-            if (followUpMessage != null) {
-                messages.add(followUpMessage)
-                return followUpMessage.content ?: toolResults.joinToString("\n")
-            }
-            return toolResults.joinToString("\n")
+            response = chatCompletion()
+            val followUpMessage = response.choices.firstOrNull()?.message ?: break
+            messages.add(followUpMessage)
+            currentMessage = followUpMessage
         }
 
-        return message.content ?: ""
+        return currentMessage.content ?: allToolResults.joinToString("\n")
     }
 }

@@ -115,11 +115,11 @@ fun createComponent(
 ): Component {
     return when (type) {
         ComponentType.AND -> And(id, x, y, inputCount, outputCount)
-        ComponentType.OR -> Or(id, x, y, 2, outputCount)
-        ComponentType.NAND -> Nand(id, x, y, 2, outputCount)
-        ComponentType.NOR -> Nor(id, x, y, 2, outputCount)
-        ComponentType.XOR -> Xor(id, x, y, 2, outputCount)
-        ComponentType.XNOR -> XNor(id, x, y, 2, outputCount)
+        ComponentType.OR -> Or(id, x, y, inputCount, outputCount)
+        ComponentType.NAND -> Nand(id, x, y, inputCount, outputCount)
+        ComponentType.NOR -> Nor(id, x, y, inputCount, outputCount)
+        ComponentType.XOR -> Xor(id, x, y, inputCount, outputCount)
+        ComponentType.XNOR -> XNor(id, x, y, inputCount, outputCount)
         ComponentType.NOT -> Not(id, x, y, 1, 1)
         ComponentType.OUTPUT -> Output(id, x, y, 1, 0)
         ComponentType.INPUT -> Input(id, x, y, 0, 1)

@@ -13,11 +13,12 @@ fun main() {
 
 fun startServer(
     canvasViewModel: CanvasViewModel = CanvasViewModel(),
-    wait: Boolean = false
+    wait: Boolean = false,
+    port: Int = 8080
 ): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
     return embeddedServer(
         factory = Netty,
-        port = 8080,
+        port = port,
         host = "127.0.0.1",
         module = { rootModule(canvasViewModel) }
     ).start(wait = wait)
