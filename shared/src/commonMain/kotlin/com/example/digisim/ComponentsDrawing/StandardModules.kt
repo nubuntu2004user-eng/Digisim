@@ -13,6 +13,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.digisim.DrawingLogic.drawSignalPort
 import com.example.digisim.DrawingLogic.getComponentInnerRectColor
 import com.example.digisim.DrawingLogic.getGateOutlineColor
 import com.example.digisim.DrawingLogic.getPortColor
@@ -34,10 +35,9 @@ internal fun DrawScope.drawStandardBlock(
     val w = component.width
     val h = component.height
     val outlineColor = getGateOutlineColor(settings)
-    val portColor = getPortColor(settings)
 
     drawRoundRect(
-        color = settings.elevatedSurfaceColor,
+        color = settings.gateBodyFillColor,
         topLeft = Offset(x, y),
         size = Size(w, h),
         cornerRadius = CornerRadius(3f, 3f)
@@ -118,11 +118,15 @@ internal fun DrawScope.drawStandardBlock(
         }
     }
 
-    component.inputPortPositions().forEach { pos ->
-        drawCircle(color = portColor, radius = 5f, center = pos)
+    component.inputPortPositions().forEachIndexed { idx, pos ->
+        val pinState = component.inputPins.getOrElse(idx) { Pin.UNDEFINED }
+        drawSignalPort(center = pos, pin = pinState, settings = settings, radius = 5f)
     }
-    component.outputPortPositions().forEach { pos ->
-        drawCircle(color = portColor, radius = 5f, center = pos)
+    component.outputPortPositions().forEachIndexed { idx, pos ->
+        val pinState = component.outputPins.getOrElse(idx) {
+            if (idx == 0) component.outputPin else Pin.UNDEFINED
+        }
+        drawSignalPort(center = pos, pin = pinState, settings = settings, radius = 5f)
     }
 }
 
@@ -138,7 +142,6 @@ fun DrawScope.drawBufferGate(
     val w = component.width
     val h = component.height
     val outlineColor = getGateOutlineColor(settings)
-    val portColor = getPortColor(settings)
     val tipX = if (inverting) x + w - 12f else x + w
 
     val path = Path().apply {
@@ -147,20 +150,20 @@ fun DrawScope.drawBufferGate(
         lineTo(x, y + h - 6f)
         close()
     }
-    drawPath(path = path, color = settings.elevatedSurfaceColor)
-    drawPath(path = path, color = outlineColor, style = Stroke(width = 2.5f))
+    drawPath(path = path, color = settings.gateBodyFillColor)
+    drawPath(path = path, color = outlineColor, style = Stroke(width = 2f))
 
     if (inverting) {
         drawCircle(
-            color = settings.elevatedSurfaceColor,
-            radius = 5.5f,
+            color = settings.gateBodyFillColor,
+            radius = 5f,
             center = Offset(x + w - 6f, y + h / 2f)
         )
         drawCircle(
             color = outlineColor,
-            radius = 5.5f,
+            radius = 5f,
             center = Offset(x + w - 6f, y + h / 2f),
-            style = Stroke(width = 2.2f)
+            style = Stroke(width = 2f)
         )
     }
 
@@ -185,11 +188,12 @@ fun DrawScope.drawBufferGate(
         )
     }
 
-    component.inputPortPositions().forEach { pos ->
-        drawCircle(color = portColor, radius = 5.5f, center = pos)
+    component.inputPortPositions().forEachIndexed { idx, pos ->
+        val pinState = component.inputPins.getOrElse(idx) { Pin.UNDEFINED }
+        drawSignalPort(center = pos, pin = pinState, settings = settings)
     }
     component.outputPortPositions().forEach { pos ->
-        drawCircle(color = portColor, radius = 5.5f, center = pos)
+        drawSignalPort(center = pos, pin = component.outputPin, settings = settings)
     }
 }
 
@@ -212,26 +216,28 @@ fun DrawScope.drawConstantPin(
 ) {
     val pin = if (isHigh) Pin.HIGH else Pin.LOW
     val outlineColor = getGateOutlineColor(settings)
-    val innerColor = getComponentInnerRectColor(pin, settings)
+    val innerColor = if (isHigh) settings.highPinColor else settings.ioIdleFillColor
+    val textColor = if (isHigh) settings.textHighColor else settings.textColor
 
+    drawRoundRect(
+        color = innerColor,
+        topLeft = Offset(component.x, component.y),
+        size = Size(component.width, component.height),
+        cornerRadius = CornerRadius(3f, 3f)
+    )
     drawRoundRect(
         color = outlineColor,
         topLeft = Offset(component.x, component.y),
         size = Size(component.width, component.height),
-        cornerRadius = CornerRadius(4f, 4f)
-    )
-    drawRoundRect(
-        color = innerColor,
-        topLeft = Offset(component.x + 6f, component.y + 6f),
-        size = Size(component.width - 12f, component.height - 12f),
-        cornerRadius = CornerRadius(2f, 2f)
+        cornerRadius = CornerRadius(3f, 3f),
+        style = Stroke(width = 2f)
     )
 
     if (settings.drawText) {
         val text = if (isHigh) "1 (VCC)" else "0 (GND)"
         val style = TextStyle(
-            color = Color.White,
-            fontSize = 11.sp,
+            color = textColor,
+            fontSize = 10.5.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace
         )
@@ -247,10 +253,10 @@ fun DrawScope.drawConstantPin(
         )
     }
 
-    drawCircle(
-        color = getPortColor(settings),
-        radius = 6f,
-        center = component.findPortOffset()
+    drawSignalPort(
+        center = component.findPortOffset(),
+        pin = pin,
+        settings = settings
     )
 }
 
@@ -263,34 +269,38 @@ fun DrawScope.drawProbeComponent(
     val outlineColor = getGateOutlineColor(settings)
     val fill = when (pinState) {
         Pin.HIGH -> settings.highPinColor
-        Pin.LOW -> settings.lowPinColor
-        Pin.ERROR -> settings.dangerColor
-        Pin.UNDEFINED -> settings.secondaryTextColor
+        Pin.ERROR -> settings.errorPinColor
+        Pin.LOW, Pin.UNDEFINED -> settings.ioIdleFillColor
+    }
+    val textColor = when (pinState) {
+        Pin.HIGH -> settings.textHighColor
+        Pin.ERROR -> settings.primaryControlText
+        Pin.LOW, Pin.UNDEFINED -> settings.textColor
     }
 
     drawRoundRect(
         color = fill,
         topLeft = Offset(component.x, component.y),
         size = Size(component.width, component.height),
-        cornerRadius = CornerRadius(12f, 12f)
+        cornerRadius = CornerRadius(3f, 3f)
     )
     drawRoundRect(
         color = outlineColor,
         topLeft = Offset(component.x, component.y),
         size = Size(component.width, component.height),
-        cornerRadius = CornerRadius(12f, 12f),
+        cornerRadius = CornerRadius(3f, 3f),
         style = Stroke(width = 2f)
     )
 
     val text = when (pinState) {
-        Pin.HIGH -> "PROBE: 1"
-        Pin.LOW -> "PROBE: 0"
-        Pin.ERROR -> "PROBE: E"
-        Pin.UNDEFINED -> "PROBE: U"
+        Pin.HIGH -> "PRB: 1"
+        Pin.LOW -> "PRB: 0"
+        Pin.ERROR -> "PRB: E"
+        Pin.UNDEFINED -> "PRB: ?"
     }
     val style = TextStyle(
-        color = Color.White,
-        fontSize = 11.sp,
+        color = textColor,
+        fontSize = 10.5.sp,
         fontWeight = FontWeight.Bold,
         fontFamily = FontFamily.Monospace
     )
@@ -306,7 +316,7 @@ fun DrawScope.drawProbeComponent(
     )
 
     component.inputPortPositions().forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 5.5f, center = pos)
+        drawSignalPort(center = pos, pin = pinState, settings = settings)
     }
 }
 
@@ -328,7 +338,7 @@ fun DrawScope.drawTunnelComponent(
         lineTo(x + 14f, y + h - 6f)
         close()
     }
-    drawPath(path = path, color = settings.elevatedSurfaceColor)
+    drawPath(path = path, color = settings.ioIdleFillColor)
     drawPath(path = path, color = outlineColor, style = Stroke(width = 2f))
 
     val netName = component.label.ifBlank { "NET" }
@@ -346,11 +356,12 @@ fun DrawScope.drawTunnelComponent(
         topLeft = Offset(x + 16f, y + h / 2f - layout.size.height / 2f)
     )
 
-    component.inputPortPositions().forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 5f, center = pos)
+    component.inputPortPositions().forEachIndexed { idx, pos ->
+        val pinState = component.inputPins.getOrElse(idx) { Pin.UNDEFINED }
+        drawSignalPort(center = pos, pin = pinState, settings = settings, radius = 5f)
     }
     component.outputPortPositions().forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 5f, center = pos)
+        drawSignalPort(center = pos, pin = component.outputPin, settings = settings, radius = 5f)
     }
 }
 
@@ -359,23 +370,24 @@ fun DrawScope.drawLedComponent(
     textMeasurer: TextMeasurer,
     settings: SettingsViewModel = SettingsViewModel.default
 ) {
-    val isLit = (component.inputPins.firstOrNull() ?: component.outputPin) == Pin.HIGH
+    val pinState = component.inputPins.firstOrNull() ?: component.outputPin
+    val isLit = pinState == Pin.HIGH
     val center = Offset(component.x + component.width / 2f + 4f, component.y + component.height / 2f)
     val radius = minOf(component.width, component.height) / 2f - 6f
     val outlineColor = getGateOutlineColor(settings)
-    val lampColor = if (isLit) settings.highPinColor else settings.elevatedSurfaceColor
+    val lampColor = if (isLit) settings.highPinColor else settings.ioIdleFillColor
 
     drawCircle(color = lampColor, radius = radius, center = center)
-    drawCircle(color = outlineColor, radius = radius, center = center, style = Stroke(width = 2.5f))
+    drawCircle(color = outlineColor, radius = radius, center = center, style = Stroke(width = 2f))
     drawCircle(
-        color = if (isLit) Color.White.copy(alpha = 0.85f) else outlineColor.copy(alpha = 0.4f),
+        color = if (isLit) Color.White.copy(alpha = 0.85f) else outlineColor.copy(alpha = 0.25f),
         radius = radius * 0.4f,
         center = center
     )
 
     if (settings.drawText) {
         val style = TextStyle(
-            color = if (isLit) Color.White else settings.textColor,
+            color = if (isLit) settings.textHighColor else settings.textColor,
             fontSize = 9.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Monospace
@@ -391,7 +403,7 @@ fun DrawScope.drawLedComponent(
     }
 
     component.inputPortPositions().forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 5.5f, center = pos)
+        drawSignalPort(center = pos, pin = pinState, settings = settings)
     }
 }
 
@@ -530,7 +542,7 @@ fun DrawScope.drawSevenSegmentComponent(
     if (settings.drawText) {
         val pinLabels = if (isHexDecoded) listOf("D0", "D1", "D2", "D3", "DP") else listOf("a", "b", "c", "d", "e", "f", "g", "dp")
         val pinStyle = TextStyle(
-            color = Color(0xFFB0BEC5),
+            color = settings.chipPinNumberColor,
             fontSize = 8.sp,
             fontWeight = FontWeight.SemiBold,
             fontFamily = FontFamily.Monospace
@@ -547,8 +559,9 @@ fun DrawScope.drawSevenSegmentComponent(
         }
     }
 
-    component.inputPortPositions().forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 5f, center = pos)
+    component.inputPortPositions().forEachIndexed { idx, pos ->
+        val pinState = component.inputPins.getOrElse(idx) { Pin.UNDEFINED }
+        drawSignalPort(center = pos, pin = pinState, settings = settings, radius = 5f)
     }
 }
 
@@ -562,10 +575,9 @@ fun DrawScope.drawDipSwitch4Bit(
     val w = component.width
     val h = component.height
     val outlineColor = getGateOutlineColor(settings)
-    val portColor = getPortColor(settings)
 
     drawRoundRect(
-        color = settings.elevatedSurfaceColor,
+        color = settings.gateBodyFillColor,
         topLeft = Offset(x, y),
         size = Size(w, h),
         cornerRadius = CornerRadius(3f, 3f)
@@ -580,24 +592,32 @@ fun DrawScope.drawDipSwitch4Bit(
 
     val mask = component.memoryData.firstOrNull() ?: 0
     val outPositions = component.outputPortPositions()
-    val pinStyle = TextStyle(
-        color = Color.White,
-        fontSize = 8.5.sp,
-        fontWeight = FontWeight.Bold,
-        fontFamily = FontFamily.Monospace
-    )
 
     outPositions.forEachIndexed { idx, portPos ->
         val isOn = (mask and (1 shl idx)) != 0
         val rowY = portPos.y - 8f
-        val fill = if (isOn) settings.highPinColor else settings.lowPinColor
+        val fill = if (isOn) settings.highPinColor else settings.ioIdleFillColor
+        val rowTextColor = if (isOn) settings.textHighColor else settings.textColor
         drawRoundRect(
             color = fill,
             topLeft = Offset(x + 8f, rowY),
             size = Size(w - 18f, 16f),
             cornerRadius = CornerRadius(2f, 2f)
         )
+        drawRoundRect(
+            color = settings.borderColor,
+            topLeft = Offset(x + 8f, rowY),
+            size = Size(w - 18f, 16f),
+            cornerRadius = CornerRadius(2f, 2f),
+            style = Stroke(width = 1f)
+        )
         if (settings.drawText) {
+            val pinStyle = TextStyle(
+                color = rowTextColor,
+                fontSize = 8.5.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace
+            )
             val txt = "SW$idx:${if (isOn) "1" else "0"}"
             val layout = textMeasurer.measure(txt, style = pinStyle)
             drawText(
@@ -607,6 +627,11 @@ fun DrawScope.drawDipSwitch4Bit(
                 topLeft = Offset(x + 14f, portPos.y - layout.size.height / 2f)
             )
         }
-        drawCircle(color = portColor, radius = 5f, center = portPos)
+        drawSignalPort(
+            center = portPos,
+            pin = if (isOn) Pin.HIGH else Pin.LOW,
+            settings = settings,
+            radius = 5f
+        )
     }
 }

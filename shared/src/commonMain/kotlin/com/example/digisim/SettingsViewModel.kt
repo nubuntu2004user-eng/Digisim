@@ -43,10 +43,19 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
     var textLowColor: Color by mutableStateOf(Color(0xFFFFFFFF))
     var textUndefinedColor: Color by mutableStateOf(Color(0xFF141414))
 
+    // Architectural Schematic Gate & IC Package Tokens (Option A)
+    var gateBodyFillColor: Color by mutableStateOf(Color(0xFFFFFFFF))
+    var ioIdleFillColor: Color by mutableStateOf(Color(0xFFF5F1E8))
+    var chipBodyColor: Color by mutableStateOf(Color(0xFF1C1C1A))
+    var chipNotchColor: Color by mutableStateOf(Color(0xFF2E2D2A))
+    var chipSubtitleColor: Color by mutableStateOf(Color(0xFFA8A298))
+    var chipPinNumberColor: Color by mutableStateOf(Color(0xFFD4B094))
+    var chipPinNameColor: Color by mutableStateOf(Color(0xFFF5F1E8))
+
     var gridColor: Color by mutableStateOf(Color(0xFFE5DFD3))
     var gridSize: Float by mutableStateOf(20f)
 
-    var customComponentFillColor: Color by mutableStateOf(Color(0xFFB38B6D))
+    var customComponentFillColor: Color by mutableStateOf(Color(0xFFF5F1E8))
     var customComponentOutlineColor: Color by mutableStateOf(Color(0xFF141414))
 
     fun applyTheme(dark: Boolean) {
@@ -68,7 +77,7 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
             dangerColor = Color(0xFFDC2626)
 
             highPinColor = Color(0xFFD97706)
-            lowPinColor = Color(0xFF334155)
+            lowPinColor = Color(0xFF475569)
             errorPinColor = Color(0xFFDC2626)
             undefinedPinColor = Color(0xFF2A2927)
             gateOutlineColor = Color(0xFFE5E0D5)
@@ -78,8 +87,16 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
             textLowColor = Color(0xFFF5F1E8)
             textUndefinedColor = Color(0xFFF5F1E8)
 
+            gateBodyFillColor = Color(0xFF262624)
+            ioIdleFillColor = Color(0xFF1C1C1A)
+            chipBodyColor = Color(0xFF181816)
+            chipNotchColor = Color(0xFF2A2927)
+            chipSubtitleColor = Color(0xFFA8A298)
+            chipPinNumberColor = Color(0xFFD4B094)
+            chipPinNameColor = Color(0xFFF5F1E8)
+
             gridColor = Color(0xFF242320)
-            customComponentFillColor = Color(0xFF7A583E)
+            customComponentFillColor = Color(0xFF262624)
             customComponentOutlineColor = Color(0xFFE5E0D5)
         } else {
             // Zurich Drafting Table (Pure Swiss Light Default)
@@ -108,8 +125,16 @@ class SettingsViewModel(drawText: Boolean = true) : ViewModel() {
             textLowColor = Color(0xFFFFFFFF)
             textUndefinedColor = Color(0xFF141414)
 
+            gateBodyFillColor = Color(0xFFFFFFFF)
+            ioIdleFillColor = Color(0xFFF5F1E8)
+            chipBodyColor = Color(0xFF1C1C1A)
+            chipNotchColor = Color(0xFF2E2D2A)
+            chipSubtitleColor = Color(0xFFA8A298)
+            chipPinNumberColor = Color(0xFFD4B094)
+            chipPinNameColor = Color(0xFFF5F1E8)
+
             gridColor = Color(0xFFE5DFD3)
-            customComponentFillColor = Color(0xFFB38B6D)
+            customComponentFillColor = Color(0xFFF5F1E8)
             customComponentOutlineColor = Color(0xFF141414)
         }
     }

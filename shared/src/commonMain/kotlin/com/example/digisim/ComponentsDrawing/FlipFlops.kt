@@ -9,14 +9,15 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.digisim.DrawingLogic.getComponentInnerRectColor
-import com.example.digisim.DrawingLogic.getComponentTextColor
+import com.example.digisim.DrawingLogic.drawGateSignalPill
+import com.example.digisim.DrawingLogic.drawSignalPort
 import com.example.digisim.DrawingLogic.getGateOutlineColor
-import com.example.digisim.DrawingLogic.getPortColor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.SettingsViewModel
+import logicGates.Pin
 
 private fun DrawScope.drawFlipFlopBase(
     component: Component,
@@ -31,11 +32,11 @@ private fun DrawScope.drawFlipFlopBase(
     val w = component.width
     val h = component.height
 
-    val cornerRadius = CornerRadius(6f, 6f)
+    val cornerRadius = CornerRadius(3f, 3f)
 
-    // Body Fill
+    // Body Fill: clean architectural drafting surface
     drawRoundRect(
-        color = getComponentInnerRectColor(component.outputPin, settings),
+        color = settings.gateBodyFillColor,
         topLeft = Offset(x, y),
         size = Size(w, h),
         cornerRadius = cornerRadius
@@ -69,13 +70,21 @@ private fun DrawScope.drawFlipFlopBase(
     }
 
     if (settings.drawText) {
-        val textColor = getComponentTextColor(component.outputPin, settings)
+        // Output Q state pill indicator below center label
+        drawGateSignalPill(
+            center = Offset(x + w / 2f, y + h / 2f + 12f),
+            pin = component.outputPin,
+            settings = settings,
+            width = 18f,
+            height = 5f
+        )
 
         // Main Center Label
         val centerTextStyle = TextStyle(
-            color = textColor,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            color = settings.textColor,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace
         )
         val centerLayout = textMeasurer.measure(mainLabel, style = centerTextStyle)
         drawText(
@@ -84,15 +93,16 @@ private fun DrawScope.drawFlipFlopBase(
             style = centerTextStyle,
             topLeft = Offset(
                 x + w / 2f - centerLayout.size.width / 2f,
-                y + h / 2f - centerLayout.size.height / 2f
+                y + h / 2f - centerLayout.size.height / 2f - 3f
             )
         )
 
         // Pin text style
         val pinTextStyle = TextStyle(
-            color = textColor,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold
+            color = settings.secondaryTextColor,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = FontFamily.Monospace
         )
 
         // Input Pin Labels
@@ -133,13 +143,18 @@ private fun DrawScope.drawFlipFlopBase(
     }
 
     // Input ports
-    component.inputPortPositions().forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 6f, center = pos)
+    component.inputPortPositions().forEachIndexed { idx, pos ->
+        val pinState = component.inputPins.getOrElse(idx) { Pin.UNDEFINED }
+        drawSignalPort(center = pos, pin = pinState, settings = settings)
     }
 
     // Output ports
-    component.outputPortPositions().forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 6f, center = pos)
+    val outPositions = component.outputPortPositions()
+    outPositions.forEachIndexed { idx, pos ->
+        val outPinState = component.outputPins.getOrElse(idx) {
+            if (idx == 0) component.outputPin else Pin.UNDEFINED
+        }
+        drawSignalPort(center = pos, pin = outPinState, settings = settings)
     }
 }
 

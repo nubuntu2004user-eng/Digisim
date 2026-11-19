@@ -8,14 +8,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.digisim.DrawingLogic.getComponentInnerRectColor
-import com.example.digisim.DrawingLogic.getComponentTextColor
+import com.example.digisim.DrawingLogic.drawSignalPort
 import com.example.digisim.DrawingLogic.getGateOutlineColor
-import com.example.digisim.DrawingLogic.getPortColor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.SettingsViewModel
+import logicGates.Pin
 
 fun DrawScope.drawButton(
     component: Component,
@@ -27,11 +27,12 @@ fun DrawScope.drawButton(
     val w = component.width
     val h = component.height
 
-    val cornerRadius = CornerRadius(4f, 4f)
+    val cornerRadius = CornerRadius(3f, 3f)
+    val isHigh = component.outputPin == Pin.HIGH
 
-    // Outer Simple Box Fill
+    // Outer Housing Fill
     drawRoundRect(
-        color = getComponentInnerRectColor(component.outputPin, settings),
+        color = settings.ioIdleFillColor,
         topLeft = Offset(x, y),
         size = Size(w, h),
         cornerRadius = cornerRadius
@@ -47,28 +48,37 @@ fun DrawScope.drawButton(
     )
 
     // Inner Push Button Cap Graphic
-    val innerMargin = 8f
+    val innerMargin = 7f
+    val capFill = if (isHigh) settings.highPinColor else settings.gateBodyFillColor
+    val capTextColor = if (isHigh) settings.textHighColor else settings.textColor
+    drawRoundRect(
+        color = capFill,
+        topLeft = Offset(x + innerMargin, y + innerMargin),
+        size = Size(w - innerMargin * 2, h - innerMargin * 2),
+        cornerRadius = CornerRadius(2f, 2f)
+    )
     drawRoundRect(
         color = getGateOutlineColor(settings),
         topLeft = Offset(x + innerMargin, y + innerMargin),
         size = Size(w - innerMargin * 2, h - innerMargin * 2),
-        cornerRadius = CornerRadius(3f, 3f),
+        cornerRadius = CornerRadius(2f, 2f),
         style = Stroke(width = 1.5f)
     )
 
     // Output Port
-    drawCircle(
-        color = getPortColor(settings),
-        radius = 6f,
-        center = component.findPortOffset()
+    drawSignalPort(
+        center = component.findPortOffset(),
+        pin = component.outputPin,
+        settings = settings
     )
 
     // Label
-    val label = if (component.label.equals("")) "BTN ${component.ID}" else "${component.label} ${component.ID}"
+    val label = if (component.label.isEmpty()) "BTN ${component.ID}" else "${component.label} ${component.ID}"
     val textStyle = TextStyle(
-        color = getComponentTextColor(component.outputPin, settings),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Medium
+        color = capTextColor,
+        fontSize = 11.sp,
+        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.Monospace
     )
     val textLayout = textMeasurer.measure(label, style = textStyle)
     if (settings.drawText) {

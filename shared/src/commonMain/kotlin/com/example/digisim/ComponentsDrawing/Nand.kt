@@ -8,14 +8,15 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.digisim.DrawingLogic.getComponentInnerRectColor
-import com.example.digisim.DrawingLogic.getComponentTextColor
+import com.example.digisim.DrawingLogic.drawGateSignalPill
+import com.example.digisim.DrawingLogic.drawSignalPort
 import com.example.digisim.DrawingLogic.getGateOutlineColor
-import com.example.digisim.DrawingLogic.getPortColor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.SettingsViewModel
+import logicGates.Pin
 
 fun DrawScope.drawNand(
     component: Component,
@@ -47,7 +48,7 @@ fun DrawScope.drawNand(
     // Fill body
     drawPath(
         path = path,
-        color = getComponentInnerRectColor(component.outputPin, settings)
+        color = settings.gateBodyFillColor
     )
 
     // Outline body
@@ -60,7 +61,7 @@ fun DrawScope.drawNand(
     // Inversion bubble
     val bubbleCenter = Offset(x + w, y + h / 2f)
     drawCircle(
-        color = getComponentInnerRectColor(component.outputPin, settings),
+        color = settings.gateBodyFillColor,
         radius = bubbleRadius,
         center = bubbleCenter
     )
@@ -71,12 +72,20 @@ fun DrawScope.drawNand(
         style = Stroke(width = 2f)
     )
 
-    // Label – using Compose's drawText (multiplatform)
-    val label = if (component.label.equals("")) "NAND ${component.ID}" else "${component.label} ${component.ID}"
+    if (settings.drawText) {
+        drawGateSignalPill(
+            center = Offset(x + bodyW * 0.45f, y + h * 0.74f),
+            pin = component.outputPin,
+            settings = settings
+        )
+    }
+
+    val label = if (component.label.isEmpty()) "NAND ${component.ID}" else "${component.label} ${component.ID}"
     val textStyle = TextStyle(
-        color = getComponentTextColor(component.outputPin, settings),
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Medium
+        color = settings.textColor,
+        fontSize = 11.5.sp,
+        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.Monospace
     )
     val textLayout = textMeasurer.measure(label, style = textStyle)
     if (settings.drawText) {
@@ -85,15 +94,15 @@ fun DrawScope.drawNand(
             text = label,
             style = textStyle,
             topLeft = Offset(
-                x + bodyW * 0.45f - textLayout.size.width / 2,
-                y + h / 2 - textLayout.size.height / 2
+                x + bodyW * 0.45f - textLayout.size.width / 2f,
+                y + h * 0.44f - textLayout.size.height / 2f
             )
         )
     }
+
     // Input ports
     val inputPositions = component.inputPortPositions()
     if (component.inputCount > 2 && inputPositions.isNotEmpty()) {
-        // Draw the vertical line
         val minY = inputPositions.minOf { it.y }
         val maxY = inputPositions.maxOf { it.y }
         drawLine(
@@ -103,13 +112,14 @@ fun DrawScope.drawNand(
             strokeWidth = 2f
         )
     }
-    
-    inputPositions.forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 6f, center = pos)
+
+    inputPositions.forEachIndexed { idx, pos ->
+        val pinState = component.inputPins.getOrElse(idx) { Pin.UNDEFINED }
+        drawSignalPort(center = pos, pin = pinState, settings = settings)
     }
 
     // Output ports
     component.outputPortPositions().forEach { pos ->
-        drawCircle(color = getPortColor(settings), radius = 6f, center = pos)
+        drawSignalPort(center = pos, pin = component.outputPin, settings = settings)
     }
 }

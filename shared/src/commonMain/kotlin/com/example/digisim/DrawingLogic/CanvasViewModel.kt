@@ -63,7 +63,7 @@ class CanvasViewModel: ViewModel() {
 
     var currentMode by mutableStateOf(editingMode.DRAG)
 
-    var currentWiringColor = Color.Blue
+    var currentWiringColor = Color(0xFF1E3A8A)
 
     var selectedGateId by mutableStateOf<Int?>(null)
     val selectedGateIds = mutableStateListOf<Int>()

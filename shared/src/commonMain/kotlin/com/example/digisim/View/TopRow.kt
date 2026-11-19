@@ -208,12 +208,12 @@ fun TopRow(
             ) {
                 if (viewModel.currentMode == CanvasViewModel.editingMode.WIRE) {
                     val colorButtonList = listOf(
-                        colorButton(Color(0xFF1D4ED8), translationViewModel.getString("Blue", lang)),
+                        colorButton(Color(0xFF1E3A8A), translationViewModel.getString("Blue", lang)),
                         colorButton(Color(0xFF141414), translationViewModel.getString("Black", lang)),
                         colorButton(Color(0xFFB91C1C), translationViewModel.getString("Red", lang)),
-                        colorButton(Color(0xFF15803D), translationViewModel.getString("Green", lang)),
-                        colorButton(Color(0xFF9333EA), translationViewModel.getString("Magenta", lang)),
-                        colorButton(Color(0xFF0E7490), translationViewModel.getString("Cyan", lang))
+                        colorButton(Color(0xFF166534), translationViewModel.getString("Green", lang)),
+                        colorButton(Color(0xFF7E22CE), translationViewModel.getString("Magenta", lang)),
+                        colorButton(Color(0xFF155E75), translationViewModel.getString("Cyan", lang))
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

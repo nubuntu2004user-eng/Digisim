@@ -93,7 +93,6 @@ fun calculateInputPinPositions(component: Component): List<Offset> {
 fun getComponentInnerRectColor(pin: Pin, settings: SettingsViewModel = SettingsViewModel.default): Color {
     return settings.getComponentInnerRectColor(pin)
 }
-// ... existing code ...
 
 fun getComponentTextColor(pin: Pin, settings: SettingsViewModel = SettingsViewModel.default): Color {
     return settings.getComponentTextColor(pin)
@@ -107,9 +106,65 @@ fun getPortColor(settings: SettingsViewModel = SettingsViewModel.default): Color
     return settings.portColor
 }
 
-
 fun getWireHighlightColor(settings: SettingsViewModel = SettingsViewModel.default): Color {
     return settings.wireHighlightColor
+}
+
+/**
+ * Draws an architectural port terminal dot with an inner signal-state core
+ * when a simulation signal is active (Option A: Zurich Drafting Table).
+ */
+fun DrawScope.drawSignalPort(
+    center: Offset,
+    pin: Pin = Pin.UNDEFINED,
+    settings: SettingsViewModel = SettingsViewModel.default,
+    radius: Float = 5.5f
+) {
+    val outline = getPortColor(settings)
+    when (pin) {
+        Pin.HIGH -> {
+            drawCircle(color = settings.highPinColor, radius = radius + 0.5f, center = center)
+            drawCircle(color = outline, radius = radius + 0.5f, center = center, style = Stroke(width = 1.5f))
+        }
+        Pin.ERROR -> {
+            drawCircle(color = settings.errorPinColor, radius = radius + 0.5f, center = center)
+            drawCircle(color = outline, radius = radius + 0.5f, center = center, style = Stroke(width = 1.5f))
+        }
+        Pin.LOW -> {
+            drawCircle(color = settings.lowPinColor, radius = radius, center = center)
+            drawCircle(color = outline, radius = radius, center = center, style = Stroke(width = 1.5f))
+        }
+        Pin.UNDEFINED -> {
+            drawCircle(color = outline, radius = radius, center = center)
+        }
+    }
+}
+
+/**
+ * Draws a compact Swiss signal status pill inside a gate or flip-flop body
+ * to indicate its live output state (1 = Amber, 0 = Slate, E = Crimson, ? = Stone)
+ * while keeping the component body a clean architectural surface.
+ */
+fun DrawScope.drawGateSignalPill(
+    center: Offset,
+    pin: Pin,
+    settings: SettingsViewModel = SettingsViewModel.default,
+    width: Float = 16f,
+    height: Float = 5f
+) {
+    val fill = when (pin) {
+        Pin.HIGH -> settings.highPinColor
+        Pin.LOW -> settings.lowPinColor
+        Pin.ERROR -> settings.errorPinColor
+        Pin.UNDEFINED -> settings.borderColor
+    }
+    val topLeft = Offset(center.x - width / 2f, center.y - height / 2f)
+    drawRoundRect(
+        color = fill,
+        topLeft = topLeft,
+        size = androidx.compose.ui.geometry.Size(width, height),
+        cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.5f, 1.5f)
+    )
 }
 
 internal fun DrawScope.drawRoutedWire(

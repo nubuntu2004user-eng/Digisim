@@ -13,10 +13,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.sp
+import com.example.digisim.DrawingLogic.drawSignalPort
 import com.example.digisim.DrawingLogic.getGateOutlineColor
-import com.example.digisim.DrawingLogic.getPortColor
 import com.example.digisim.ParsingLogic.Component
 import com.example.digisim.SettingsViewModel
+import logicGates.Pin
 
 private data class PinInfo(val pinNum: Int, val name: String, val yOffset: Float)
 
@@ -34,10 +35,10 @@ private fun DrawScope.drawDIP14Chip(
     val w = component.width
     val h = component.height
 
-    val cornerRadius = CornerRadius(6f, 6f)
+    val cornerRadius = CornerRadius(3f, 3f)
 
-    // DIP IC Body (dark IC package)
-    val bodyColor = Color(0xFF212121)
+    // Ceramic DIP IC Body (Warm Swiss Charcoal)
+    val bodyColor = settings.chipBodyColor
     drawRoundRect(
         color = bodyColor,
         topLeft = Offset(x, y),
@@ -72,20 +73,20 @@ private fun DrawScope.drawDIP14Chip(
             forceMoveTo = false
         )
     }
-    drawPath(path = notchPath, color = Color(0xFF333333))
+    drawPath(path = notchPath, color = settings.chipNotchColor)
     drawPath(path = notchPath, color = outlineColor, style = Stroke(width = 2f))
 
-    // Pin 1 Indicator Dot (top-left corner)
+    // Pin 1 Indicator Dot (top-left corner in Swiss Taupe)
     drawCircle(
-        color = Color(0xFF555555),
+        color = settings.accentTaupe,
         radius = 3.5f,
         center = Offset(x + 12f, y + 12f)
     )
 
     // Chip Center Label (e.g. "7400")
     val centerTextStyle = TextStyle(
-        color = Color.White,
-        fontSize = 17.sp,
+        color = settings.chipPinNameColor,
+        fontSize = 15.sp,
         fontWeight = FontWeight.Bold,
         fontFamily = FontFamily.Monospace
     )
@@ -102,9 +103,10 @@ private fun DrawScope.drawDIP14Chip(
 
     // Subtitle under chip number (e.g. "QUAD NAND")
     val subTextStyle = TextStyle(
-        color = Color(0xFFB0BEC5),
+        color = settings.chipSubtitleColor,
         fontSize = 8.5.sp,
-        fontWeight = FontWeight.Medium
+        fontWeight = FontWeight.SemiBold,
+        fontFamily = FontFamily.Monospace
     )
     val subLayout = textMeasurer.measure(chipSubtitle, style = subTextStyle)
     drawText(
@@ -117,23 +119,35 @@ private fun DrawScope.drawDIP14Chip(
         )
     )
 
-    // Pin Labels Style
+    // Pin Labels Style (Swiss Brass/Taupe for numbers, Warm Parchment for pin names)
     val pinNumStyle = TextStyle(
-        color = Color(0xFF90CAF9),
+        color = settings.chipPinNumberColor,
         fontSize = 8.5.sp,
         fontWeight = FontWeight.SemiBold,
         fontFamily = FontFamily.Monospace
     )
     val pinNameStyle = TextStyle(
-        color = Color(0xFFE0E0E0),
+        color = settings.chipPinNameColor,
         fontSize = 9.sp,
-        fontWeight = FontWeight.Medium
+        fontWeight = FontWeight.Medium,
+        fontFamily = FontFamily.Monospace
+    )
+    val vccPinStyle = TextStyle(
+        color = Color(0xFFF59E0B),
+        fontSize = 9.sp,
+        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.Monospace
+    )
+    val gndPinStyle = TextStyle(
+        color = settings.chipSubtitleColor,
+        fontSize = 9.sp,
+        fontWeight = FontWeight.SemiBold,
+        fontFamily = FontFamily.Monospace
     )
 
-    // Left Pins (Pins 1 to 7)
+    // Left Pins (Pins 1 to 7/8)
     leftPins.forEach { pin ->
         val pinY = y + pin.yOffset
-        // Pin Number
         val numLayout = textMeasurer.measure(pin.pinNum.toString(), style = pinNumStyle)
         drawText(
             textMeasurer = textMeasurer,
@@ -142,29 +156,36 @@ private fun DrawScope.drawDIP14Chip(
             topLeft = Offset(x + 5f, pinY - numLayout.size.height / 2f)
         )
 
-        // Pin Function Name
-        val nameLayout = textMeasurer.measure(pin.name, style = pinNameStyle)
+        val activeNameStyle = when (pin.name) {
+            "VCC" -> vccPinStyle
+            "GND", "NC" -> gndPinStyle
+            else -> pinNameStyle
+        }
+        val nameLayout = textMeasurer.measure(pin.name, style = activeNameStyle)
         drawText(
             textMeasurer = textMeasurer,
             text = pin.name,
-            style = pinNameStyle,
+            style = activeNameStyle,
             topLeft = Offset(x + 16f, pinY - nameLayout.size.height / 2f)
         )
     }
 
-    // Right Pins (Pins 14 down to 8)
+    // Right Pins (Pins 14/16 down to 8/9)
     rightPins.forEach { pin ->
         val pinY = y + pin.yOffset
-        // Pin Function Name
-        val nameLayout = textMeasurer.measure(pin.name, style = pinNameStyle)
+        val activeNameStyle = when (pin.name) {
+            "VCC" -> vccPinStyle
+            "GND", "NC" -> gndPinStyle
+            else -> pinNameStyle
+        }
+        val nameLayout = textMeasurer.measure(pin.name, style = activeNameStyle)
         drawText(
             textMeasurer = textMeasurer,
             text = pin.name,
-            style = pinNameStyle,
+            style = activeNameStyle,
             topLeft = Offset(x + w - nameLayout.size.width - 18f, pinY - nameLayout.size.height / 2f)
         )
 
-        // Pin Number
         val numLayout = textMeasurer.measure(pin.pinNum.toString(), style = pinNumStyle)
         drawText(
             textMeasurer = textMeasurer,
@@ -175,12 +196,13 @@ private fun DrawScope.drawDIP14Chip(
     }
 
     // Port terminals for wire connections
-    val portColor = getPortColor(settings)
-    component.inputPortPositions().forEach { pos ->
-        drawCircle(color = portColor, radius = 5.5f, center = pos)
+    component.inputPortPositions().forEachIndexed { idx, pos ->
+        val pinState = component.inputPins.getOrElse(idx) { Pin.UNDEFINED }
+        drawSignalPort(center = pos, pin = pinState, settings = settings, radius = 5f)
     }
-    component.outputPortPositions().forEach { pos ->
-        drawCircle(color = portColor, radius = 5.5f, center = pos)
+    component.outputPortPositions().forEachIndexed { idx, pos ->
+        val pinState = component.outputPins.getOrElse(idx) { Pin.UNDEFINED }
+        drawSignalPort(center = pos, pin = pinState, settings = settings, radius = 5f)
     }
 }
 
