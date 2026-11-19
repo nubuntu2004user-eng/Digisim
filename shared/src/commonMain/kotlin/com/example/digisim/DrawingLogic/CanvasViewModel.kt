@@ -78,7 +78,72 @@ class CanvasViewModel: ViewModel() {
 
     var viewportX by mutableStateOf(0f)
     var viewportY by mutableStateOf(0f)
+    var isTextInputFocused by mutableStateOf(false)
 //    var isPanning by mutableStateOf(false)
+
+    fun rotateActiveComponentLeft(): Boolean {
+        val pending = pendingComponent
+        if (pending != null) {
+            pending.rotateLeft()
+            return true
+        }
+        val dragging = dragState?.let { findGate(it.componentId) }
+        if (dragging != null) {
+            dragging.rotateLeft()
+            return true
+        }
+        if (currentMode == editingMode.EDIT) {
+            val selected = selectedGateId?.let { findGate(it) }
+            if (selected != null) {
+                selected.rotateLeft()
+                return true
+            }
+        }
+        return false
+    }
+
+    fun rotateActiveComponentRight(): Boolean {
+        val pending = pendingComponent
+        if (pending != null) {
+            pending.rotateRight()
+            return true
+        }
+        val dragging = dragState?.let { findGate(it.componentId) }
+        if (dragging != null) {
+            dragging.rotateRight()
+            return true
+        }
+        if (currentMode == editingMode.EDIT) {
+            val selected = selectedGateId?.let { findGate(it) }
+            if (selected != null) {
+                selected.rotateRight()
+                return true
+            }
+        }
+        return false
+    }
+
+    fun deleteActiveComponent(): Boolean {
+        if (pendingComponent != null) {
+            pendingComponent = null
+            return true
+        }
+        if (currentMode == editingMode.EDIT || selectedGateId != null) {
+            val selected = selectedGateId?.let { findGate(it) }
+            if (selected != null) {
+                wires.removeAll {
+                    it.sourceGateId == selected.ID || it.targetGateId == selected.ID
+                }
+                components.remove(selected)
+                if (dragState?.componentId == selected.ID) {
+                    dragState = null
+                }
+                selectedGateId = null
+                return true
+            }
+        }
+        return false
+    }
 
     fun addComponent(type: ComponentType, logic: MutableList<MutableList<SimulationComponent>>? = null, name: String? = null, inputCount: Int = 2, outputCount: Int = 1) {
         pendingComponent = createComponent(type, id = -1, x = -1000f, y = -1000f , inputCount, outputCount , logic, name)
@@ -98,24 +163,26 @@ class CanvasViewModel: ViewModel() {
                 component.componentType == ComponentType.CONSTANT_HIGH ||
                 component.componentType == ComponentType.CONSTANT_LOW
             ) {
-                if (distance(position, component.findPortOffset()) < 12f) {
-                    return PortHit(component.ID, 0, false, component.findPortOffset())
+                val portPos = component.rotatedFindPortOffset()
+                if (distance(position, portPos) < 12f) {
+                    return PortHit(component.ID, 0, false, portPos)
                 }
             }
             if (component.componentType == ComponentType.OUTPUT ||
                 component.componentType == ComponentType.PROBE ||
                 component.componentType == ComponentType.LED
             ) {
-                if (distance(position, component.findPortOffset()) < 12f) {
-                    return PortHit(component.ID, 0, true, component.findPortOffset())
+                val portPos = component.rotatedFindPortOffset()
+                if (distance(position, portPos) < 12f) {
+                    return PortHit(component.ID, 0, true, portPos)
                 }
             }
-            component.inputPortPositions().forEachIndexed { idx, portPos ->
+            component.rotatedInputPortPositions().forEachIndexed { idx, portPos ->
                 if (distance(position, portPos) < 12f) {
                     return PortHit(component.ID, idx, true, portPos)
                 }
             }
-            component.outputPortPositions().forEachIndexed { idx, portPos ->
+            component.rotatedOutputPortPositions().forEachIndexed { idx, portPos ->
                 if (distance(position, portPos) < 12f) {
                     return PortHit(component.ID, idx, false, portPos)
                 }

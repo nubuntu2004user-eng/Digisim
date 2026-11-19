@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.TextMeasurer
 import com.example.digisim.ComponentsDrawing.drawAnd
 import com.example.digisim.ComponentsDrawing.drawButton
@@ -125,18 +126,18 @@ internal fun DrawScope.drawWire(
         sourceComponent.componentType == ComponentType.CONSTANT_HIGH ||
         sourceComponent.componentType == ComponentType.CONSTANT_LOW
     ) {
-        sourceComponent.findPortOffset()
+        sourceComponent.rotatedFindPortOffset()
     } else {
-        sourceComponent.outputPortPositions().getOrElse(sourcePortIndex) { sourceComponent.findPortOffset() }
+        sourceComponent.rotatedOutputPortPositions().getOrElse(sourcePortIndex) { sourceComponent.rotatedFindPortOffset() }
     }
 
     val targetPos = if (targetComponent.componentType == ComponentType.OUTPUT ||
         targetComponent.componentType == ComponentType.PROBE ||
         targetComponent.componentType == ComponentType.LED
     ) {
-        targetComponent.findPortOffset()
+        targetComponent.rotatedFindPortOffset()
     } else {
-        targetComponent.inputPortPositions().getOrElse(targetPortIndex) { targetComponent.findPortOffset() }
+        targetComponent.rotatedInputPortPositions().getOrElse(targetPortIndex) { targetComponent.rotatedFindPortOffset() }
     }
 
     val midX = (sourcePos.x + targetPos.x) / 2f
@@ -155,6 +156,22 @@ internal fun DrawScope.drawWire(
 }
 
 fun DrawScope.drawComponent(
+    component: Component,
+    textMeasurer: TextMeasurer,
+    settings: SettingsViewModel = SettingsViewModel.default
+) {
+    val deg = component.rotationDegrees
+    val pivot = Offset(component.x + component.width / 2f, component.y + component.height / 2f)
+    withTransform({
+        if (deg != 0f) {
+            rotate(degrees = deg, pivot = pivot)
+        }
+    }) {
+        drawComponentUnrotated(component, textMeasurer, settings)
+    }
+}
+
+private fun DrawScope.drawComponentUnrotated(
     component: Component,
     textMeasurer: TextMeasurer,
     settings: SettingsViewModel = SettingsViewModel.default

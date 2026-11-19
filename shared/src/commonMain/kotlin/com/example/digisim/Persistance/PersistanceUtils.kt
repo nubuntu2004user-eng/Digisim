@@ -91,11 +91,11 @@ fun Component.toDto(): ComponentDto = ComponentDto(
     outputCount = outputCount,
     label = label,
     customLogic = abstractedLogic,
-    customName = customComponentName
-
+    customName = customComponentName,
+    rotationSteps = rotationSteps
 )
 
-fun ComponentDto.toComponent(): Component = when (type) {
+fun ComponentDto.toComponent(): Component = (when (type) {
     ComponentType.BUTTON -> Button(
         id = id,
         initialX = x,
@@ -468,4 +468,6 @@ fun ComponentDto.toComponent(): Component = when (type) {
         customComponentName = customName,
         label = label
     )
+}).apply {
+    this.rotationSteps = this@toComponent.rotationSteps
 }

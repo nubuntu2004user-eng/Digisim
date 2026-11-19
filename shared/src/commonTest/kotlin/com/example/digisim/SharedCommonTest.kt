@@ -527,5 +527,74 @@ class SharedCommonTest {
         assertEquals(Pin.LOW, hexDisp.inputPins[0])
         assertEquals(Pin.HIGH, hexDisp.inputPins[1])
     }
+
+    @Test
+    fun testComponentRotationPortsPlacementAndPersistence() {
+        val viewModel = CanvasViewModel()
+        val canvasWidth = 600f
+        val canvasHeight = 500f
+
+        // 1. Add pending AND gate and rotate right (90 deg CW) and left (back to 0, then 270 deg)
+        viewModel.addComponent(ComponentType.AND)
+        val pending = viewModel.pendingComponent
+        assertNotNull(pending)
+        assertEquals(0, pending.rotationSteps)
+        assertEquals(0f, pending.rotationDegrees)
+
+        assertTrue(viewModel.rotateActiveComponentRight())
+        assertEquals(1, pending.rotationSteps)
+        assertEquals(90f, pending.rotationDegrees)
+
+        placePendingComponent(viewModel, Offset(200f, 150f), canvasWidth, canvasHeight)
+        assertEquals(1, viewModel.components.size)
+        val placed = viewModel.components.first()
+        assertEquals(1, placed.rotationSteps)
+        assertEquals(90f, placed.rotationDegrees)
+
+        // Verify rotated port positions differ from unrotated port positions around center
+        val unrotatedOut = placed.outputPortPositions().first()
+        val rotatedOut = placed.rotatedOutputPortPositions().first()
+        assertNotEquals(unrotatedOut, rotatedOut)
+        // Center is (160 + 40, 120 + 30) = (200, 150). Unrotated output is (240, 150) -> dx=+40, dy=0.
+        // At 90 deg CW (step=1): (cx - dy, cy + dx) = (200, 190).
+        assertEquals(Offset(200f, 190f), rotatedOut)
+
+        // 2. Edit mode rotation via viewModel shortcuts
+        viewModel.currentMode = CanvasViewModel.editingMode.EDIT
+        viewModel.selectedGateId = placed.ID
+        assertTrue(viewModel.rotateActiveComponentLeft())
+        assertEquals(0, placed.rotationSteps)
+        assertTrue(viewModel.rotateActiveComponentLeft())
+        assertEquals(3, placed.rotationSteps)
+        assertEquals(270f, placed.rotationDegrees)
+
+        // 3. Persistence round-trip preserves rotationSteps
+        val dto = placed.toDto()
+        assertEquals(3, dto.rotationSteps)
+        val restored = dto.toComponent()
+        assertEquals(3, restored.rotationSteps)
+        assertEquals(270f, restored.rotationDegrees)
+
+        // 4. Delete active pending component discards it without touching placed components
+        viewModel.addComponent(ComponentType.OR)
+        assertNotNull(viewModel.pendingComponent)
+        assertTrue(viewModel.deleteActiveComponent())
+        assertNull(viewModel.pendingComponent)
+        assertEquals(1, viewModel.components.size)
+
+        // 5. Delete selected component removes it and its connected wires
+        val outPin = Output(99, 300f, 150f, 1, 0)
+        viewModel.components.add(outPin)
+        viewModel.wires.add(Wire(100, placed.ID, 0, outPin.ID, 0))
+        assertEquals(2, viewModel.components.size)
+        assertEquals(1, viewModel.wires.size)
+
+        viewModel.currentMode = CanvasViewModel.editingMode.EDIT
+        viewModel.selectedGateId = placed.ID
+        assertTrue(viewModel.deleteActiveComponent())
+        assertNull(viewModel.selectedGateId)
+        assertEquals(1, viewModel.components.size)
+        assertEquals(0, viewModel.wires.size)
+    }
 }
 

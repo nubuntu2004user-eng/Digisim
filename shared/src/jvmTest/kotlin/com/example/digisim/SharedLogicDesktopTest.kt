@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.dp
@@ -19,6 +20,7 @@ import logicGates.Pin
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
@@ -921,5 +923,111 @@ class SharedLogicDesktopTest {
         waitForIdle()
         assertEquals(Pin.HIGH, inPin.outputPin)
         assertEquals(Pin.LOW, outPin.outputPin)
+    }
+
+    /**
+     * Playwright-style Test 9:
+     * Verifies rotating components 90 degrees via Q / E shortcuts when placing a new component
+     * and when in Edit mode, as well as via the two turn buttons to the left of the component ID
+     * in the Edit / Inspector menu header, and wiring rotated components.
+     */
+    @Test
+    fun testRotateComponentViaShortcutsAndInspectorButtonsInUi() = runComposeUiTest {
+        val viewModel = CanvasViewModel()
+        val simulation = SimulationViewModel()
+        val librariesVm = ComponentLibrariesViewModel()
+        val clockManager = ClockManager()
+        val translationVm = TranslationViewModel()
+        val appState = AppState()
+
+        setContent {
+            Box(modifier = Modifier.size(1280.dp, 820.dp)) {
+                App(
+                    viewModel = viewModel,
+                    simulation = simulation,
+                    librariesViewModel = librariesVm,
+                    clockManager = clockManager,
+                    translationViewModel = translationVm,
+                    appState = appState
+                )
+            }
+        }
+        waitForIdle()
+
+        val canvasNode = onNodeWithTag("logic_canvas").assertExists()
+
+        // 1. Select NOT Gate to start placing a new component on canvas
+        onNodeWithTag("quick_insert_NOT").performScrollTo().performClick()
+        waitForIdle()
+        assertNotNull(viewModel.pendingComponent)
+        assertEquals(0, viewModel.pendingComponent!!.rotationSteps)
+
+        // Press 'E' key to rotate right 90 degrees while placing
+        canvasNode.performKeyInput { pressKey(Key.E) }
+        waitForIdle()
+        assertEquals(1, viewModel.pendingComponent!!.rotationSteps)
+
+        // Place rotated NOT gate on canvas at (260, 200)
+        canvasNode.performMouseInput { click(Offset(260f, 200f)) }
+        waitForIdle()
+        assertEquals(1, viewModel.components.size)
+        val notComp = viewModel.components.first()
+        assertEquals(1, notComp.rotationSteps)
+        assertEquals(90f, notComp.rotationDegrees)
+
+        // 2. Switch to Edit Mode and click the rotated NOT gate
+        onNodeWithText("Switch to Edit Mode").performClick()
+        waitForIdle()
+        val notCenter = Offset(notComp.x + notComp.width / 2f, notComp.y + notComp.height / 2f)
+        canvasNode.performMouseInput { click(notCenter) }
+        waitForIdle()
+        assertEquals(notComp.ID, viewModel.selectedGateId)
+
+        // Verify the two rotation buttons exist in the Inspector header to the left of the ID badge
+        val leftBtn = onNodeWithTag("rotate_left_button").assertExists().assertIsDisplayed()
+        val rightBtn = onNodeWithTag("rotate_right_button").assertExists().assertIsDisplayed()
+        val idBadge = onNodeWithText("ID:${notComp.ID}").assertExists().assertIsDisplayed()
+
+        val leftBounds = leftBtn.fetchSemanticsNode().boundsInRoot
+        val rightBounds = rightBtn.fetchSemanticsNode().boundsInRoot
+        val idBounds = idBadge.fetchSemanticsNode().boundsInRoot
+        assertTrue(leftBounds.right <= rightBounds.left + 1f, "Turn left button should be to the left of turn right button")
+        assertTrue(rightBounds.right <= idBounds.left + 1f, "Turn right button should be to the left of ID badge")
+
+        // Click turn right button -> rotationSteps becomes 2 (180 degrees)
+        rightBtn.performClick()
+        waitForIdle()
+        assertEquals(2, notComp.rotationSteps)
+
+        // Click turn left button -> rotationSteps becomes 1 (90 degrees)
+        leftBtn.performClick()
+        waitForIdle()
+        assertEquals(1, notComp.rotationSteps)
+
+        // Press 'Q' shortcut in Edit mode -> rotationSteps becomes 0 (0 degrees)
+        canvasNode.performKeyInput { pressKey(Key.Q) }
+        waitForIdle()
+        assertEquals(0, notComp.rotationSteps)
+
+        // Press 'E' shortcut in Edit mode -> rotationSteps becomes 1 (90 degrees)
+        canvasNode.performKeyInput { pressKey(Key.E) }
+        waitForIdle()
+        assertEquals(1, notComp.rotationSteps)
+
+        // 3. Start placing a new AND gate, then press 'Delete' key to discard it before placement
+        onNodeWithTag("quick_insert_AND").performScrollTo().performClick()
+        waitForIdle()
+        assertNotNull(viewModel.pendingComponent)
+        canvasNode.performKeyInput { pressKey(Key.Delete) }
+        waitForIdle()
+        assertNull(viewModel.pendingComponent)
+        assertEquals(1, viewModel.components.size)
+
+        // 4. With notComp selected in Edit mode, press 'Delete' key to delete the selected component
+        assertEquals(notComp.ID, viewModel.selectedGateId)
+        canvasNode.performKeyInput { pressKey(Key.Delete) }
+        waitForIdle()
+        assertEquals(0, viewModel.components.size)
+        assertEquals(null, viewModel.selectedGateId)
     }
 }

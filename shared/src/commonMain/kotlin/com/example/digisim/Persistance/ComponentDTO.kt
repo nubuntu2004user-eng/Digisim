@@ -14,5 +14,6 @@ data class ComponentDto(
     val outputCount: Int,
     val label: String,
     val customLogic: MutableList<MutableList<SimulationComponent>>?,
-    val customName: String?
+    val customName: String?,
+    val rotationSteps: Int = 0
 )

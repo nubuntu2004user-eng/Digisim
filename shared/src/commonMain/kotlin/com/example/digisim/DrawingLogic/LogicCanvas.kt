@@ -2,10 +2,13 @@ package com.example.digisim.DrawingLogic
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -31,6 +34,16 @@ fun DigitalLogicSimulator(
 ) {
 
     val textMeasurer = rememberTextMeasurer()
+    val canvasFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(viewModel.pendingComponent, viewModel.selectedGateId, viewModel.currentMode) {
+        if (!viewModel.isTextInputFocused) {
+            try {
+                canvasFocusRequester.requestFocus()
+            } catch (_: Exception) {
+            }
+        }
+    }
 
     Row(modifier = modifier.fillMaxSize()) {
         Canvas(
@@ -39,6 +52,8 @@ fun DigitalLogicSimulator(
                 .fillMaxHeight()
                 .background(SettingsViewModel.default.canvasBackgroundColor)
                 .clip(RectangleShape)
+                .focusRequester(canvasFocusRequester)
+                .focusable()
                 .testTag("logic_canvas")
                 .pointerInput(Unit) {
                     awaitPointerEventScope {
@@ -52,6 +67,11 @@ fun DigitalLogicSimulator(
 
                             when (event.type) {
                                 PointerEventType.Press -> {
+                                    viewModel.isTextInputFocused = false
+                                    try {
+                                        canvasFocusRequester.requestFocus()
+                                    } catch (_: Exception) {
+                                    }
                                     lastPosition = position
                                     
                                     if (viewModel.pendingComponent != null) {
@@ -76,8 +96,7 @@ fun DigitalLogicSimulator(
                                     // Check if we hit a component
                                     val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
                                     val hitGate = viewModel.components.findLast { component ->
-                                        worldPosition.x in component.x..(component.x + component.width) &&
-                                                worldPosition.y in component.y..(component.y + component.height)
+                                        component.containsPoint(worldPosition)
                                     }
                                     
                                     if (hitGate != null && viewModel.currentMode != CanvasViewModel.editingMode.POKE) {
@@ -158,18 +177,19 @@ fun DigitalLogicSimulator(
                     if (viewModel.selectedGateId == component.ID) {
                         val pad = 6f
                         val settings = SettingsViewModel.default
+                        val bounds = component.rotatedBounds()
                         drawRect(
                             color = settings.accentTaupe,
-                            topLeft = Offset(component.x - pad, component.y - pad),
-                            size = androidx.compose.ui.geometry.Size(component.width + pad * 2f, component.height + pad * 2f),
+                            topLeft = Offset(bounds.left - pad, bounds.top - pad),
+                            size = androidx.compose.ui.geometry.Size(bounds.width + pad * 2f, bounds.height + pad * 2f),
                             style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2f)
                         )
                         // Swiss technical corner ticks
                         val c = 5f
-                        drawRect(color = settings.strongBorderColor, topLeft = Offset(component.x - pad - 2f, component.y - pad - 2f), size = androidx.compose.ui.geometry.Size(c, c))
-                        drawRect(color = settings.strongBorderColor, topLeft = Offset(component.x + component.width + pad - 3f, component.y - pad - 2f), size = androidx.compose.ui.geometry.Size(c, c))
-                        drawRect(color = settings.strongBorderColor, topLeft = Offset(component.x - pad - 2f, component.y + component.height + pad - 3f), size = androidx.compose.ui.geometry.Size(c, c))
-                        drawRect(color = settings.strongBorderColor, topLeft = Offset(component.x + component.width + pad - 3f, component.y + component.height + pad - 3f), size = androidx.compose.ui.geometry.Size(c, c))
+                        drawRect(color = settings.strongBorderColor, topLeft = Offset(bounds.left - pad - 2f, bounds.top - pad - 2f), size = androidx.compose.ui.geometry.Size(c, c))
+                        drawRect(color = settings.strongBorderColor, topLeft = Offset(bounds.right + pad - 3f, bounds.top - pad - 2f), size = androidx.compose.ui.geometry.Size(c, c))
+                        drawRect(color = settings.strongBorderColor, topLeft = Offset(bounds.left - pad - 2f, bounds.bottom + pad - 3f), size = androidx.compose.ui.geometry.Size(c, c))
+                        drawRect(color = settings.strongBorderColor, topLeft = Offset(bounds.right + pad - 3f, bounds.bottom + pad - 3f), size = androidx.compose.ui.geometry.Size(c, c))
                     }
                 }
 

@@ -86,12 +86,24 @@ fun App(
                 .fillMaxSize()
                 .background(settings.canvasBackgroundColor)
                 .onPreviewKeyEvent { event ->
-                    if (event.type == KeyEventType.KeyDown &&
-                        event.isCtrlPressed &&
-                        event.key == Key.Z
-                    ) {
-                        undoOnce(viewModel)
-                        true
+                    if (event.type == KeyEventType.KeyDown) {
+                        if (event.isCtrlPressed && event.key == Key.Z) {
+                            undoOnce(viewModel)
+                            true
+                        } else if (!viewModel.isTextInputFocused &&
+                            !event.isCtrlPressed &&
+                            !event.isAltPressed &&
+                            !event.isMetaPressed
+                        ) {
+                            when (event.key) {
+                                Key.Q -> viewModel.rotateActiveComponentLeft()
+                                Key.E -> viewModel.rotateActiveComponentRight()
+                                Key.Delete -> viewModel.deleteActiveComponent()
+                                else -> false
+                            }
+                        } else {
+                            false
+                        }
                     } else {
                         false
                     }

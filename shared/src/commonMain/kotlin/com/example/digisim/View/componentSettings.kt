@@ -13,6 +13,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +48,25 @@ fun componentSettings(
             settings = settings,
             trailingContent = {
                 if (selectedComponent != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        SwissButton(
+                            text = "↺",
+                            onClick = { selectedComponent.rotateLeft() },
+                            modifier = Modifier.testTag("rotate_left_button"),
+                            compact = true,
+                            settings = settings
+                        )
+                        SwissButton(
+                            text = "↻",
+                            onClick = { selectedComponent.rotateRight() },
+                            modifier = Modifier.testTag("rotate_right_button"),
+                            compact = true,
+                            settings = settings
+                        )
+                    }
                     SwissMonoBadge(
                         text = "ID:${selectedComponent.ID}",
                         settings = settings,
@@ -161,6 +182,7 @@ fun componentSettings(
                 SwissTextField(
                     value = userLabel,
                     onValueChange = { userLabel = it },
+                    modifier = Modifier.onFocusChanged { viewModel.isTextInputFocused = it.isFocused },
                     label = translationViewModel.getString("Component Label", lang),
                     placeholder = selectedComponent.componentType.name,
                     settings = settings,
@@ -193,6 +215,7 @@ fun componentSettings(
                     SwissTextField(
                         value = userInputCount,
                         onValueChange = { userInputCount = it },
+                        modifier = Modifier.onFocusChanged { viewModel.isTextInputFocused = it.isFocused },
                         label = translationViewModel.getString("Input count: ", lang) + selectedComponent.inputCount,
                         placeholder = translationViewModel.getString("Change input count", lang),
                         settings = settings,
@@ -376,13 +399,7 @@ fun componentSettings(
                 // Delete Component Action
                 SwissButton(
                     text = translationViewModel.getString("Delete Component", lang),
-                    onClick = {
-                        viewModel.wires.removeAll {
-                            it.sourceGateId == selectedComponent.ID || it.targetGateId == selectedComponent.ID
-                        }
-                        viewModel.components.remove(selectedComponent)
-                        viewModel.selectedGateId = null
-                    },
+                    onClick = { viewModel.deleteActiveComponent() },
                     isDanger = true,
                     modifier = Modifier.fillMaxWidth(),
                     settings = settings,

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import logicGates.SimulationComponent
@@ -24,6 +25,55 @@ abstract class Component(val ID: Int) {
 
     open var outputPin: Pin by mutableStateOf(Pin.LOW)
     open var label: String by mutableStateOf("")
+    open var rotationSteps: Int by mutableStateOf(0)
+
+    val rotationDegrees: Float
+        get() = (rotationSteps.mod(4)) * 90f
+
+    fun rotateLeft() {
+        rotationSteps = (rotationSteps - 1).mod(4)
+    }
+
+    fun rotateRight() {
+        rotationSteps = (rotationSteps + 1).mod(4)
+    }
+
+    fun rotatePoint(point: Offset): Offset {
+        val step = rotationSteps.mod(4)
+        if (step == 0) return point
+        val cx = x + width / 2f
+        val cy = y + height / 2f
+        val dx = point.x - cx
+        val dy = point.y - cy
+        return when (step) {
+            1 -> Offset(cx - dy, cy + dx) // 90 deg CW
+            2 -> Offset(cx - dx, cy - dy) // 180 deg
+            3 -> Offset(cx + dy, cy - dx) // 270 deg CW (90 CCW)
+            else -> point
+        }
+    }
+
+    fun rotatedBounds(): Rect {
+        val step = rotationSteps.mod(4)
+        return if (step == 1 || step == 3) {
+            val cx = x + width / 2f
+            val cy = y + height / 2f
+            Rect(
+                left = cx - height / 2f,
+                top = cy - width / 2f,
+                right = cx + height / 2f,
+                bottom = cy + width / 2f
+            )
+        } else {
+            Rect(left = x, top = y, right = x + width, bottom = y + height)
+        }
+    }
+
+    fun containsPoint(worldPos: Offset): Boolean {
+        val bounds = rotatedBounds()
+        return worldPos.x in bounds.left..bounds.right &&
+                worldPos.y in bounds.top..bounds.bottom
+    }
 
     @Transient
     val inputPins = mutableStateListOf<Pin>()
@@ -47,6 +97,15 @@ abstract class Component(val ID: Int) {
     abstract fun outputPortPositions(): List<Offset>
 
     abstract fun findPortOffset(): Offset // for elements with one pin
+
+    fun rotatedInputPortPositions(): List<Offset> =
+        inputPortPositions().map { rotatePoint(it) }
+
+    fun rotatedOutputPortPositions(): List<Offset> =
+        outputPortPositions().map { rotatePoint(it) }
+
+    fun rotatedFindPortOffset(): Offset =
+        rotatePoint(findPortOffset())
 }
 
 enum class ComponentType {

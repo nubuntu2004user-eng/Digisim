@@ -32,8 +32,7 @@ internal fun pokeComponent(
 ) {
     val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
     val hitGate = viewModel.components.findLast { component ->
-        worldPosition.x in component.x..(component.x + component.width) &&
-                worldPosition.y in component.y..(component.y + component.height)
+        component.containsPoint(worldPosition)
     }
 
     if (hitGate is Input) {
@@ -63,9 +62,9 @@ internal fun pokeComponent(
             }
         }
     } else if (hitGate is DipSwitch4BitComp) {
-        val outPositions = hitGate.outputPortPositions()
+        val outPositions = hitGate.rotatedOutputPortPositions()
         val closestIndex = outPositions.indices.minByOrNull { idx ->
-            kotlin.math.abs(worldPosition.y - outPositions[idx].y)
+            viewModel.distance(worldPosition, outPositions[idx])
         } ?: 0
         hitGate.toggleSwitch(closestIndex)
         if (simulation != null && simulation.isRunning) {
@@ -115,8 +114,7 @@ internal fun wirePins(viewModel: CanvasViewModel, position: Offset) {
 internal fun handleDrag(viewModel: CanvasViewModel , position: Offset){
     val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
     val hitGate = viewModel.components.findLast { component ->
-        worldPosition.x in component.x..(component.x + component.width) &&
-                worldPosition.y in component.y..(component.y + component.height)
+        component.containsPoint(worldPosition)
     }
     if (hitGate != null) {
         viewModel.dragState = DragState(
@@ -205,7 +203,9 @@ internal fun placePendingComponent(
         outputCount = pending.outputCount,
         logic = pending.abstractedLogic,
         name = pending.customComponentName
-    )
+    ).apply {
+        rotationSteps = pending.rotationSteps
+    }
     viewModel.components.add(placedComponent)
     viewModel.pendingComponent = null
 }
@@ -214,8 +214,7 @@ internal fun placePendingComponent(
 internal fun editComponent(viewModel: CanvasViewModel , position: Offset){
     val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
     val hitGate = viewModel.components.findLast { gate ->
-        worldPosition.x in gate.x..(gate.x + gate.width) &&
-                worldPosition.y in gate.y..(gate.y + gate.height)
+        gate.containsPoint(worldPosition)
     }
 
     if (hitGate != null){
