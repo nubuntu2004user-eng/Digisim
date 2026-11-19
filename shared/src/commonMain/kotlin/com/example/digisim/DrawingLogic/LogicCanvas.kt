@@ -174,18 +174,24 @@ fun DigitalLogicSimulator(
                 drawContext.canvas.save()
                 drawContext.canvas.translate(-viewModel.viewportX, -viewModel.viewportY)
                 
-                // Draw wires
+                // Draw wires (routed around components and non-overlapping)
+                val routedWirePaths = routeAllWires(viewModel.components, viewModel.wires)
                 viewModel.wires.forEach { wire ->
-                    val source = viewModel.components.find { it.ID == wire.sourceGateId }
-                    val target = viewModel.components.find { it.ID == wire.targetGateId }
-                    if (source != null && target != null) {
-                        drawWire(
-                            sourceComponent = source,
-                            sourcePortIndex = wire.sourcePortIndex,
-                            targetComponent = target,
-                            targetPortIndex = wire.targetPortIndex,
-                            color = wire.color
-                        )
+                    val points = routedWirePaths[wire.id]
+                    if (points != null && points.size >= 2) {
+                        drawRoutedWire(points = points, color = wire.color)
+                    } else {
+                        val source = viewModel.components.find { it.ID == wire.sourceGateId }
+                        val target = viewModel.components.find { it.ID == wire.targetGateId }
+                        if (source != null && target != null) {
+                            drawWire(
+                                sourceComponent = source,
+                                sourcePortIndex = wire.sourcePortIndex,
+                                targetComponent = target,
+                                targetPortIndex = wire.targetPortIndex,
+                                color = wire.color
+                            )
+                        }
                     }
                 }
 

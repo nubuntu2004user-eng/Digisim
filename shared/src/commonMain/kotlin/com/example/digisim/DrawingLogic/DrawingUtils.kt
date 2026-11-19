@@ -112,6 +112,24 @@ fun getWireHighlightColor(settings: SettingsViewModel = SettingsViewModel.defaul
     return settings.wireHighlightColor
 }
 
+internal fun DrawScope.drawRoutedWire(
+    points: List<Offset>,
+    color: Color
+) {
+    if (points.size < 2) return
+    val path = Path().apply {
+        moveTo(points.first().x, points.first().y)
+        for (i in 1 until points.size) {
+            lineTo(points[i].x, points[i].y)
+        }
+    }
+    drawPath(
+        path = path,
+        color = color,
+        style = Stroke(width = 3f)
+    )
+}
+
 internal fun DrawScope.drawWire(
     sourceComponent: Component,
     sourcePortIndex: Int,

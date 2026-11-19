@@ -11,6 +11,7 @@ import com.example.digisim.DrawingLogic.getComponentTextColor
 import com.example.digisim.DrawingLogic.handleDrag
 import com.example.digisim.DrawingLogic.placePendingComponent
 import com.example.digisim.DrawingLogic.pokeComponent
+import com.example.digisim.DrawingLogic.routeAllWires
 import com.example.digisim.DrawingLogic.startSelectionBox
 import com.example.digisim.DrawingLogic.updatePendingComponentPosition
 import com.example.digisim.DrawingLogic.updateSelectionBox
@@ -655,6 +656,70 @@ class SharedCommonTest {
         assertEquals(0, viewModel.wires.size)
         assertTrue(viewModel.selectedGateIds.isEmpty())
         assertNull(viewModel.selectedGateId)
+    }
+
+    @Test
+    fun testWireRoutingAvoidsComponentsAndPreventsCollinearOverlap() {
+        // 1. Place Input at (20, 100), an obstacle AND gate directly in the middle at (180, 100), and Output at (360, 100)
+        val in0 = Input(1, 20f, 100f, 0, 1)
+        val obstacle = And(2, 180f, 100f, 2, 1)
+        val out0 = Output(3, 360f, 100f, 1, 0)
+        val wire1 = Wire(10, 1, 0, 3, 0)
+
+        val routed1 = routeAllWires(listOf(in0, obstacle, out0), listOf(wire1))
+        val path1 = routed1[10]
+        assertNotNull(path1)
+        assertTrue(path1.size >= 4, "Expected routed detour around obstacle, got $path1")
+
+        val obsBounds = obstacle.rotatedBounds()
+        // Check that no segment of path1 passes through the interior of obstacle's bounds
+        for (i in 0 until path1.size - 1) {
+            val a = path1[i]
+            val b = path1[i + 1]
+            // Sample points along segment
+            for (step in 0..20) {
+                val t = step / 20f
+                val px = a.x + (b.x - a.x) * t
+                val py = a.y + (b.y - a.y) * t
+                val insideObstacle = px > obsBounds.left + 1f && px < obsBounds.right - 1f &&
+                        py > obsBounds.top + 1f && py < obsBounds.bottom - 1f
+                assertTrue(!insideObstacle, "Wire segment ($a -> $b) passed through obstacle at ($px, $py)")
+            }
+        }
+
+        // 2. Test two wires whose default midX vertical trunks or horizontal paths would overlap
+        val inA = Input(1, 20f, 60f, 0, 1)
+        val inB = Input(2, 20f, 140f, 0, 1)
+        val outA = Output(3, 300f, 140f, 1, 0)
+        val outB = Output(4, 300f, 60f, 1, 0)
+        val wA = Wire(20, 1, 0, 3, 0)
+        val wB = Wire(21, 2, 0, 4, 0)
+
+        val routed2 = routeAllWires(listOf(inA, inB, outA, outB), listOf(wA, wB))
+        val pA = routed2[20]!!
+        val pB = routed2[21]!!
+
+        // Verify no horizontal segment of pA overlaps collinearly with any horizontal segment of pB,
+        // and no vertical segment of pA overlaps collinearly with any vertical segment of pB
+        for (i in 0 until pA.size - 1) {
+            val a1 = pA[i]
+            val a2 = pA[i + 1]
+            val aHoriz = kotlin.math.abs(a1.y - a2.y) < 0.5f
+            for (j in 0 until pB.size - 1) {
+                val b1 = pB[j]
+                val b2 = pB[j + 1]
+                val bHoriz = kotlin.math.abs(b1.y - b2.y) < 0.5f
+                if (aHoriz && bHoriz && kotlin.math.abs(a1.y - b1.y) < 0.5f) {
+                    val overlapStart = maxOf(minOf(a1.x, a2.x), minOf(b1.x, b2.x))
+                    val overlapEnd = minOf(maxOf(a1.x, a2.x), maxOf(b1.x, b2.x))
+                    assertTrue(overlapEnd - overlapStart <= 1f, "Collinear horizontal overlap between $pA and $pB")
+                } else if (!aHoriz && !bHoriz && kotlin.math.abs(a1.x - b1.x) < 0.5f) {
+                    val overlapStart = maxOf(minOf(a1.y, a2.y), minOf(b1.y, b2.y))
+                    val overlapEnd = minOf(maxOf(a1.y, a2.y), maxOf(b1.y, b2.y))
+                    assertTrue(overlapEnd - overlapStart <= 1f, "Collinear vertical overlap between $pA and $pB")
+                }
+            }
+        }
     }
 }
 
