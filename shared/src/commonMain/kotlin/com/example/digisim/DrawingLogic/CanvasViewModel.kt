@@ -66,6 +66,10 @@ class CanvasViewModel: ViewModel() {
     var currentWiringColor = Color.Blue
 
     var selectedGateId by mutableStateOf<Int?>(null)
+    val selectedGateIds = mutableStateListOf<Int>()
+
+    var selectionBoxStart by mutableStateOf<Offset?>(null)
+    var selectionBoxEnd by mutableStateOf<Offset?>(null)
 
     val components = mutableStateListOf<Component>()
 
@@ -81,23 +85,40 @@ class CanvasViewModel: ViewModel() {
     var isTextInputFocused by mutableStateOf(false)
 //    var isPanning by mutableStateOf(false)
 
+    private fun resolveActiveComponentsForAction(): List<Component> {
+        val ids = linkedSetOf<Int>()
+        ids.addAll(selectedGateIds)
+        selectedGateId?.let { ids.add(it) }
+        dragState?.let { state ->
+            ids.add(state.componentId)
+            ids.addAll(state.groupOffsets.keys)
+        }
+        return ids.mapNotNull { findGate(it) }
+    }
+
+    fun clearSelection() {
+        selectedGateIds.clear()
+        selectedGateId = null
+    }
+
+    fun selectSingleGate(id: Int?) {
+        selectedGateIds.clear()
+        if (id != null) {
+            selectedGateIds.add(id)
+        }
+        selectedGateId = id
+    }
+
     fun rotateActiveComponentLeft(): Boolean {
         val pending = pendingComponent
         if (pending != null) {
             pending.rotateLeft()
             return true
         }
-        val dragging = dragState?.let { findGate(it.componentId) }
-        if (dragging != null) {
-            dragging.rotateLeft()
+        val targets = resolveActiveComponentsForAction()
+        if (targets.isNotEmpty()) {
+            targets.forEach { it.rotateLeft() }
             return true
-        }
-        if (currentMode == editingMode.EDIT) {
-            val selected = selectedGateId?.let { findGate(it) }
-            if (selected != null) {
-                selected.rotateLeft()
-                return true
-            }
         }
         return false
     }
@@ -108,17 +129,10 @@ class CanvasViewModel: ViewModel() {
             pending.rotateRight()
             return true
         }
-        val dragging = dragState?.let { findGate(it.componentId) }
-        if (dragging != null) {
-            dragging.rotateRight()
+        val targets = resolveActiveComponentsForAction()
+        if (targets.isNotEmpty()) {
+            targets.forEach { it.rotateRight() }
             return true
-        }
-        if (currentMode == editingMode.EDIT) {
-            val selected = selectedGateId?.let { findGate(it) }
-            if (selected != null) {
-                selected.rotateRight()
-                return true
-            }
         }
         return false
     }
@@ -128,19 +142,21 @@ class CanvasViewModel: ViewModel() {
             pendingComponent = null
             return true
         }
-        if (currentMode == editingMode.EDIT || selectedGateId != null) {
-            val selected = selectedGateId?.let { findGate(it) }
-            if (selected != null) {
-                wires.removeAll {
-                    it.sourceGateId == selected.ID || it.targetGateId == selected.ID
-                }
-                components.remove(selected)
-                if (dragState?.componentId == selected.ID) {
-                    dragState = null
-                }
-                selectedGateId = null
-                return true
+        val targets = resolveActiveComponentsForAction()
+        if (targets.isNotEmpty()) {
+            val targetIds = targets.map { it.ID }.toSet()
+            wires.removeAll {
+                it.sourceGateId in targetIds || it.targetGateId in targetIds
             }
+            components.removeAll { it.ID in targetIds }
+            if (dragState != null && (dragState!!.componentId in targetIds || dragState!!.groupOffsets.keys.any { it in targetIds })) {
+                dragState = null
+            }
+            selectedGateIds.removeAll { it in targetIds }
+            if (selectedGateId in targetIds) {
+                selectedGateId = selectedGateIds.firstOrNull()
+            }
+            return true
         }
         return false
     }

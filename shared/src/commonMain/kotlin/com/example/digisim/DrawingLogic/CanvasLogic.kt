@@ -1,6 +1,7 @@
 package com.example.digisim.DrawingLogic
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.PointerEvent
 import com.example.digisim.Wiring.Button
 import com.example.digisim.Wiring.Input
@@ -117,15 +118,58 @@ internal fun handleDrag(viewModel: CanvasViewModel , position: Offset){
         component.containsPoint(worldPosition)
     }
     if (hitGate != null) {
+        if (hitGate.ID !in viewModel.selectedGateIds) {
+            viewModel.selectSingleGate(hitGate.ID)
+        } else {
+            viewModel.selectedGateId = hitGate.ID
+        }
+        val groupOffsets = viewModel.selectedGateIds
+            .mapNotNull { id -> viewModel.findGate(id) }
+            .associate { comp ->
+                comp.ID to Offset(worldPosition.x - comp.x, worldPosition.y - comp.y)
+            }
         viewModel.dragState = DragState(
             componentId = hitGate.ID,
             pointerOffset = Offset(worldPosition.x - hitGate.x, worldPosition.y - hitGate.y),
             originalX = hitGate.x,
-            originalY = hitGate.y
+            originalY = hitGate.y,
+            groupOffsets = groupOffsets
         )
     } else {
         viewModel.wireSource = null
     }
+}
+
+internal fun startSelectionBox(viewModel: CanvasViewModel, position: Offset) {
+    val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
+    viewModel.clearSelection()
+    viewModel.selectionBoxStart = worldPosition
+    viewModel.selectionBoxEnd = worldPosition
+}
+
+internal fun updateSelectionBox(viewModel: CanvasViewModel, position: Offset) {
+    val start = viewModel.selectionBoxStart ?: return
+    val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
+    viewModel.selectionBoxEnd = worldPosition
+
+    val minX = minOf(start.x, worldPosition.x)
+    val maxX = maxOf(start.x, worldPosition.x)
+    val minY = minOf(start.y, worldPosition.y)
+    val maxY = maxOf(start.y, worldPosition.y)
+    val boxRect = Rect(minX, minY, maxX, maxY)
+
+    viewModel.selectedGateIds.clear()
+    viewModel.components.forEach { comp ->
+        if (boxRect.overlaps(comp.rotatedBounds())) {
+            viewModel.selectedGateIds.add(comp.ID)
+        }
+    }
+    viewModel.selectedGateId = viewModel.selectedGateIds.firstOrNull()
+}
+
+internal fun finishSelectionBox(viewModel: CanvasViewModel) {
+    viewModel.selectionBoxStart = null
+    viewModel.selectionBoxEnd = null
 }
 
 internal fun dragComponent(
@@ -135,19 +179,38 @@ internal fun dragComponent(
     canvasHeight: Float = Float.MAX_VALUE
 ) {
     viewModel.dragState?.let { state ->
-        val component = viewModel.findGate(state.componentId)
-        if (component != null) {
-            val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
-            val rawX = worldPosition.x - state.pointerOffset.x
-            val rawY = worldPosition.y - state.pointerOffset.y
-            val maxX = (canvasWidth - component.width).coerceAtLeast(0f)
-            val maxY = (canvasHeight - component.height).coerceAtLeast(0f)
-            val newX = snap(rawX).coerceIn(0f, maxX)
-            val newY = snap(rawY).coerceIn(0f, maxY)
-            val index = viewModel.components.indexOf(component)
-            if (index != -1) {
-                viewModel.components[index].x = newX
-                viewModel.components[index].y = newY
+        val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
+        if (state.groupOffsets.size > 1) {
+            state.groupOffsets.forEach { (id, offset) ->
+                val comp = viewModel.findGate(id)
+                if (comp != null) {
+                    val rawX = worldPosition.x - offset.x
+                    val rawY = worldPosition.y - offset.y
+                    val maxX = (canvasWidth - comp.width).coerceAtLeast(0f)
+                    val maxY = (canvasHeight - comp.height).coerceAtLeast(0f)
+                    val newX = snap(rawX).coerceIn(0f, maxX)
+                    val newY = snap(rawY).coerceIn(0f, maxY)
+                    val index = viewModel.components.indexOf(comp)
+                    if (index != -1) {
+                        viewModel.components[index].x = newX
+                        viewModel.components[index].y = newY
+                    }
+                }
+            }
+        } else {
+            val component = viewModel.findGate(state.componentId)
+            if (component != null) {
+                val rawX = worldPosition.x - state.pointerOffset.x
+                val rawY = worldPosition.y - state.pointerOffset.y
+                val maxX = (canvasWidth - component.width).coerceAtLeast(0f)
+                val maxY = (canvasHeight - component.height).coerceAtLeast(0f)
+                val newX = snap(rawX).coerceIn(0f, maxX)
+                val newY = snap(rawY).coerceIn(0f, maxY)
+                val index = viewModel.components.indexOf(component)
+                if (index != -1) {
+                    viewModel.components[index].x = newX
+                    viewModel.components[index].y = newY
+                }
             }
         }
     }
@@ -218,8 +281,9 @@ internal fun editComponent(viewModel: CanvasViewModel , position: Offset){
     }
 
     if (hitGate != null){
-
-        viewModel.selectedGateId = hitGate.ID
+        viewModel.selectSingleGate(hitGate.ID)
+    } else {
+        viewModel.clearSelection()
     }
 
 }

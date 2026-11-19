@@ -26,6 +26,7 @@ data class DragState(
     val componentId: Int,
     val pointerOffset: Offset,
     val originalX: Float,
-    val originalY: Float
+    val originalY: Float,
+    val groupOffsets: Map<Int, Offset> = emptyMap()
 )
 

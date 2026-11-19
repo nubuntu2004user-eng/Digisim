@@ -1030,4 +1030,116 @@ class SharedLogicDesktopTest {
         assertEquals(0, viewModel.components.size)
         assertEquals(null, viewModel.selectedGateId)
     }
+
+    /**
+     * Playwright-style Test 10:
+     * Verifies single-click selection in DRAG mode, left-button drag marquee multi-selection,
+     * group dragging, group rotation with Q/E, group deletion with Delete, and right-mouse-button canvas panning.
+     */
+    @Test
+    fun testDragModeMultiSelectionGroupDragRotateDeleteAndRightClickPan() = runComposeUiTest {
+        val viewModel = CanvasViewModel()
+        val simulation = SimulationViewModel()
+        val librariesVm = ComponentLibrariesViewModel()
+        val clockManager = ClockManager()
+        val translationVm = TranslationViewModel()
+        val appState = AppState()
+
+        setContent {
+            Box(modifier = Modifier.size(1280.dp, 820.dp)) {
+                App(
+                    viewModel = viewModel,
+                    simulation = simulation,
+                    librariesViewModel = librariesVm,
+                    clockManager = clockManager,
+                    translationViewModel = translationVm,
+                    appState = appState
+                )
+            }
+        }
+        waitForIdle()
+
+        val canvasNode = onNodeWithTag("logic_canvas").assertExists()
+
+        // 1. Place two AND gates in DRAG mode at (140, 140) and (280, 140)
+        onNodeWithTag("quick_insert_AND").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(140f, 140f)) }
+        waitForIdle()
+
+        onNodeWithTag("quick_insert_AND").performScrollTo().performClick()
+        waitForIdle()
+        canvasNode.performMouseInput { click(Offset(280f, 140f)) }
+        waitForIdle()
+
+        assertEquals(2, viewModel.components.size)
+        val c1 = viewModel.components[0]
+        val c2 = viewModel.components[1]
+        assertEquals(CanvasViewModel.editingMode.DRAG, viewModel.currentMode)
+
+        // 2. Single-click c1 in DRAG mode -> highlights/selects c1 and allows rotating with E/Q
+        val c1Center = Offset(c1.x + c1.width / 2f, c1.y + c1.height / 2f)
+        canvasNode.performMouseInput { click(c1Center) }
+        waitForIdle()
+        assertEquals(c1.ID, viewModel.selectedGateId)
+        assertTrue(c1.ID in viewModel.selectedGateIds)
+
+        canvasNode.performKeyInput { pressKey(Key.E) }
+        waitForIdle()
+        assertEquals(1, c1.rotationSteps)
+        canvasNode.performKeyInput { pressKey(Key.Q) }
+        waitForIdle()
+        assertEquals(0, c1.rotationSteps)
+
+        // 3. Left-click and drag across empty canvas from (50, 50) to (400, 260) to select both c1 and c2
+        canvasNode.performMouseInput {
+            moveTo(Offset(50f, 50f))
+            press( MouseButton.Primary )
+            moveTo(Offset(400f, 260f))
+            release( MouseButton.Primary )
+        }
+        waitForIdle()
+        assertEquals(2, viewModel.selectedGateIds.size)
+        assertTrue(c1.ID in viewModel.selectedGateIds)
+        assertTrue(c2.ID in viewModel.selectedGateIds)
+
+        // 4. Drag c1 by +60px X, +60px Y -> both c1 and c2 move together
+        val origC1X = c1.x
+        val origC2X = c2.x
+        val startDragPos = Offset(c1.x + c1.width / 2f, c1.y + c1.height / 2f)
+        canvasNode.performMouseInput {
+            moveTo(startDragPos)
+            press(MouseButton.Primary)
+            moveTo(startDragPos + Offset(60f, 60f))
+            release(MouseButton.Primary)
+        }
+        waitForIdle()
+        assertEquals(origC1X + 60f, c1.x)
+        assertEquals(origC2X + 60f, c2.x)
+
+        // 5. Press 'E' -> both selected components rotate 90 degrees right
+        canvasNode.performKeyInput { pressKey(Key.E) }
+        waitForIdle()
+        assertEquals(1, c1.rotationSteps)
+        assertEquals(1, c2.rotationSteps)
+
+        // 6. Right-mouse-button drag pans the canvas viewport
+        assertEquals(0f, viewModel.viewportX)
+        assertEquals(0f, viewModel.viewportY)
+        canvasNode.performMouseInput {
+            moveTo(Offset(500f, 300f))
+            press(MouseButton.Secondary)
+            moveTo(Offset(450f, 260f))
+            release(MouseButton.Secondary)
+        }
+        waitForIdle()
+        assertEquals(50f, viewModel.viewportX)
+        assertEquals(40f, viewModel.viewportY)
+
+        // 7. Press 'Delete' -> deletes all selected components in DRAG mode
+        canvasNode.performKeyInput { pressKey(Key.Delete) }
+        waitForIdle()
+        assertEquals(0, viewModel.components.size)
+        assertTrue(viewModel.selectedGateIds.isEmpty())
+    }
 }

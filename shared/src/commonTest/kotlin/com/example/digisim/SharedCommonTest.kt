@@ -5,12 +5,15 @@ import androidx.compose.ui.graphics.Color
 import com.example.digisim.DrawingLogic.CanvasViewModel
 import com.example.digisim.DrawingLogic.createComponent
 import com.example.digisim.DrawingLogic.dragComponent
+import com.example.digisim.DrawingLogic.finishSelectionBox
 import com.example.digisim.DrawingLogic.getComponentInnerRectColor
 import com.example.digisim.DrawingLogic.getComponentTextColor
 import com.example.digisim.DrawingLogic.handleDrag
 import com.example.digisim.DrawingLogic.placePendingComponent
 import com.example.digisim.DrawingLogic.pokeComponent
+import com.example.digisim.DrawingLogic.startSelectionBox
 import com.example.digisim.DrawingLogic.updatePendingComponentPosition
+import com.example.digisim.DrawingLogic.updateSelectionBox
 import com.example.digisim.DrawingLogic.wirePins
 import com.example.digisim.FlipFlops.DFlipFlop
 import com.example.digisim.FlipFlops.JKFlipFlop
@@ -595,6 +598,63 @@ class SharedCommonTest {
         assertNull(viewModel.selectedGateId)
         assertEquals(1, viewModel.components.size)
         assertEquals(0, viewModel.wires.size)
+    }
+
+    @Test
+    fun testMultiComponentBoxSelectionGroupDragRotateAndDelete() {
+        val viewModel = CanvasViewModel()
+        viewModel.currentMode = CanvasViewModel.editingMode.DRAG
+
+        val g1 = And(1, 100f, 100f, 2, 1)
+        val g2 = And(2, 220f, 100f, 2, 1)
+        val g3 = Output(3, 450f, 300f, 1, 0)
+        viewModel.components.addAll(listOf(g1, g2, g3))
+        viewModel.wires.add(Wire(10, 1, 0, 2, 0))
+        viewModel.wires.add(Wire(11, 2, 0, 3, 0))
+
+        // 1. Clicking a single component in DRAG mode selects and highlights it
+        handleDrag(viewModel, Offset(120f, 120f))
+        assertEquals(1, viewModel.selectedGateId)
+        assertEquals(listOf(1), viewModel.selectedGateIds.toList())
+        viewModel.dragState = null
+
+        // Rotate and verify it works in DRAG mode on single selected component
+        assertTrue(viewModel.rotateActiveComponentRight())
+        assertEquals(1, g1.rotationSteps)
+        assertTrue(viewModel.rotateActiveComponentLeft())
+        assertEquals(0, g1.rotationSteps)
+
+        // 2. Marquee box selection over g1 and g2 (excluding g3)
+        startSelectionBox(viewModel, Offset(80f, 80f))
+        updateSelectionBox(viewModel, Offset(320f, 200f))
+        finishSelectionBox(viewModel)
+
+        assertEquals(listOf(1, 2), viewModel.selectedGateIds.toList())
+
+        // 3. Dragging g1 moves both g1 and g2 together while keeping g3 stationary
+        handleDrag(viewModel, Offset(120f, 120f))
+        dragComponent(viewModel, Offset(160f, 180f), 1000f, 1000f)
+        viewModel.dragState = null
+
+        assertEquals(140f, g1.x)
+        assertEquals(160f, g1.y)
+        assertEquals(260f, g2.x)
+        assertEquals(160f, g2.y)
+        assertEquals(450f, g3.x)
+        assertEquals(300f, g3.y)
+
+        // 4. Rotating right rotates both selected components (g1 and g2), leaving g3 at 0
+        assertTrue(viewModel.rotateActiveComponentRight())
+        assertEquals(1, g1.rotationSteps)
+        assertEquals(1, g2.rotationSteps)
+        assertEquals(0, g3.rotationSteps)
+
+        // 5. Deleting deletes both selected components (g1 and g2) and their connected wires
+        assertTrue(viewModel.deleteActiveComponent())
+        assertEquals(listOf(g3), viewModel.components.toList())
+        assertEquals(0, viewModel.wires.size)
+        assertTrue(viewModel.selectedGateIds.isEmpty())
+        assertNull(viewModel.selectedGateId)
     }
 }
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -36,7 +37,12 @@ fun DigitalLogicSimulator(
     val textMeasurer = rememberTextMeasurer()
     val canvasFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(viewModel.pendingComponent, viewModel.selectedGateId, viewModel.currentMode) {
+    LaunchedEffect(
+        viewModel.pendingComponent,
+        viewModel.selectedGateId,
+        viewModel.selectedGateIds.size,
+        viewModel.currentMode
+    ) {
         if (!viewModel.isTextInputFocused) {
             try {
                 canvasFocusRequester.requestFocus()
@@ -73,6 +79,12 @@ fun DigitalLogicSimulator(
                                     } catch (_: Exception) {
                                     }
                                     lastPosition = position
+
+                                    // Right mouse button pans around the canvas
+                                    if (event.buttons.isSecondaryPressed) {
+                                        isPanning = true
+                                        continue
+                                    }
                                     
                                     if (viewModel.pendingComponent != null) {
                                         placePendingComponent(viewModel, position, canvasWidth, canvasHeight)
@@ -91,9 +103,10 @@ fun DigitalLogicSimulator(
 
                                     else if (viewModel.currentMode == CanvasViewModel.editingMode.POKE){
                                         pokeComponent(viewModel, simulation, scope, position , clockManager )
+                                        continue
                                     }
 
-                                    // Check if we hit a component
+                                    // Check if we hit a component in DRAG mode
                                     val worldPosition = screenToWorld(position, viewModel.viewportX, viewModel.viewportY)
                                     val hitGate = viewModel.components.findLast { component ->
                                         component.containsPoint(worldPosition)
@@ -101,8 +114,8 @@ fun DigitalLogicSimulator(
                                     
                                     if (hitGate != null && viewModel.currentMode != CanvasViewModel.editingMode.POKE) {
                                         handleDrag(viewModel, position)
-                                    } else if (hitGate == null) {
-                                        isPanning = true
+                                    } else if (hitGate == null && viewModel.currentMode == CanvasViewModel.editingMode.DRAG) {
+                                        startSelectionBox(viewModel, position)
                                     }
                                 }
                                 PointerEventType.Move -> {
@@ -113,6 +126,8 @@ fun DigitalLogicSimulator(
                                         lastPosition = position
                                     } else if (viewModel.pendingComponent != null) {
                                         updatePendingComponentPosition(viewModel, position, canvasWidth, canvasHeight)
+                                    } else if (viewModel.selectionBoxStart != null) {
+                                        updateSelectionBox(viewModel, position)
                                     } else if (viewModel.currentMode == CanvasViewModel.editingMode.DRAG){
                                         dragComponent(viewModel, event, canvasWidth, canvasHeight)
                                     }
@@ -129,6 +144,9 @@ fun DigitalLogicSimulator(
                                 PointerEventType.Release -> {
                                     isPanning = false
                                     viewModel.dragState = null
+                                    if (viewModel.selectionBoxStart != null) {
+                                        finishSelectionBox(viewModel)
+                                    }
                                 }
                             }
                         }
@@ -174,7 +192,8 @@ fun DigitalLogicSimulator(
                 //Draw All
                 viewModel.components.forEach { component ->
                     drawComponent(component , textMeasurer , SettingsViewModel.default)
-                    if (viewModel.selectedGateId == component.ID) {
+                    val isSelected = viewModel.selectedGateId == component.ID || component.ID in viewModel.selectedGateIds
+                    if (isSelected) {
                         val pad = 6f
                         val settings = SettingsViewModel.default
                         val bounds = component.rotatedBounds()
@@ -191,6 +210,28 @@ fun DigitalLogicSimulator(
                         drawRect(color = settings.strongBorderColor, topLeft = Offset(bounds.left - pad - 2f, bounds.bottom + pad - 3f), size = androidx.compose.ui.geometry.Size(c, c))
                         drawRect(color = settings.strongBorderColor, topLeft = Offset(bounds.right + pad - 3f, bounds.bottom + pad - 3f), size = androidx.compose.ui.geometry.Size(c, c))
                     }
+                }
+
+                // Draw active rubber-band selection box
+                val selStart = viewModel.selectionBoxStart
+                val selEnd = viewModel.selectionBoxEnd
+                if (selStart != null && selEnd != null) {
+                    val left = minOf(selStart.x, selEnd.x)
+                    val top = minOf(selStart.y, selEnd.y)
+                    val width = kotlin.math.abs(selEnd.x - selStart.x)
+                    val height = kotlin.math.abs(selEnd.y - selStart.y)
+                    val settings = SettingsViewModel.default
+                    drawRect(
+                        color = settings.accentTaupe.copy(alpha = 0.15f),
+                        topLeft = Offset(left, top),
+                        size = androidx.compose.ui.geometry.Size(width, height)
+                    )
+                    drawRect(
+                        color = settings.accentTaupe,
+                        topLeft = Offset(left, top),
+                        size = androidx.compose.ui.geometry.Size(width, height),
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.5f)
+                    )
                 }
 
 
