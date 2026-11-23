@@ -2,7 +2,7 @@
 
 World first digital logic simulator with embedded mcp protocol aiming to accelerate development of circuits with usage of large language models inspired by [Logisim](https://github.com/logisim-evolution/logisim-evolution) and [Digital](https://github.com/hneemann/Digital).
 
-> ⚠️ **This is a pre-release build.** Expect bugs and missing features — but it's already usable by beginners looking to learn the basics of digital logic.
+
 
 ## Features
 
@@ -32,6 +32,7 @@ World first digital logic simulator with embedded mcp protocol aiming to acceler
 
 - Undo multiple button ( under “Edit” menu)
 
+- And much more
 ## Getting Started
 
 1. Go to the [Releases](file:///home/nubuntu/releases) tab
